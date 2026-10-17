@@ -1,0 +1,9 @@
+packages:
+  - 'packages/**'
+  - '!packages/**/.venv'
+
+allowBuilds:
+  sharp: false
+  unrs-resolver: false
+
+minimumReleaseAge: 0

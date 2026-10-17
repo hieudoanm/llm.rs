@@ -1,0 +1,912 @@
+{
+  "info": {
+    "name": "mlrs Training API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Local FastAPI contract for the scikit-learn-client platform. ONNX is the required training artefact.",
+    "version": "0.1.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:8000"
+    }
+  ],
+  "item": [
+    {
+      "name": "GET /healthz",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/healthz",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "healthz"
+          ]
+        },
+        "description": "Liveness"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /readyz",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/readyz",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "readyz"
+          ]
+        },
+        "description": "Readiness (PostgreSQL)"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /health/worker",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health/worker",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health",
+            "worker"
+          ]
+        },
+        "description": "Worker status"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /api/v1/algorithms",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/algorithms",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "algorithms"
+          ],
+          "query": [
+            {
+              "key": "taskType",
+              "value": "",
+              "description": ""
+            }
+          ]
+        },
+        "description": "Algorithm catalogue"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "POST /api/v1/datasets",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/datasets",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "datasets"
+          ]
+        },
+        "description": "Upload CSV dataset"
+      },
+      "response": [
+        {
+          "name": "201",
+          "status": "OK",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /api/v1/datasets/{dataset_id}",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/datasets/{dataset_id}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "datasets",
+            ":dataset_id"
+          ],
+          "variable": [
+            {
+              "key": "dataset_id",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ]
+        },
+        "description": "Dataset metadata"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /api/v1/datasets/{dataset_id}/insights",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/datasets/{dataset_id}/insights",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "datasets",
+            ":dataset_id",
+            "insights"
+          ],
+          "variable": [
+            {
+              "key": "dataset_id",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "query": [
+            {
+              "key": "previewLimit",
+              "value": "10",
+              "description": ""
+            },
+            {
+              "key": "previewOffset",
+              "value": "",
+              "description": ""
+            }
+          ]
+        },
+        "description": "Dataset insights"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /api/v1/jobs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "jobs"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20",
+              "description": ""
+            },
+            {
+              "key": "cursor",
+              "value": "",
+              "description": ""
+            },
+            {
+              "key": "status",
+              "value": "",
+              "description": ""
+            },
+            {
+              "key": "taskType",
+              "value": "",
+              "description": ""
+            },
+            {
+              "key": "algorithmId",
+              "value": "",
+              "description": ""
+            },
+            {
+              "key": "tag",
+              "value": "",
+              "description": ""
+            },
+            {
+              "key": "q",
+              "value": "",
+              "description": ""
+            },
+            {
+              "key": "createdFrom",
+              "value": "",
+              "description": ""
+            },
+            {
+              "key": "createdTo",
+              "value": "",
+              "description": ""
+            },
+            {
+              "key": "sort",
+              "value": "",
+              "description": ""
+            }
+          ]
+        },
+        "description": "List training jobs"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "POST /api/v1/jobs",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/jobs",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "jobs"
+          ]
+        },
+        "description": "Enqueue training job",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [
+        {
+          "name": "202",
+          "status": "OK",
+          "code": 202,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /api/v1/jobs/compare",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/jobs/compare",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "jobs",
+            "compare"
+          ],
+          "query": [
+            {
+              "key": "ids",
+              "value": "",
+              "description": ""
+            }
+          ]
+        },
+        "description": "Compare 2-5 jobs"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /api/v1/jobs/artefacts.zip",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/jobs/artefacts.zip",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "jobs",
+            "artefacts.zip"
+          ],
+          "query": [
+            {
+              "key": "ids",
+              "value": "",
+              "description": ""
+            }
+          ]
+        },
+        "description": "Download the artefacts of several jobs as a ZIP bundle"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": ""
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /api/v1/jobs/{job_id}",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/jobs/{job_id}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "jobs",
+            ":job_id"
+          ],
+          "variable": [
+            {
+              "key": "job_id",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ]
+        },
+        "description": "Poll job status"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "PATCH /api/v1/jobs/{job_id}",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/jobs/{job_id}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "jobs",
+            ":job_id"
+          ],
+          "variable": [
+            {
+              "key": "job_id",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ]
+        },
+        "description": "Update job name and tags",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "DELETE /api/v1/jobs/{job_id}",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/jobs/{job_id}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "jobs",
+            ":job_id"
+          ],
+          "variable": [
+            {
+              "key": "job_id",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ]
+        },
+        "description": "Delete job and files"
+      },
+      "response": [
+        {
+          "name": "204",
+          "status": "OK",
+          "code": 204,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": ""
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /api/v1/jobs/{job_id}/artefacts.zip",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/jobs/{job_id}/artefacts.zip",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "jobs",
+            ":job_id",
+            "artefacts.zip"
+          ],
+          "variable": [
+            {
+              "key": "job_id",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ]
+        },
+        "description": "Download the artefacts of one job as a ZIP bundle"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": ""
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /api/v1/jobs/{job_id}/artefacts/{artefact_id}",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/v1/jobs/{job_id}/artefacts/{artefact_id}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "jobs",
+            "{job_id}",
+            "artefacts",
+            ":artefact_id"
+          ],
+          "variable": [
+            {
+              "key": "artefact_id",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ]
+        },
+        "description": "Download artefact"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        },
+        {
+          "name": "422",
+          "status": "Client Error",
+          "code": 422,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    },
+    {
+      "name": "GET /",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": []
+        },
+        "description": "Service banner"
+      },
+      "response": [
+        {
+          "name": "200",
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "header": [
+            {
+              "key": "X-Request-ID",
+              "value": "e7f8a9b0-1c2d-4e5f-8a9b-0c1d2e3f4a5b"
+            }
+          ],
+          "body": "{}"
+        }
+      ]
+    }
+  ]
+}

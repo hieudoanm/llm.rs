@@ -1,0 +1,166 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "26"
+  DATABASE_URL: sqlite:////tmp/mlrs-data/mlrs.db
+  MLRS_DATA_DIR: /tmp/mlrs-data
+
+jobs:
+  frontend:
+    name: Front-end
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.16.1
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install frontend dependencies
+        working-directory: ${{ github.workspace }}/packages/frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Run frontend lint
+        working-directory: ${{ github.workspace }}/packages/frontend
+        run: pnpm run lint
+
+      - name: Run frontend typecheck
+        working-directory: ${{ github.workspace }}/packages/frontend
+        run: pnpm exec tsc --noEmit
+
+      - name: Run frontend unit tests
+        working-directory: ${{ github.workspace }}/packages/frontend
+        run: pnpm run test:coverage
+
+      - name: Build frontend
+        working-directory: ${{ github.workspace }}/packages/frontend
+        run: pnpm run build
+
+  backend:
+    name: Back-end (Rust)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust check
+        working-directory: ${{ github.workspace }}/crates
+        run: cargo check --workspace --all-targets
+
+      - name: Run Rust tests
+        working-directory: ${{ github.workspace }}/crates
+        run: cargo test --workspace
+
+  e2e:
+    name: End-to-End
+    needs: [frontend, backend]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.1.0
+        with:
+          version: 12.16.1
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install frontend dependencies
+        working-directory: ${{ github.workspace }}/packages/frontend
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        working-directory: ${{ github.workspace }}/packages/frontend
+        run: pnpm exec playwright install --with-deps
+
+      - name: Build Rust backend
+        working-directory: ${{ github.workspace }}/crates
+        run: cargo build -p mlrs-server
+
+      - name: Start Rust backend
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          MLRS_DATA_DIR: ${{ env.MLRS_DATA_DIR }}
+          MLRS_HOST: 127.0.0.1
+          MLRS_PORT: 8000
+        working-directory: ${{ github.workspace }}/crates
+        run: cargo run -p mlrs-server &
+        shell: bash
+
+      - name: Wait for backend to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8000/healthz > /dev/null 2>&1; then
+              echo "Backend is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Backend failed to start"
+          exit 1
+        shell: bash
+
+      - name: Start frontend dev server
+        working-directory: ${{ github.workspace }}/packages/frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+        run: pnpm run dev &
+        shell: bash
+
+      - name: Wait for frontend to be ready
+        run: |
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+              echo "Frontend is ready"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Frontend failed to start"
+          exit 1
+        shell: bash
+
+      - name: Run e2e tests
+        working-directory: ${{ github.workspace }}/packages/frontend
+        env:
+          NEXT_PUBLIC_API_URL: http://127.0.0.1:8000
+        run: pnpm exec playwright test
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: playwright-report
+          path: ${{ github.workspace }}/packages/frontend/playwright-report/
+          retention-days: 7

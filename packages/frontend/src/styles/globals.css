@@ -1,0 +1,257 @@
+@import 'tailwindcss';
+
+@plugin 'daisyui' {
+  themes: false;
+  logs: false;
+}
+
+/*
+ * DaisyUI themes. Values mirror
+ * docs/07-ui-ux-design/system/design-tokens.md and the prototypes under
+ * docs/07-ui-ux-design/prototypes. Change a token in all three places.
+ */
+@plugin 'daisyui/theme' {
+  name: 'skl-light';
+  default: true;
+  prefersdark: false;
+  color-scheme: 'light';
+
+  --color-base-100: #ffffff;
+  --color-base-200: #f1f5f9;
+  --color-base-300: #cbd5e1;
+  --color-base-content: #0f172a;
+
+  --color-primary: #2563eb;
+  --color-primary-content: #ffffff;
+  --color-secondary: #64748b;
+  --color-secondary-content: #ffffff;
+  --color-accent: #0d9488;
+  --color-accent-content: #ffffff;
+  --color-neutral: #0f172a;
+  --color-neutral-content: #ffffff;
+  --color-info: #3b82f6;
+  --color-info-content: #ffffff;
+  --color-success: #10b981;
+  --color-success-content: #ffffff;
+  --color-warning: #f59e0b;
+  --color-warning-content: #78350f;
+  --color-error: #ef4444;
+  --color-error-content: #ffffff;
+
+  --radius-selector: 9999px;
+  --radius-field: 0.5rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+@plugin 'daisyui/theme' {
+  name: 'skl-dark';
+  default: false;
+  prefersdark: true;
+  color-scheme: 'dark';
+
+  --color-base-100: #0f172a;
+  --color-base-200: #1e293b;
+  --color-base-300: #334155;
+  --color-base-content: #e2e8f0;
+
+  --color-primary: #60a5fa;
+  --color-primary-content: #0b1120;
+  --color-secondary: #94a3b8;
+  --color-secondary-content: #0b1120;
+  --color-accent: #2dd4bf;
+  --color-accent-content: #0b1120;
+  --color-neutral: #1e293b;
+  --color-neutral-content: #e2e8f0;
+  --color-info: #60a5fa;
+  --color-info-content: #0b1120;
+  --color-success: #34d399;
+  --color-success-content: #0b1120;
+  --color-warning: #fbbf24;
+  --color-warning-content: #0b1120;
+  --color-error: #f87171;
+  --color-error-content: #0b1120;
+
+  --radius-selector: 9999px;
+  --radius-field: 0.5rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/*
+ * Extended tokens. The light values are the defaults; the dark block below
+ * overrides the ones that differ. `font-*` variables come from next/font.
+ */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', monospace;
+
+  --color-background: #ffffff;
+  --color-background-secondary: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-raised: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-border-light: #f1f5f9;
+  --color-border-strong: #94a3b8;
+
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #64748b;
+  --color-text-tertiary: #94a3b8;
+  --color-text-inverse: #ffffff;
+
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-active: #1e40af;
+  --color-primary-content: #ffffff;
+  --color-primary-muted: #eff6ff;
+
+  --color-secondary: #64748b;
+  --color-secondary-content: #ffffff;
+
+  --color-accent: #0d9488;
+  --color-accent-content: #ffffff;
+
+  --color-success: #10b981;
+  --color-success-content: #ffffff;
+  --color-success-bg: #d1fae5;
+  --color-success-fg: #047857;
+
+  --color-warning: #f59e0b;
+  --color-warning-content: #78350f;
+  --color-warning-bg: #fef3c7;
+  --color-warning-fg: #92400e;
+
+  --color-error: #ef4444;
+  --color-error-content: #ffffff;
+  --color-error-bg: #fee2e2;
+  --color-error-fg: #b91c1c;
+
+  --color-info: #3b82f6;
+  --color-info-content: #ffffff;
+  --color-info-bg: #dbeafe;
+  --color-info-fg: #1d4ed8;
+
+  --color-focus-ring: #2563eb;
+
+  --radius-selector: 9999px;
+  --radius-field: 0.5rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+}
+
+[data-theme='skl-dark'] {
+  color-scheme: dark;
+
+  --color-background: #0b1120;
+  --color-background-secondary: #0f172a;
+  --color-surface: #0f172a;
+  --color-surface-raised: #1e293b;
+  --color-border: #334155;
+  --color-border-light: #1e293b;
+  --color-border-strong: #475569;
+
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-tertiary: #64748b;
+  --color-text-inverse: #0b1120;
+
+  --color-primary: #60a5fa;
+  --color-primary-hover: #93c5fd;
+  --color-primary-active: #2563eb;
+  --color-primary-content: #0b1120;
+  --color-primary-muted: #172554;
+
+  --color-secondary: #94a3b8;
+  --color-secondary-content: #0b1120;
+
+  --color-accent: #2dd4bf;
+  --color-accent-content: #0b1120;
+
+  --color-success: #34d399;
+  --color-success-content: #0b1120;
+  --color-success-bg: #064e3b;
+  --color-success-fg: #34d399;
+
+  --color-warning: #fbbf24;
+  --color-warning-content: #0b1120;
+  --color-warning-bg: #451a03;
+  --color-warning-fg: #fcd34d;
+
+  --color-error: #f87171;
+  --color-error-content: #0b1120;
+  --color-error-bg: #450a0a;
+  --color-error-fg: #fca5a5;
+
+  --color-info: #60a5fa;
+  --color-info-content: #0b1120;
+  --color-info-bg: #1e3a8a;
+  --color-info-fg: #93c5fd;
+
+  --color-focus-ring: #60a5fa;
+}
+
+@layer components {
+  .icon-xs {
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .icon-sm {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+  .icon-md {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+  .icon-lg {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .icon-xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
+/* Theme-only elements swap with the active theme (brand marks, theme icon). */
+[data-theme='skl-dark'] .theme-light {
+  display: none;
+}
+[data-theme='skl-light'] .theme-dark {
+  display: none;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
