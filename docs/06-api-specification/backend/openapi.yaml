@@ -1,0 +1,1449 @@
+openapi: 3.1.0
+info:
+  title: llm Training API
+  description: Local FastAPI contract for the llm-client platform. ONNX is the required training
+    artefact.
+  version: 0.1.0
+servers:
+- url: http://127.0.0.1:8000
+  description: Docker Compose backend
+paths:
+  /healthz:
+    get:
+      tags:
+      - health
+      summary: Liveness
+      description: Process liveness probe.
+      operationId: healthz_healthz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+  /readyz:
+    get:
+      tags:
+      - health
+      summary: Readiness (PostgreSQL)
+      description: Database reachability probe.
+      operationId: readyz_readyz_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadyResponse'
+  /health/worker:
+    get:
+      tags:
+      - health
+      summary: Worker status
+      description: 'Report the worker queue against its configured concurrency limit.
+
+
+        The counters come straight from the ``jobs`` table: ``runningJobs`` counts
+
+        the non-terminal statuses, so a slot is only reported busy while an attempt
+
+        is actually in flight. This makes "why is my job still queued?" answerable
+
+        without reading the process logs.'
+      operationId: worker_status_health_worker_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkerStatusResponse'
+  /api/v1/algorithms:
+    get:
+      tags:
+      - algorithms
+      summary: Algorithm catalogue
+      description: Return the allow-listed algorithm catalogue, optionally filtered by task type.
+      operationId: list_algorithms_api_v1_algorithms_get
+      parameters:
+      - name: taskType
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - $ref: '#/components/schemas/TaskType'
+          - type: 'null'
+          title: Tasktype
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AlgorithmsListResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/datasets:
+    post:
+      tags:
+      - datasets
+      summary: Upload CSV dataset
+      description: 'Accept a CSV upload, persist bytes, hash, and infer column preview.
+
+
+        The extension, the declared content type, and the sniffed bytes are all
+
+        checked before anything is written to the volume.'
+      operationId: upload_dataset_api_v1_datasets_post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Body_upload_dataset_api_v1_datasets_post'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/datasets/{dataset_id}:
+    get:
+      tags:
+      - datasets
+      summary: Dataset metadata
+      description: Return dataset metadata and column preview.
+      operationId: get_dataset_api_v1_datasets__dataset_id__get
+      parameters:
+      - name: dataset_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Dataset Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/datasets/{dataset_id}/insights:
+    get:
+      tags:
+      - datasets
+      summary: Dataset insights
+      description: 'Return the per-column profile of a dataset plus a raw preview.
+
+
+        The profile is computed once at upload time; the preview rows are read
+
+        from the stored CSV on demand.'
+      operationId: get_dataset_insights_api_v1_datasets__dataset_id__insights_get
+      parameters:
+      - name: dataset_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Dataset Id
+      - name: previewLimit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 10
+          title: Previewlimit
+      - name: previewOffset
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 0
+          title: Previewoffset
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetInsightsResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs:
+    get:
+      tags:
+      - jobs
+      summary: List training jobs
+      description: 'List jobs with optional filters, sorting, and cursor pagination.
+
+
+        Filters compose with AND. ``status``, ``taskType``, ``algorithmId``, and
+
+        ``tag`` take comma-separated values; ``tag`` requires **all** the listed
+
+        tags to be present.'
+      operationId: list_jobs_api_v1_jobs_get
+      parameters:
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Limit
+      - name: cursor
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Cursor
+      - name: status
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Status
+      - name: taskType
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tasktype
+      - name: algorithmId
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Algorithmid
+      - name: tag
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Tag
+      - name: q
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Q
+      - name: createdFrom
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Createdfrom
+      - name: createdTo
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Createdto
+      - name: sort
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Sort
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobListResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    post:
+      tags:
+      - jobs
+      summary: Enqueue training job
+      description: 'Validate and enqueue a training job. Returns 202 Accepted.
+
+
+        When an ``Idempotency-Key`` header is supplied, the response is cached and
+
+        replayed on retry (see :mod:`src.api.idempotency`).'
+      operationId: create_job_api_v1_jobs_post
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Idempotency-Key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJobRequest'
+      responses:
+        '202':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobAcceptedResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs/compare:
+    get:
+      tags:
+      - jobs
+      summary: Compare 2-5 jobs
+      description: Compare 2–5 jobs side by side, with warnings about unlike jobs.
+      operationId: compare_api_v1_jobs_compare_get
+      parameters:
+      - name: ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ids
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobComparisonResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs/artefacts.zip:
+    get:
+      tags:
+      - jobs
+      summary: Download the artefacts of several jobs as a ZIP bundle
+      description: Bundle the artefacts of 1–10 jobs into one ZIP archive.
+      operationId: download_jobs_bundle_api_v1_jobs_artefacts_zip_get
+      parameters:
+      - name: ids
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Ids
+      responses:
+        '200':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs/{job_id}:
+    get:
+      tags:
+      - jobs
+      summary: Poll job status
+      description: Return the current state of a job.
+      operationId: get_job_api_v1_jobs__job_id__get
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+      - jobs
+      summary: Update job name and tags
+      description: 'Update the human-readable metadata of a job.
+
+
+        Only ``name`` and ``tags`` are editable; the training configuration of a
+
+        job is immutable. A field that is absent from the request is left
+
+        unchanged.'
+      operationId: update_job_metadata_api_v1_jobs__job_id__patch
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJobMetadataRequest'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JobResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+      - jobs
+      summary: Delete job and files
+      description: Delete a job and its artefact files.
+      operationId: delete_job_api_v1_jobs__job_id__delete
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs/{job_id}/artefacts.zip:
+    get:
+      tags:
+      - jobs
+      summary: Download the artefacts of one job as a ZIP bundle
+      description: Bundle the artefacts of one job into a ZIP archive.
+      operationId: download_job_bundle_api_v1_jobs__job_id__artefacts_zip_get
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      responses:
+        '200':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/jobs/{job_id}/artefacts/{artefact_id}:
+    get:
+      tags:
+      - jobs
+      summary: Download artefact
+      description: Stream an artefact file as an attachment.
+      operationId: download_artefact_api_v1_jobs__job_id__artefacts__artefact_id__get
+      parameters:
+      - name: job_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Job Id
+      - name: artefact_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+          title: Artefact Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /:
+    get:
+      tags:
+      - health
+      summary: Service banner
+      description: Identify the service and its version.
+      operationId: root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                additionalProperties: true
+                type: object
+                title: Response Root  Get
+components:
+  schemas:
+    AlgorithmResponse:
+      properties:
+        algorithmId:
+          type: string
+          title: Algorithmid
+        name:
+          type: string
+          title: Name
+        taskType:
+          $ref: '#/components/schemas/TaskType'
+        family:
+          type: string
+          title: Family
+          default: llmearn
+        description:
+          type: string
+          title: Description
+        defaultHyperparameters:
+          additionalProperties: true
+          type: object
+          title: Defaulthyperparameters
+        exports:
+          items:
+            $ref: '#/components/schemas/ArtefactFormat'
+          type: array
+          title: Exports
+      type: object
+      required:
+      - algorithmId
+      - name
+      - taskType
+      - description
+      title: AlgorithmResponse
+    AlgorithmsListResponse:
+      properties:
+        algorithms:
+          items:
+            $ref: '#/components/schemas/AlgorithmResponse'
+          type: array
+          title: Algorithms
+      type: object
+      required:
+      - algorithms
+      title: AlgorithmsListResponse
+    ArtefactFormat:
+      type: string
+      enum:
+      - onnx
+      - pkl
+      - joblib
+      title: ArtefactFormat
+    ArtefactResponse:
+      properties:
+        artefactId:
+          type: string
+          format: uuid
+          title: Artefactid
+        format:
+          $ref: '#/components/schemas/ArtefactFormat'
+        filename:
+          type: string
+          title: Filename
+        byteSize:
+          type: integer
+          title: Bytesize
+      type: object
+      required:
+      - artefactId
+      - format
+      - filename
+      - byteSize
+      title: ArtefactResponse
+    Body_upload_dataset_api_v1_datasets_post:
+      properties:
+        file:
+          type: string
+          contentMediaType: application/octet-stream
+          title: File
+      type: object
+      required:
+      - file
+      title: Body_upload_dataset_api_v1_datasets_post
+    ColumnInsight:
+      properties:
+        name:
+          type: string
+          title: Name
+        inferredType:
+          type: string
+          title: Inferredtype
+        missingCount:
+          type: integer
+          title: Missingcount
+          default: 0
+        missingRate:
+          type: number
+          title: Missingrate
+          default: 0.0
+        uniqueCount:
+          type: integer
+          title: Uniquecount
+          default: 0
+        numeric:
+          anyOf:
+          - $ref: '#/components/schemas/NumericSummary'
+          - type: 'null'
+        topValues:
+          items:
+            $ref: '#/components/schemas/ValueCount'
+          type: array
+          title: Topvalues
+        warnings:
+          items:
+            type: string
+          type: array
+          title: Warnings
+      type: object
+      required:
+      - name
+      - inferredType
+      title: ColumnInsight
+      description: Per-column profile.
+    ColumnPreview:
+      properties:
+        name:
+          type: string
+          title: Name
+        inferredDtype:
+          type: string
+          title: Inferreddtype
+        nullCount:
+          type: integer
+          minimum: 0.0
+          title: Nullcount
+        sampleValues:
+          items: {}
+          type: array
+          title: Samplevalues
+      type: object
+      required:
+      - name
+      - inferredDtype
+      - nullCount
+      title: ColumnPreview
+    ComparisonDataset:
+      properties:
+        datasetId:
+          type: string
+          format: uuid
+          title: Datasetid
+        filename:
+          type: string
+          title: Filename
+        rowCount:
+          type: integer
+          title: Rowcount
+        columnCount:
+          type: integer
+          title: Columncount
+      type: object
+      required:
+      - datasetId
+      - filename
+      - rowCount
+      - columnCount
+      title: ComparisonDataset
+      description: Dataset summary attached to a compared job.
+    ComparisonJob:
+      properties:
+        jobId:
+          type: string
+          format: uuid
+          title: Jobid
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        tags:
+          items:
+            type: string
+          type: array
+          title: Tags
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        taskType:
+          $ref: '#/components/schemas/TaskType'
+        algorithmId:
+          type: string
+          title: Algorithmid
+        createdAt:
+          type: string
+          format: date-time
+          title: Createdat
+        dataset:
+          $ref: '#/components/schemas/ComparisonDataset'
+        featureColumns:
+          items:
+            type: string
+          type: array
+          title: Featurecolumns
+        labelColumn:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Labelcolumn
+        splitRatio:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Splitratio
+        randomSeed:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Randomseed
+        hyperparameters:
+          additionalProperties: true
+          type: object
+          title: Hyperparameters
+        metrics:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: number
+              - type: integer
+            type: object
+          - type: 'null'
+          title: Metrics
+        artefactFormats:
+          items:
+            type: string
+          type: array
+          title: Artefactformats
+        error:
+          anyOf:
+          - $ref: '#/components/schemas/JobErrorDetail'
+          - type: 'null'
+      type: object
+      required:
+      - jobId
+      - status
+      - taskType
+      - algorithmId
+      - createdAt
+      - dataset
+      title: ComparisonJob
+      description: One column of the comparison view.
+    ComparisonWarning:
+      properties:
+        code:
+          type: string
+          title: Code
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - code
+      - message
+      title: ComparisonWarning
+      description: A reason why the compared jobs are not strictly comparable.
+    CreateJobRequest:
+      properties:
+        datasetId:
+          type: string
+          format: uuid
+          title: Datasetid
+        featureColumns:
+          items:
+            type: string
+          type: array
+          minItems: 1
+          title: Featurecolumns
+        taskType:
+          $ref: '#/components/schemas/TaskType'
+        algorithmId:
+          type: string
+          title: Algorithmid
+        labelColumn:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Labelcolumn
+        rlColumns:
+          anyOf:
+          - $ref: '#/components/schemas/RLColumns'
+          - type: 'null'
+        hyperparameters:
+          additionalProperties: true
+          type: object
+          title: Hyperparameters
+        splitRatio:
+          type: number
+          exclusiveMaximum: 1.0
+          exclusiveMinimum: 0.0
+          title: Splitratio
+          default: 0.2
+        randomSeed:
+          type: integer
+          minimum: 0.0
+          title: Randomseed
+          default: 42
+        exportPkl:
+          type: boolean
+          title: Exportpkl
+          default: false
+        exportJoblib:
+          type: boolean
+          title: Exportjoblib
+          default: false
+      additionalProperties: false
+      type: object
+      required:
+      - datasetId
+      - featureColumns
+      - taskType
+      - algorithmId
+      title: CreateJobRequest
+      description: Request body for POST /api/v1/jobs.
+    DatasetInsightsResponse:
+      properties:
+        datasetId:
+          type: string
+          format: uuid
+          title: Datasetid
+        sha256:
+          type: string
+          title: Sha256
+        filename:
+          type: string
+          title: Filename
+        rowCount:
+          type: integer
+          title: Rowcount
+        columnCount:
+          type: integer
+          title: Columncount
+        totalMissingCells:
+          type: integer
+          title: Totalmissingcells
+          default: 0
+        missingRate:
+          type: number
+          title: Missingrate
+          default: 0.0
+        columns:
+          items:
+            $ref: '#/components/schemas/ColumnInsight'
+          type: array
+          title: Columns
+        warnings:
+          items:
+            $ref: '#/components/schemas/DatasetWarning'
+          type: array
+          title: Warnings
+        preview:
+          $ref: '#/components/schemas/DatasetPreview'
+      type: object
+      required:
+      - datasetId
+      - sha256
+      - filename
+      - rowCount
+      - columnCount
+      - preview
+      title: DatasetInsightsResponse
+      description: Response for GET /api/v1/datasets/{datasetId}/insights.
+    DatasetPreview:
+      properties:
+        offset:
+          type: integer
+          title: Offset
+        limit:
+          type: integer
+          title: Limit
+        totalRows:
+          type: integer
+          title: Totalrows
+        columns:
+          items:
+            type: string
+          type: array
+          title: Columns
+        rows:
+          items:
+            items:
+              anyOf:
+              - type: string
+              - type: 'null'
+            type: array
+          type: array
+          title: Rows
+      type: object
+      required:
+      - offset
+      - limit
+      - totalRows
+      title: DatasetPreview
+      description: Raw preview rows, positionally aligned with ``columns``.
+    DatasetResponse:
+      properties:
+        datasetId:
+          type: string
+          format: uuid
+          title: Datasetid
+        sha256:
+          type: string
+          title: Sha256
+        filename:
+          type: string
+          title: Filename
+        byteSize:
+          type: integer
+          title: Bytesize
+        columns:
+          items:
+            $ref: '#/components/schemas/ColumnPreview'
+          type: array
+          title: Columns
+        rowCount:
+          type: integer
+          title: Rowcount
+        createdAt:
+          type: string
+          format: date-time
+          title: Createdat
+      type: object
+      required:
+      - datasetId
+      - sha256
+      - filename
+      - byteSize
+      - columns
+      - rowCount
+      - createdAt
+      title: DatasetResponse
+    DatasetWarning:
+      properties:
+        code:
+          type: string
+          title: Code
+        column:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Column
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - code
+      - message
+      title: DatasetWarning
+      description: A dataset-level warning.
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    HealthResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+          default: ok
+      type: object
+      title: HealthResponse
+    JobAcceptedResponse:
+      properties:
+        jobId:
+          type: string
+          format: uuid
+          title: Jobid
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        datasetId:
+          type: string
+          format: uuid
+          title: Datasetid
+        taskType:
+          $ref: '#/components/schemas/TaskType'
+        algorithmId:
+          type: string
+          title: Algorithmid
+        createdAt:
+          type: string
+          format: date-time
+          title: Createdat
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        tags:
+          items:
+            type: string
+          type: array
+          title: Tags
+        attempts:
+          type: integer
+          title: Attempts
+          default: 0
+        maxAttempts:
+          type: integer
+          title: Maxattempts
+          default: 2
+        nextAttemptAt:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Nextattemptat
+        queuePosition:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Queueposition
+      type: object
+      required:
+      - jobId
+      - status
+      - datasetId
+      - taskType
+      - algorithmId
+      - createdAt
+      title: JobAcceptedResponse
+      description: Response for 202 Accepted from POST /api/v1/jobs.
+    JobComparisonResponse:
+      properties:
+        jobs:
+          items:
+            $ref: '#/components/schemas/ComparisonJob'
+          type: array
+          title: Jobs
+        warnings:
+          items:
+            $ref: '#/components/schemas/ComparisonWarning'
+          type: array
+          title: Warnings
+      type: object
+      required:
+      - jobs
+      title: JobComparisonResponse
+      description: Response for GET /api/v1/jobs/compare.
+    JobErrorDetail:
+      properties:
+        code:
+          type: string
+          title: Code
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+      - code
+      - message
+      title: JobErrorDetail
+    JobListResponse:
+      properties:
+        jobs:
+          items:
+            $ref: '#/components/schemas/JobAcceptedResponse'
+          type: array
+          title: Jobs
+        nextCursor:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Nextcursor
+        hasMore:
+          type: boolean
+          title: Hasmore
+      type: object
+      required:
+      - jobs
+      - hasMore
+      title: JobListResponse
+    JobResponse:
+      properties:
+        jobId:
+          type: string
+          format: uuid
+          title: Jobid
+        status:
+          $ref: '#/components/schemas/JobStatus'
+        datasetId:
+          type: string
+          format: uuid
+          title: Datasetid
+        taskType:
+          $ref: '#/components/schemas/TaskType'
+        algorithmId:
+          type: string
+          title: Algorithmid
+        createdAt:
+          type: string
+          format: date-time
+          title: Createdat
+        updatedAt:
+          type: string
+          format: date-time
+          title: Updatedat
+        featureColumns:
+          items:
+            type: string
+          type: array
+          title: Featurecolumns
+        labelColumn:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Labelcolumn
+        rlColumns:
+          anyOf:
+          - $ref: '#/components/schemas/RLColumns'
+          - type: 'null'
+        hyperparameters:
+          additionalProperties: true
+          type: object
+          title: Hyperparameters
+        metrics:
+          anyOf:
+          - additionalProperties:
+              anyOf:
+              - type: number
+              - type: integer
+            type: object
+          - type: 'null'
+          title: Metrics
+        charts:
+          anyOf:
+          - additionalProperties: true
+            type: object
+          - type: 'null'
+          title: Charts
+        artefacts:
+          items:
+            $ref: '#/components/schemas/ArtefactResponse'
+          type: array
+          title: Artefacts
+        libraryVersions:
+          anyOf:
+          - additionalProperties:
+              type: string
+            type: object
+          - type: 'null'
+          title: Libraryversions
+        error:
+          anyOf:
+          - $ref: '#/components/schemas/JobErrorDetail'
+          - type: 'null'
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        tags:
+          items:
+            type: string
+          type: array
+          title: Tags
+        attempts:
+          type: integer
+          title: Attempts
+          default: 0
+        maxAttempts:
+          type: integer
+          title: Maxattempts
+          default: 2
+        nextAttemptAt:
+          anyOf:
+          - type: string
+            format: date-time
+          - type: 'null'
+          title: Nextattemptat
+        queuePosition:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Queueposition
+      type: object
+      required:
+      - jobId
+      - status
+      - datasetId
+      - taskType
+      - algorithmId
+      - createdAt
+      - updatedAt
+      - featureColumns
+      title: JobResponse
+      description: Full job detail from GET /api/v1/jobs/{jobId}.
+    JobStatus:
+      type: string
+      enum:
+      - queued
+      - validating
+      - training
+      - evaluating
+      - exporting
+      - retrying
+      - completed
+      - failed
+      title: JobStatus
+    NumericSummary:
+      properties:
+        min:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Min
+        max:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Max
+        mean:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Mean
+        std:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Std
+        median:
+          anyOf:
+          - type: number
+          - type: 'null'
+          title: Median
+      type: object
+      title: NumericSummary
+      description: Numeric summary of a column.
+    RLColumns:
+      properties:
+        actionColumn:
+          type: string
+          title: Actioncolumn
+        rewardColumn:
+          type: string
+          title: Rewardcolumn
+        nextStateColumns:
+          items:
+            type: string
+          type: array
+          title: Nextstatecolumns
+        doneColumn:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Donecolumn
+        episodeColumn:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Episodecolumn
+      additionalProperties: false
+      type: object
+      required:
+      - actionColumn
+      - rewardColumn
+      title: RLColumns
+      description: Experience log columns for reinforcement_learning jobs.
+    ReadyResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+          default: ok
+      type: object
+      title: ReadyResponse
+    TaskType:
+      type: string
+      enum:
+      - classification
+      - regression
+      - semi_supervised
+      - clustering
+      - anomaly_detection
+      - reinforcement_learning
+      title: TaskType
+    UpdateJobMetadataRequest:
+      properties:
+        name:
+          anyOf:
+          - type: string
+            maxLength: 120
+          - type: 'null'
+          title: Name
+        tags:
+          items:
+            type: string
+          type: array
+          maxItems: 10
+          title: Tags
+      additionalProperties: false
+      type: object
+      title: UpdateJobMetadataRequest
+      description: 'Request body for PATCH /api/v1/jobs/{jobId}.
+
+
+        Only the human-readable metadata of a job is editable; the training
+
+        configuration is immutable once the job is submitted.'
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    ValueCount:
+      properties:
+        value:
+          type: string
+          title: Value
+        count:
+          type: integer
+          title: Count
+      type: object
+      required:
+      - value
+      - count
+      title: ValueCount
+      description: One of the most frequent values of a column.
+    WorkerStatusResponse:
+      properties:
+        maxConcurrentJobs:
+          type: integer
+          title: Maxconcurrentjobs
+        runningJobs:
+          type: integer
+          title: Runningjobs
+        queuedJobs:
+          type: integer
+          title: Queuedjobs
+        retryingJobs:
+          type: integer
+          title: Retryingjobs
+        availableSlots:
+          type: integer
+          title: Availableslots
+      type: object
+      required:
+      - maxConcurrentJobs
+      - runningJobs
+      - queuedJobs
+      - retryingJobs
+      - availableSlots
+      title: WorkerStatusResponse
+      description: Runtime worker counters for GET /health/worker.
+tags:
+- name: health
+  description: Liveness and readiness probes.
+- name: datasets
+  description: CSV upload, dataset metadata, and per-column insights.
+- name: algorithms
+  description: Algorithm catalogue with task types and hyperparameter ranges.
+- name: jobs
+  description: 'Training jobs: creation, history, comparison, and artefact download.'

@@ -1,0 +1,29 @@
+import Navbar from '../components/shared/Navbar';
+import Hero from '../components/landing/Hero';
+import Bands from '../components/landing/Bands';
+import WhyLLM from '../components/landing/WhyLLM';
+import Workflow from '../components/landing/Workflow';
+import BuiltDifferent from '../components/landing/BuiltDifferent';
+import Tools from '../components/landing/Tools';
+import GetStarted from '../components/landing/GetStarted';
+import Footer from '../components/shared/Footer';
+
+export default function Page() {
+  return (
+    <div className='relative overflow-hidden'>
+      <div className='pointer-events-none absolute top-20 right-[2%] h-[520px] w-[520px] rounded-full bg-[radial-gradient(circle,#d9554420_0,transparent_68%)] blur-[1px]' />
+      <div className='pointer-events-none absolute top-[600px] left-[-250px] h-[550px] w-[550px] rounded-full bg-[radial-gradient(circle,#28405d30_0,transparent_70%)] blur-[1px]' />
+      <Navbar />
+      <main>
+        <Hero />
+        <Bands />
+        <WhyLLM />
+        <Workflow />
+        <BuiltDifferent />
+        <Tools />
+        <GetStarted />
+      </main>
+      <Footer />
+    </div>
+  );
+}

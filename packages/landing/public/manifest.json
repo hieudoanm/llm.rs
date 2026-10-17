@@ -1,0 +1,19 @@
+{
+  "id": "/llm.rs/",
+  "name": "llm.rs — Machine Learning in Rust",
+  "short_name": "llm.rs",
+  "description": "Train supervised, semi-supervised, unsupervised, and offline reinforcement-learning models from CSV files. Export portable ONNX — all on your own machine.",
+  "start_url": "/llm.rs/",
+  "scope": "/llm.rs/",
+  "display": "standalone",
+  "background_color": "#0b1018",
+  "theme_color": "#0b1018",
+  "icons": [
+    {
+      "src": "/llm.rs/images/png/llm-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
