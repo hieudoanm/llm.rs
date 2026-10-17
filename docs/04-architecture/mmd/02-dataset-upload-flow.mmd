@@ -1,0 +1,14 @@
+sequenceDiagram
+  actor User
+  participant UI as Next.js
+  participant API as FastAPI
+  participant FS as Volume
+  participant DB as PostgreSQL
+
+  User->>UI: Select CSV
+  UI->>API: POST /api/v1/datasets
+  API->>API: Size and UTF-8 CSV checks
+  API->>FS: Write datasets/{id}.csv
+  API->>DB: INSERT datasets
+  API-->>UI: 201 datasetId, columns
+  UI-->>User: Column preview

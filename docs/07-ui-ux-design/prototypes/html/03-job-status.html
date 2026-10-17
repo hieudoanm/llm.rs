@@ -1,0 +1,777 @@
+<!doctype html>
+<html lang="en" data-theme="skl-light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Job status · skl</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5"
+      rel="stylesheet"
+      type="text/css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css"
+      rel="stylesheet"
+      type="text/css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+      rel="stylesheet"
+      type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --font-sans:
+          Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --font-mono:
+          'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco,
+          Consolas, 'Liberation Mono', monospace;
+
+        --color-base-100: #ffffff;
+        --color-base-200: #f1f5f9;
+        --color-base-300: #cbd5e1;
+        --color-base-content: #0f172a;
+
+        --color-background: #ffffff;
+        --color-background-secondary: #f8fafc;
+        --color-surface: #ffffff;
+        --color-surface-raised: #f8fafc;
+        --color-border: #e2e8f0;
+        --color-border-light: #f1f5f9;
+        --color-border-strong: #94a3b8;
+
+        --color-text-primary: #0f172a;
+        --color-text-secondary: #64748b;
+        --color-text-tertiary: #94a3b8;
+        --color-text-inverse: #ffffff;
+
+        --color-primary: #2563eb;
+        --color-primary-hover: #1d4ed8;
+        --color-primary-active: #1e40af;
+        --color-primary-content: #ffffff;
+        --color-primary-muted: #eff6ff;
+
+        --color-secondary: #64748b;
+        --color-secondary-content: #ffffff;
+
+        --color-accent: #0d9488;
+        --color-accent-content: #ffffff;
+
+        --color-success: #10b981;
+        --color-success-content: #064e3b;
+        --color-success-bg: #d1fae5;
+        --color-success-fg: #047857;
+
+        --color-warning: #f59e0b;
+        --color-warning-content: #78350f;
+        --color-warning-bg: #fef3c7;
+        --color-warning-fg: #92400e;
+
+        --color-error: #ef4444;
+        --color-error-content: #ffffff;
+        --color-error-bg: #fee2e2;
+        --color-error-fg: #b91c1c;
+
+        --color-focus-ring: #2563eb;
+      }
+    </style>
+    <style>
+      .icon {
+        display: inline-block;
+        line-height: 1;
+        vertical-align: -0.125em;
+      }
+      .icon-sm {
+        font-size: 20px;
+      }
+      .icon-md {
+        font-size: 24px;
+      }
+      .icon-lg {
+        font-size: 32px;
+      }
+      .icon-xl {
+        font-size: 48px;
+      }
+      [data-theme='skl-dark'] .logo-light {
+        display: none;
+      }
+      [data-theme='skl-light'] .logo-dark {
+        display: none;
+      }
+      [data-theme='skl-light'] {
+        color-scheme: light;
+        --color-base-100: #ffffff;
+        --color-base-200: #f1f5f9;
+        --color-base-300: #cbd5e1;
+        --color-base-content: #0f172a;
+        --color-primary: #2563eb;
+        --color-primary-content: #ffffff;
+        --color-secondary: #64748b;
+        --color-secondary-content: #ffffff;
+        --color-accent: #0d9488;
+        --color-accent-content: #ffffff;
+        --color-neutral: #0f172a;
+        --color-neutral-content: #ffffff;
+        --color-info: #3b82f6;
+        --color-info-content: #ffffff;
+        --color-success: #10b981;
+        --color-success-content: #064e3b;
+        --color-warning: #f59e0b;
+        --color-warning-content: #78350f;
+        --color-error: #ef4444;
+        --color-error-content: #ffffff;
+        --color-background: #ffffff;
+        --color-background-secondary: #f8fafc;
+        --color-surface: #ffffff;
+        --color-surface-raised: #f8fafc;
+        --color-border: #e2e8f0;
+        --color-border-light: #f1f5f9;
+        --color-border-strong: #94a3b8;
+        --color-text-primary: #0f172a;
+        --color-text-secondary: #64748b;
+        --color-text-tertiary: #94a3b8;
+        --color-text-inverse: #ffffff;
+        --color-primary-hover: #1d4ed8;
+        --color-primary-active: #1e40af;
+        --color-primary-muted: #eff6ff;
+        --color-success-bg: #d1fae5;
+        --color-success-fg: #047857;
+        --color-error-bg: #fee2e2;
+        --color-error-fg: #b91c1c;
+        --color-warning-bg: #fef3c7;
+        --color-warning-fg: #92400e;
+        --color-info-bg: #dbeafe;
+        --color-info-fg: #1d4ed8;
+        --color-focus-ring: #2563eb;
+      }
+      [data-theme='skl-dark'] {
+        color-scheme: dark;
+        --color-base-100: #0f172a;
+        --color-base-200: #1e293b;
+        --color-base-300: #334155;
+        --color-base-content: #e2e8f0;
+        --color-primary: #60a5fa;
+        --color-primary-content: #0b1120;
+        --color-secondary: #94a3b8;
+        --color-secondary-content: #0b1120;
+        --color-accent: #2dd4bf;
+        --color-accent-content: #0b1120;
+        --color-neutral: #1e293b;
+        --color-neutral-content: #e2e8f0;
+        --color-info: #60a5fa;
+        --color-info-content: #0b1120;
+        --color-success: #34d399;
+        --color-success-content: #064e3b;
+        --color-warning: #fbbf24;
+        --color-warning-content: #78350f;
+        --color-error: #f87171;
+        --color-error-content: #0b1120;
+        --color-background: #0b1120;
+        --color-background-secondary: #0f172a;
+        --color-surface: #0f172a;
+        --color-surface-raised: #1e293b;
+        --color-border: #334155;
+        --color-border-light: #1e293b;
+        --color-border-strong: #475569;
+        --color-text-primary: #e2e8f0;
+        --color-text-secondary: #94a3b8;
+        --color-text-tertiary: #64748b;
+        --color-text-inverse: #0b1120;
+        --color-primary-hover: #93c5fd;
+        --color-primary-active: #2563eb;
+        --color-primary-muted: #172554;
+        --color-success-bg: #064e3b;
+        --color-success-fg: #34d399;
+        --color-error-bg: #450a0a;
+        --color-error-fg: #fca5a5;
+        --color-warning-bg: #451a03;
+        --color-warning-fg: #fcd34d;
+        --color-info-bg: #1e3a8a;
+        --color-info-fg: #93c5fd;
+        --color-focus-ring: #60a5fa;
+      }
+      body {
+        background-color: var(--color-background);
+        color: var(--color-text-primary);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      :focus-visible {
+        outline: 2px solid var(--color-focus-ring);
+        outline-offset: 2px;
+      }
+      .theme-switcher {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 60;
+        display: flex;
+        gap: 0.25rem;
+        padding: 0.25rem;
+        border-radius: 999px;
+        border: 1px solid var(--color-base-300);
+        background: var(--color-base-100);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      }
+      .theme-switcher button {
+        font: inherit;
+        font-size: 12px;
+        line-height: 1;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        border: 0;
+        background: transparent;
+        color: var(--color-base-content);
+        opacity: 0.65;
+        cursor: pointer;
+      }
+      .theme-switcher button[aria-pressed='true'] {
+        background: var(--color-base-200);
+        opacity: 1;
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var t = window.localStorage.getItem('skl-theme');
+          if (t !== 'skl-light' && t !== 'skl-dark') {
+            t = window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'skl-dark'
+              : 'skl-light';
+          }
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-background text-text-primary min-h-screen">
+    <div class="theme-switcher" role="group" aria-label="Colour theme">
+      <button type="button" data-theme-value="skl-light" aria-pressed="true">
+        Light
+      </button>
+      <button type="button" data-theme-value="skl-dark" aria-pressed="false">
+        Dark
+      </button>
+    </div>
+    <script>
+      (function () {
+        var key = 'skl-theme';
+        function apply(theme) {
+          document.documentElement.setAttribute('data-theme', theme);
+          Array.prototype.forEach.call(
+            document.querySelectorAll('.theme-switcher button'),
+            function (button) {
+              button.setAttribute(
+                'aria-pressed',
+                String(button.getAttribute('data-theme-value') === theme)
+              );
+            }
+          );
+        }
+        apply(
+          document.documentElement.getAttribute('data-theme') || 'skl-light'
+        );
+        Array.prototype.forEach.call(
+          document.querySelectorAll('.theme-switcher button'),
+          function (button) {
+            button.addEventListener('click', function () {
+              var theme = button.getAttribute('data-theme-value');
+              try {
+                window.localStorage.setItem(key, theme);
+              } catch (error) {}
+              apply(theme);
+            });
+          }
+        );
+      })();
+    </script>
+    <header
+      class="bg-background/80 border-border sticky top-0 z-40 border-b backdrop-blur">
+      <div
+        class="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+        <a href="01-home.html" class="flex items-center gap-2"
+          ><img
+            src="../../brand/svg/logo-mark-light.svg"
+            alt=""
+            aria-hidden="true"
+            class="logo-light h-6 w-6" /><img
+            src="../../brand/svg/logo-mark-dark.svg"
+            alt=""
+            aria-hidden="true"
+            class="logo-dark h-6 w-6"
+        /></a>
+        <nav class="hidden items-center gap-6 md:flex" aria-label="Primary">
+          <a
+            href="01-home.html"
+            class="text-text-secondary hover:text-text-primary text-sm font-medium"
+            >Home</a
+          >
+          <a
+            href="02-new-job.html"
+            class="text-text-secondary hover:text-text-primary text-sm font-medium"
+            >New job</a
+          >
+          <a
+            href="04-jobs.html"
+            class="text-text-secondary hover:text-text-primary text-sm font-medium"
+            >Jobs</a
+          >
+        </nav>
+      </div>
+    </header>
+    <main class="mx-auto max-w-5xl px-4 pt-16 pb-12">
+      <div class="flex items-center justify-between gap-4 mb-6">
+        <h1 class="text-text-primary text-xl font-semibold tracking-tight">
+          Job
+          <span class="text-text-tertiary font-mono text-sm">job-7f3a9c1e</span>
+        </h1>
+        <a href="04-jobs.html" class="btn btn-ghost">Back to jobs</a>
+      </div>
+
+      <div class="w-full border-border border-b bg-surface mb-8">
+        <div class="mx-auto max-w-5xl px-4 py-6">
+          <ol class="steps horizontal w-full justify-between">
+            <li class="step step-primary">Queued</li>
+            <li class="step step-primary">Validating</li>
+            <li class="step step-primary">Training</li>
+            <li class="step step-primary">Evaluating</li>
+            <li class="step step-primary">Exporting</li>
+            <li class="step step-success">Completed</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="grid gap-6 sm:grid-cols-2 md:grid-cols-4 mb-8">
+        <div class="card bg-base-100 shadow p-6">
+          <p class="text-text-secondary text-sm font-medium">Status</p>
+          <p class="mt-1"><span class="badge badge-success">Completed</span></p>
+        </div>
+        <div class="card bg-base-100 shadow p-6">
+          <p class="text-text-secondary text-sm font-medium">Task</p>
+          <p class="mt-1">
+            <span class="badge badge-ghost badge-sm">semi_supervised</span>
+          </p>
+        </div>
+        <div class="card bg-base-100 shadow p-6">
+          <p class="text-text-secondary text-sm font-medium">Algorithm</p>
+          <p class="text-text-primary mt-1 text-sm font-mono">
+            self_training_classifier
+          </p>
+        </div>
+        <div class="card bg-base-100 shadow p-6">
+          <p class="text-text-secondary text-sm font-medium">Created</p>
+          <p class="text-text-primary mt-1 text-sm font-mono">
+            2026-10-16T14:32:00Z
+          </p>
+        </div>
+      </div>
+
+      <section class="mb-8">
+        <h2 class="text-text-primary text-lg font-semibold mb-4">Metrics</h2>
+        <dl class="rounded-lg border border-border divide-y divide-border">
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-text-secondary text-sm">
+              Accuracy<span class="text-text-tertiary mt-0.5 block text-xs"
+                >Share of test rows where the predicted class matches the true
+                class.</span
+              >
+            </dt>
+            <dd class="text-text-primary font-mono text-sm">0.924</dd>
+          </div>
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-text-secondary text-sm">
+              Precision (macro)<span
+                class="text-text-tertiary mt-0.5 block text-xs"
+                >Of the rows predicted as each class, the share that are correct
+                — averaged equally over classes.</span
+              >
+            </dt>
+            <dd class="text-text-primary font-mono text-sm">0.911</dd>
+          </div>
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-text-secondary text-sm">
+              Recall (macro)<span
+                class="text-text-tertiary mt-0.5 block text-xs"
+                >Of the rows truly in each class, the share the model finds —
+                averaged equally over classes.</span
+              >
+            </dt>
+            <dd class="text-text-primary font-mono text-sm">0.937</dd>
+          </div>
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-text-secondary text-sm">
+              F1 (macro)<span class="text-text-tertiary mt-0.5 block text-xs"
+                >Harmonic mean of macro precision and recall: one balanced score
+                for both.</span
+              >
+            </dt>
+            <dd class="text-text-primary font-mono text-sm">0.924</dd>
+          </div>
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-text-secondary text-sm">
+              Labelled rows<span class="text-text-tertiary mt-0.5 block text-xs"
+                >Rows whose label cell carried a real class value.</span
+              >
+            </dt>
+            <dd class="text-text-primary font-mono text-sm">420</dd>
+          </div>
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-text-secondary text-sm">
+              Unlabelled rows<span
+                class="text-text-tertiary mt-0.5 block text-xs"
+                >Rows passed to self-training without a label.</span
+              >
+            </dt>
+            <dd class="text-text-primary font-mono text-sm">80</dd>
+          </div>
+          <div class="flex items-start justify-between gap-4 px-4 py-3">
+            <dt class="text-text-secondary text-sm">
+              Self-training iterations<span
+                class="text-text-tertiary mt-0.5 block text-xs"
+                >Number of rounds before no additional unlabelled rows cleared
+                the threshold.</span
+              >
+            </dt>
+            <dd class="text-text-primary font-mono text-sm">4</dd>
+          </div>
+        </dl>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-text-primary text-lg font-semibold mb-2">
+          Other task metric sets
+        </h2>
+        <p class="text-text-tertiary mb-4 text-xs">
+          Shown in place of the definition list above when the job's task
+          matches.
+        </p>
+        <div class="grid gap-8 lg:grid-cols-2">
+          <div>
+            <h3 class="text-text-primary text-base font-semibold mb-3">
+              Clustering
+            </h3>
+            <dl class="rounded-lg border border-border divide-y divide-border">
+              <div class="flex items-start justify-between gap-4 px-4 py-3">
+                <dt class="text-text-secondary text-sm">
+                  Silhouette<span
+                    class="text-text-tertiary mt-0.5 block text-xs"
+                    >How well rows match their own cluster versus the next
+                    closest — higher is better, near 1.</span
+                  >
+                </dt>
+                <dd class="text-text-primary font-mono text-sm">0.6120</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4 px-4 py-3">
+                <dt class="text-text-secondary text-sm">
+                  Davies–Bouldin<span
+                    class="text-text-tertiary mt-0.5 block text-xs"
+                    >Average similarity between clusters — lower is better, 0 is
+                    ideal.</span
+                  >
+                </dt>
+                <dd class="text-text-primary font-mono text-sm">0.7840</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4 px-4 py-3">
+                <dt class="text-text-secondary text-sm">
+                  Calinski–Harabasz<span
+                    class="text-text-tertiary mt-0.5 block text-xs"
+                    >Ratio of between-cluster to within-cluster dispersion —
+                    higher is better.</span
+                  >
+                </dt>
+                <dd class="text-text-primary font-mono text-sm">238.5400</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4 px-4 py-3">
+                <dt class="text-text-secondary text-sm">
+                  Inertia<span class="text-text-tertiary mt-0.5 block text-xs"
+                    >Sum of squared distances from rows to their cluster
+                    centroid — lower is better.</span
+                  >
+                </dt>
+                <dd class="text-text-primary font-mono text-sm">412.3300</dd>
+              </div>
+            </dl>
+          </div>
+          <div>
+            <h3 class="text-text-primary text-base font-semibold mb-3">
+              Anomaly detection
+            </h3>
+            <dl class="rounded-lg border border-border divide-y divide-border">
+              <div class="flex items-start justify-between gap-4 px-4 py-3">
+                <dt class="text-text-secondary text-sm">
+                  Anomalies flagged<span
+                    class="text-text-tertiary mt-0.5 block text-xs"
+                    >Rows the model labelled as outliers.</span
+                  >
+                </dt>
+                <dd class="text-text-primary font-mono text-sm">24</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4 px-4 py-3">
+                <dt class="text-text-secondary text-sm">
+                  Anomaly rate<span
+                    class="text-text-tertiary mt-0.5 block text-xs"
+                    >Share of scored rows flagged as anomalies.</span
+                  >
+                </dt>
+                <dd class="text-text-primary font-mono text-sm">0.0480</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4 px-4 py-3">
+                <dt class="text-text-secondary text-sm">
+                  Mean anomaly score<span
+                    class="text-text-tertiary mt-0.5 block text-xs"
+                    >Average decision score across all rows — lower means more
+                    anomalous.</span
+                  >
+                </dt>
+                <dd class="text-text-primary font-mono text-sm">0.0810</dd>
+              </div>
+              <div class="flex items-start justify-between gap-4 px-4 py-3">
+                <dt class="text-text-secondary text-sm">
+                  Anomaly score std. dev.<span
+                    class="text-text-tertiary mt-0.5 block text-xs"
+                    >Spread of decision scores across all rows.</span
+                  >
+                </dt>
+                <dd class="text-text-primary font-mono text-sm">0.0430</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-text-primary text-lg font-semibold mb-4">Model report</h2>
+        <p class="text-text-tertiary mb-4 text-xs">
+          Charts for completed jobs — see
+          <a
+            href="../../../07-ui-ux-design/system/charts.md"
+            class="text-primary hover:text-primary-hover underline"
+            >charts.md</a
+          >. This section is hidden when the job is not completed or when chart
+          data is absent.
+        </p>
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
+          <div class="card bg-base-100 shadow p-6">
+            <h3 class="text-text-primary text-base font-semibold mb-2">
+              Confusion matrix
+            </h3>
+            <p class="text-text-tertiary mb-4 text-xs">
+              Which classes does the model confuse?
+            </p>
+            <div
+              class="border-border border rounded-lg p-4 bg-background-secondary h-48 flex items-center justify-center">
+              <svg width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="Confusion matrix heatmap">
+                <text x="90" y="-5" text-anchor="middle" font-size="10" fill="var(--color-text-tertiary)">Predicted →</text>
+                <text x="-15" y="90" text-anchor="middle" font-size="10" fill="var(--color-text-tertiary)" transform="rotate(-90, -15, 90)">← Actual</text>
+                <!-- 3x3 confusion matrix -->
+                <rect x="30" y="10" width="40" height="40" fill="#10b981" opacity="0.9" />
+                <text x="50" y="35" text-anchor="middle" font-size="11" fill="white">45</text>
+                <rect x="75" y="10" width="40" height="40" fill="#fbbf24" opacity="0.5" />
+                <text x="95" y="35" text-anchor="middle" font-size="11" fill="var(--color-text-primary)">3</text>
+                <rect x="120" y="10" width="40" height="40" fill="#fbbf24" opacity="0.3" />
+                <text x="140" y="35" text-anchor="middle" font-size="11" fill="var(--color-text-primary)">2</text>
+
+                <rect x="30" y="55" width="40" height="40" fill="#fbbf24" opacity="0.4" />
+                <text x="50" y="80" text-anchor="middle" font-size="11" fill="var(--color-text-primary)">4</text>
+                <rect x="75" y="55" width="40" height="40" fill="#10b981" opacity="0.85" />
+                <text x="95" y="80" text-anchor="middle" font-size="11" fill="white">38</text>
+                <rect x="120" y="55" width="40" height="40" fill="#fbbf24" opacity="0.3" />
+                <text x="140" y="80" text-anchor="middle" font-size="11" fill="var(--color-text-primary)">2</text>
+
+                <rect x="30" y="100" width="40" height="40" fill="#fbbf24" opacity="0.2" />
+                <text x="50" y="125" text-anchor="middle" font-size="11" fill="var(--color-text-primary)">1</text>
+                <rect x="75" y="100" width="40" height="40" fill="#fbbf24" opacity="0.4" />
+                <text x="95" y="125" text-anchor="middle" font-size="11" fill="var(--color-text-primary)">5</text>
+                <rect x="120" y="100" width="40" height="40" fill="#10b981" opacity="0.8" />
+                <text x="140" y="125" text-anchor="middle" font-size="11" fill="white">42</text>
+
+                <!-- Class labels -->
+                <text x="50" y="165" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">A</text>
+                <text x="95" y="165" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">B</text>
+                <text x="140" y="165" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">C</text>
+                <text x="15" y="35" text-anchor="end" font-size="9" fill="var(--color-text-secondary)">A</text>
+                <text x="15" y="80" text-anchor="end" font-size="9" fill="var(--color-text-secondary)">B</text>
+                <text x="15" y="125" text-anchor="end" font-size="9" fill="var(--color-text-secondary)">C</text>
+              </svg>
+            </div>
+          </div>
+          <div class="card bg-base-100 shadow p-6">
+            <h3 class="text-text-primary text-base font-semibold mb-2">
+              Per-class precision / recall / F1
+            </h3>
+            <p class="text-text-tertiary mb-4 text-xs">
+              Which classes are strong or weak?
+            </p>
+            <div
+              class="border-border border rounded-lg p-4 bg-background-secondary h-48 flex items-center justify-center">
+              <svg width="200" height="180" viewBox="0 0 200 180" role="img" aria-label="Per-class precision, recall, and F1 scores">
+                <!-- Legend -->
+                <rect x="10" y="5" width="10" height="10" fill="#2563eb" />
+                <text x="25" y="14" font-size="9" fill="var(--color-text-secondary)">Precision</text>
+                <rect x="80" y="5" width="10" height="10" fill="#10b981" />
+                <text x="95" y="14" font-size="9" fill="var(--color-text-secondary)">Recall</text>
+                <rect x="140" y="5" width="10" height="10" fill="#f59e0b" />
+                <text x="155" y="14" font-size="9" fill="var(--color-text-secondary)">F1</text>
+
+                <!-- Y-axis line -->
+                <line x1="25" y1="25" x2="25" y2="155" stroke="var(--color-border)" stroke-width="1" />
+                <!-- X-axis line -->
+                <line x1="25" y1="155" x2="190" y2="155" stroke="var(--color-border)" stroke-width="1" />
+
+                <!-- Y-axis labels -->
+                <text x="20" y="155" text-anchor="end" font-size="8" fill="var(--color-text-tertiary)">0</text>
+                <text x="20" y="115" text-anchor="end" font-size="8" fill="var(--color-text-tertiary)">0.25</text>
+                <text x="20" y="75" text-anchor="end" font-size="8" fill="var(--color-text-tertiary)">0.5</text>
+                <text x="20" y="35" text-anchor="end" font-size="8" fill="var(--color-text-tertiary)">0.75</text>
+                <text x="20" y="28" text-anchor="end" font-size="8" fill="var(--color-text-tertiary)">1</text>
+
+                <!-- Class A bars -->
+                <rect x="35" y="37" width="10" height="118" fill="#2563eb" />
+                <rect x="47" y="41" width="10" height="114" fill="#10b981" />
+                <rect x="59" y="39" width="10" height="116" fill="#f59e0b" />
+                <text x="52" y="168" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">A</text>
+
+                <!-- Class B bars -->
+                <rect x="85" y="49" width="10" height="106" fill="#2563eb" />
+                <rect x="97" y="45" width="10" height="110" fill="#10b981" />
+                <rect x="109" y="47" width="10" height="108" fill="#f59e0b" />
+                <text x="102" y="168" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">B</text>
+
+                <!-- Class C bars -->
+                <rect x="135" y="41" width="10" height="114" fill="#2563eb" />
+                <rect x="147" y="45" width="10" height="110" fill="#10b981" />
+                <rect x="159" y="43" width="10" height="112" fill="#f59e0b" />
+                <text x="152" y="168" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">C</text>
+              </svg>
+            </div>
+          </div>
+          <div class="card bg-base-100 shadow p-6">
+            <h3 class="text-text-primary text-base font-semibold mb-2">
+              Predicted vs actual
+            </h3>
+            <p class="text-text-tertiary mb-4 text-xs">
+              How close are predictions, over the whole range?
+            </p>
+            <div
+              class="border-border border rounded-lg p-4 bg-background-secondary h-48 flex items-center justify-center">
+              <svg width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="Predicted vs actual scatter plot">
+                <!-- Axis lines -->
+                <line x1="20" y1="160" x2="160" y2="160" stroke="var(--color-border)" stroke-width="1" />
+                <line x1="20" y1="160" x2="20" y2="20" stroke="var(--color-border)" stroke-width="1" />
+
+                <!-- Perfect prediction line (y = x) -->
+                <line x1="20" y1="160" x2="160" y2="20" stroke="var(--color-text-tertiary)" stroke-width="1" stroke-dasharray="4,2" />
+                <text x="100" y="15" text-anchor="middle" font-size="8" fill="var(--color-text-tertiary)">y = x</text>
+
+                <!-- Axis labels -->
+                <text x="90" y="178" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">Actual</text>
+                <text x="8" y="90" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)" transform="rotate(-90, 8, 90)">Predicted</text>
+
+                <!-- Scatter points (simulated data near the line) -->
+                <circle cx="30" cy="145" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="40" cy="135" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="50" cy="125" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="55" cy="130" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="65" cy="115" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="70" cy="105" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="80" cy="95" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="85" cy="100" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="95" cy="85" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="105" cy="75" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="110" cy="80" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="120" cy="65" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="130" cy="55" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="135" cy="60" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="145" cy="45" r="3" fill="#2563eb" opacity="0.7" />
+                <circle cx="150" cy="35" r="3" fill="#2563eb" opacity="0.7" />
+              </svg>
+            </div>
+          </div>
+          <div class="card bg-base-100 shadow p-6">
+            <h3 class="text-text-primary text-base font-semibold mb-2">
+              Cluster sizes
+            </h3>
+            <p class="text-text-tertiary mb-4 text-xs">
+              Are the clusters balanced?
+            </p>
+            <div
+              class="border-border border rounded-lg p-4 bg-background-secondary h-48 flex items-center justify-center">
+              <svg width="180" height="180" viewBox="0 0 180 180" role="img" aria-label="Cluster sizes bar chart">
+                <!-- Y-axis line -->
+                <line x1="30" y1="20" x2="30" y2="150" stroke="var(--color-border)" stroke-width="1" />
+                <!-- X-axis line -->
+                <line x1="30" y1="150" x2="160" y2="150" stroke="var(--color-border)" stroke-width="1" />
+
+                <!-- Y-axis labels -->
+                <text x="25" y="150" text-anchor="end" font-size="8" fill="var(--color-text-tertiary)">0</text>
+                <text x="25" y="110" text-anchor="end" font-size="8" fill="var(--color-text-tertiary)">50</text>
+                <text x="25" y="70" text-anchor="end" font-size="8" fill="var(--color-text-tertiary)">100</text>
+                <text x="25" y="30" text-anchor="end" font-size="8" fill="var(--color-text-tertiary)">150</text>
+
+                <!-- Cluster 0 bar -->
+                <rect x="40" y="50" width="20" height="100" fill="#2563eb" />
+                <text x="50" y="165" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">C0</text>
+                <text x="50" y="45" text-anchor="middle" font-size="8" fill="var(--color-text-primary)">125</text>
+
+                <!-- Cluster 1 bar -->
+                <rect x="70" y="70" width="20" height="80" fill="#10b981" />
+                <text x="80" y="165" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">C1</text>
+                <text x="80" y="65" text-anchor="middle" font-size="8" fill="var(--color-text-primary)">100</text>
+
+                <!-- Cluster 2 bar -->
+                <rect x="100" y="90" width="20" height="60" fill="#f59e0b" />
+                <text x="110" y="165" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">C2</text>
+                <text x="110" y="85" text-anchor="middle" font-size="8" fill="var(--color-text-primary)">75</text>
+
+                <!-- Cluster 3 bar -->
+                <rect x="130" y="110" width="20" height="40" fill="#ef4444" />
+                <text x="140" y="165" text-anchor="middle" font-size="9" fill="var(--color-text-secondary)">C3</text>
+                <text x="140" y="105" text-anchor="middle" font-size="8" fill="var(--color-text-primary)">50</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-8">
+        <h2 class="text-text-primary text-lg font-semibold mb-4">Downloads</h2>
+        <div class="grid gap-2 sm:max-w-md">
+          <a href="#" class="btn btn-primary flex items-center justify-between">
+            <span>model.onnx</span
+            ><i class="ph ph-download icon-sm" aria-hidden="true"></i>
+          </a>
+          <a href="#" class="btn btn-ghost flex items-center justify-between">
+            <span>model.pkl</span
+            ><i class="ph ph-download icon-sm" aria-hidden="true"></i>
+          </a>
+          <a href="#" class="btn btn-ghost flex items-center justify-between">
+            <span>model.joblib</span
+            ><i class="ph ph-download icon-sm" aria-hidden="true"></i>
+          </a>
+        </div>
+      </section>
+    </main>
+    <footer class="border-border border-t">
+      <div
+        class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row">
+        <span class="text-text-tertiary text-xs"
+          >scikit-learn-client &mdash; prototype only.</span
+        >
+        <p class="text-text-tertiary text-xs">
+          Not a production AutoML service.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
