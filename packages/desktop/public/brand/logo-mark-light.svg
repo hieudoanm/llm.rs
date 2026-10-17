@@ -1,0 +1,28 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="256"
+  height="256"
+  viewBox="0 0 256 256"
+  role="img"
+  aria-label="llm.rs"
+>
+  <title>llm.rs</title>
+  <desc>llm.rs mark for light backgrounds: deep orange rounded box with a cream diagonal line.</desc>
+  <rect
+    x="32"
+    y="32"
+    width="192"
+    height="192"
+    rx="56"
+    fill="#C2410C"
+  />
+  <line
+    x1="184"
+    y1="72"
+    x2="72"
+    y2="184"
+    stroke="#FFF7ED"
+    stroke-width="18"
+    stroke-linecap="round"
+  />
+</svg>

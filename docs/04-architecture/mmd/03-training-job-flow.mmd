@@ -1,0 +1,22 @@
+sequenceDiagram
+  actor User
+  participant UI as Next.js
+  participant API as FastAPI
+  participant W as Worker
+  participant DB as PostgreSQL
+  participant FS as Volume
+
+  User->>UI: Map X/Y, choose model, start
+  UI->>API: POST /api/v1/jobs
+  API->>DB: INSERT jobs status=queued
+  API-->>UI: 202 jobId
+  loop until terminal
+    UI->>API: GET /api/v1/jobs/{jobId}
+    API->>DB: SELECT job
+    API-->>UI: status, metrics, artefacts
+  end
+  W->>DB: Claim queued job
+  W->>FS: Read CSV
+  W->>W: Fit, evaluate, export ONNX
+  W->>FS: Write artefacts/{jobId}.onnx
+  W->>DB: UPDATE completed + artefacts

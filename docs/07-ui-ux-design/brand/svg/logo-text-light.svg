@@ -1,0 +1,37 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="640"
+  height="256"
+  viewBox="0 0 640 256"
+  role="img"
+  aria-label="llm.rs"
+>
+  <title>llm.rs</title>
+  <desc>llm.rs lockup for light backgrounds: deep orange mark with a dark llm.rs wordmark.</desc>
+  <rect
+    x="0"
+    y="32"
+    width="192"
+    height="192"
+    rx="56"
+    fill="#C2410C"
+  />
+  <line
+    x1="152"
+    y1="72"
+    x2="40"
+    y2="184"
+    stroke="#FFF7ED"
+    stroke-width="18"
+    stroke-linecap="round"
+  />
+  <text
+    x="224"
+    y="176"
+    font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif"
+    font-size="120"
+    font-weight="700"
+    letter-spacing="-3"
+    fill="#0B1018"
+  >llm.rs</text>
+</svg>

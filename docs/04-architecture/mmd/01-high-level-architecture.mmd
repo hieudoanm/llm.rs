@@ -1,0 +1,14 @@
+flowchart LR
+  subgraph browser [Browser]
+    UI[Next.js UI]
+  end
+  subgraph compose [Docker Compose]
+    FE[frontend]
+    API[backend FastAPI]
+    PG[(PostgreSQL 18)]
+    VOL[artefact volume]
+  end
+  UI --> FE
+  UI -->|REST /api/v1| API
+  API --> PG
+  API --> VOL

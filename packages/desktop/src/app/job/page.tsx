@@ -1,0 +1,127 @@
+'use client';
+
+import { useSearchParams } from 'next/navigation';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { JobMetadataEditor } from '@/components/jobs/JobMetadataEditor';
+import { DatasetInsightsPanel } from '@/components/jobs/DatasetInsightsPanel';
+import { tauriGetJob, tauriPatchJob, TauriError } from '@/lib/tauri';
+import { QUERY_CACHE } from '@/lib/queryCache';
+import { TERMINAL_STATUSES } from './_lib/constants';
+import { type Job, type JobStatus } from './_lib/types';
+import { JobHeader } from './_components/JobHeader';
+import { JobStepper } from './_components/JobStepper';
+import { JobDetails } from './_components/JobDetails';
+import { JobMetrics } from './_components/JobMetrics';
+import { JobCharts } from './_components/JobCharts';
+import { JobDownloads } from './_components/JobDownloads';
+
+export const dynamic = 'force-dynamic';
+
+const JobStatusContent = () => {
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get('id') ?? '';
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, isError, error, refetch } = useQuery<Job, Error>({
+    queryKey: ['job', jobId],
+    queryFn: () => tauriGetJob<Job>(jobId),
+    refetchInterval: (query) => {
+      const current = query.state.data as Job | undefined;
+      return current && TERMINAL_STATUSES.includes(current.status as JobStatus) ? false : 1000;
+    },
+    retry: (failureCount, failure) => {
+      if (failure instanceof TauriError && failure.serverCode === 'DATASET_NOT_FOUND') return false;
+      return failureCount < 3;
+    },
+    enabled: !!jobId,
+    ...QUERY_CACHE.liveJob,
+  });
+
+  if (isLoading) {
+    return (
+      <div className='mx-auto max-w-5xl px-4 pt-16 pb-12'>
+        <h1 className='text-text-primary mb-8 text-xl font-semibold tracking-tight'>Job status</h1>
+        <div
+          role='status'
+          aria-label='Loading job'
+          className='flex items-center justify-center py-20'>
+          <span className='loading loading-spinner loading-lg' aria-hidden='true' />
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !data) {
+    return (
+      <div className='mx-auto max-w-5xl px-4 pt-16 pb-12'>
+        <h1 className='text-text-primary mb-8 text-xl font-semibold tracking-tight'>Job status</h1>
+        <ApiErrorAlert error={error ?? new Error('Job not found.')} onRetry={() => refetch()} />
+      </div>
+    );
+  }
+
+  const isTerminal = TERMINAL_STATUSES.includes(data.status as JobStatus);
+  const isCompleted = data.status === 'completed';
+  const isFailed = data.status === 'failed';
+
+  return (
+    <div className='mx-auto max-w-5xl px-4 pt-16 pb-12'>
+      <JobHeader job={data} />
+
+      <p className='sr-only' aria-live='polite'>
+        Job status: {data.status}
+      </p>
+
+      {isFailed && data.errorCode && data.errorMessage && (
+        <ApiErrorAlert
+          error={
+            new TauriError('INVOKE_ERROR', data.errorMessage, 500, undefined, data.errorCode, {
+              code: data.errorCode,
+            })
+          }
+        />
+      )}
+
+      <JobStepper status={data.status as JobStatus} />
+
+      <JobMetadataEditor
+        jobId={jobId}
+        name={data.name ?? null}
+        tags={data.tags ?? []}
+        onSave={async (metadata) => {
+          const updated = await tauriPatchJob<Job>(jobId, metadata.name ?? null, metadata.tags);
+          void queryClient.invalidateQueries({ queryKey: ['job', jobId] });
+          return { name: updated.name ?? null, tags: updated.tags ?? [] };
+        }}
+      />
+
+      <JobDetails job={data} />
+
+      {isCompleted && data.metrics && Object.keys(data.metrics).length > 0 && (
+        <JobMetrics metrics={data.metrics as Record<string, number>} jobId={jobId} />
+      )}
+
+      {isCompleted && data.charts && <JobCharts jobId={jobId} />}
+
+      <JobDownloads artefacts={data.artefacts ?? []} jobId={jobId} isTerminal={isTerminal} />
+
+      <DatasetInsightsPanel datasetId={data.datasetId} />
+
+      {!isTerminal && (
+        <p className='text-text-secondary text-center text-sm'>Polling for status updates…</p>
+      )}
+    </div>
+  );
+};
+
+const JobStatusPage = () => (
+  <ErrorBoundary
+    title='This job view could not be displayed'
+    guidance='Reload the page or return to the jobs list.'>
+    <JobStatusContent />
+  </ErrorBoundary>
+);
+
+export default JobStatusPage;

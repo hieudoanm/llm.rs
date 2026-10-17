@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://hieudoanm.github.io/llm.rs/</loc></url>
+  <url><loc>https://hieudoanm.github.io/llm.rs/docs/</loc></url>
+  <url><loc>https://hieudoanm.github.io/llm.rs/docs/01-getting-started/</loc></url>
+  <url><loc>https://hieudoanm.github.io/llm.rs/docs/02-cli/</loc></url>
+  <url><loc>https://hieudoanm.github.io/llm.rs/docs/03-workflow/</loc></url>
+  <url><loc>https://hieudoanm.github.io/llm.rs/docs/04-algorithms/</loc></url>
+  <url><loc>https://hieudoanm.github.io/llm.rs/docs/05-architecture/</loc></url>
+  <url><loc>https://hieudoanm.github.io/llm.rs/downloads/</loc></url>
+</urlset>
