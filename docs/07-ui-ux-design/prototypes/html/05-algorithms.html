@@ -1,0 +1,1611 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>skl Prototype &mdash; Algorithms</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5"
+      rel="stylesheet"
+      type="text/css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css"
+      rel="stylesheet"
+      type="text/css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
+      rel="stylesheet"
+      type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --font-sans:
+          Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --font-mono:
+          'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco,
+          Consolas, 'Liberation Mono', monospace;
+
+        --color-base-100: #ffffff;
+        --color-base-200: #f1f5f9;
+        --color-base-300: #cbd5e1;
+        --color-base-content: #0f172a;
+
+        --color-background: #ffffff;
+        --color-background-secondary: #f8fafc;
+        --color-surface: #ffffff;
+        --color-surface-raised: #f8fafc;
+        --color-border: #e2e8f0;
+        --color-border-light: #f1f5f9;
+        --color-border-strong: #94a3b8;
+
+        --color-text-primary: #0f172a;
+        --color-text-secondary: #64748b;
+        --color-text-tertiary: #94a3b8;
+        --color-text-inverse: #ffffff;
+
+        --color-primary: #2563eb;
+        --color-primary-hover: #1d4ed8;
+        --color-primary-active: #1e40af;
+        --color-primary-content: #ffffff;
+        --color-primary-muted: #eff6ff;
+
+        --color-secondary: #64748b;
+        --color-secondary-content: #ffffff;
+
+        --color-accent: #0d9488;
+        --color-accent-content: #ffffff;
+
+        --color-success: #10b981;
+        --color-success-content: #064e3b;
+        --color-success-bg: #d1fae5;
+        --color-success-fg: #047857;
+
+        --color-warning: #f59e0b;
+        --color-warning-content: #78350f;
+        --color-warning-bg: #fef3c7;
+        --color-warning-fg: #92400e;
+
+        --color-error: #ef4444;
+        --color-error-content: #ffffff;
+        --color-error-bg: #fee2e2;
+        --color-error-fg: #b91c1c;
+
+        --color-focus-ring: #2563eb;
+      }
+    </style>
+    <style>
+      .icon {
+        display: inline-block;
+        line-height: 1;
+        vertical-align: -0.125em;
+      }
+      .icon-sm {
+        font-size: 20px;
+      }
+      .icon-md {
+        font-size: 24px;
+      }
+      .icon-lg {
+        font-size: 32px;
+      }
+      .icon-xl {
+        font-size: 48px;
+      }
+      [data-theme='skl-dark'] .logo-light {
+        display: none;
+      }
+      [data-theme='skl-light'] .logo-dark {
+        display: none;
+      }
+      [data-theme='skl-light'] {
+        color-scheme: light;
+        --color-base-100: #ffffff;
+        --color-base-200: #f1f5f9;
+        --color-base-300: #cbd5e1;
+        --color-base-content: #0f172a;
+        --color-primary: #2563eb;
+        --color-primary-content: #ffffff;
+        --color-secondary: #64748b;
+        --color-secondary-content: #ffffff;
+        --color-accent: #0d9488;
+        --color-accent-content: #ffffff;
+        --color-neutral: #0f172a;
+        --color-neutral-content: #ffffff;
+        --color-info: #3b82f6;
+        --color-info-content: #ffffff;
+        --color-success: #10b981;
+        --color-success-content: #064e3b;
+        --color-warning: #f59e0b;
+        --color-warning-content: #78350f;
+        --color-error: #ef4444;
+        --color-error-content: #ffffff;
+        --color-background: #ffffff;
+        --color-background-secondary: #f8fafc;
+        --color-surface: #ffffff;
+        --color-surface-raised: #f8fafc;
+        --color-border: #e2e8f0;
+        --color-border-light: #f1f5f9;
+        --color-border-strong: #94a3b8;
+        --color-text-primary: #0f172a;
+        --color-text-secondary: #64748b;
+        --color-text-tertiary: #94a3b8;
+        --color-text-inverse: #ffffff;
+        --color-primary-hover: #1d4ed8;
+        --color-primary-active: #1e40af;
+        --color-primary-muted: #eff6ff;
+        --color-success-bg: #d1fae5;
+        --color-success-fg: #047857;
+        --color-error-bg: #fee2e2;
+        --color-error-fg: #b91c1c;
+        --color-warning-bg: #fef3c7;
+        --color-warning-fg: #92400e;
+        --color-info-bg: #dbeafe;
+        --color-info-fg: #1d4ed8;
+        --color-focus-ring: #2563eb;
+      }
+      [data-theme='skl-dark'] {
+        color-scheme: dark;
+        --color-base-100: #0f172a;
+        --color-base-200: #1e293b;
+        --color-base-300: #334155;
+        --color-base-content: #e2e8f0;
+        --color-primary: #60a5fa;
+        --color-primary-content: #0b1120;
+        --color-secondary: #94a3b8;
+        --color-secondary-content: #0b1120;
+        --color-accent: #2dd4bf;
+        --color-accent-content: #0b1120;
+        --color-neutral: #1e293b;
+        --color-neutral-content: #e2e8f0;
+        --color-info: #60a5fa;
+        --color-info-content: #0b1120;
+        --color-success: #34d399;
+        --color-success-content: #064e3b;
+        --color-warning: #fbbf24;
+        --color-warning-content: #78350f;
+        --color-error: #f87171;
+        --color-error-content: #0b1120;
+        --color-background: #0b1120;
+        --color-background-secondary: #0f172a;
+        --color-surface: #0f172a;
+        --color-surface-raised: #1e293b;
+        --color-border: #334155;
+        --color-border-light: #1e293b;
+        --color-border-strong: #475569;
+        --color-text-primary: #e2e8f0;
+        --color-text-secondary: #94a3b8;
+        --color-text-tertiary: #64748b;
+        --color-text-inverse: #0b1120;
+        --color-primary-hover: #93c5fd;
+        --color-primary-active: #2563eb;
+        --color-primary-muted: #172554;
+        --color-success-bg: #064e3b;
+        --color-success-fg: #34d399;
+        --color-error-bg: #450a0a;
+        --color-error-fg: #fca5a5;
+        --color-warning-bg: #451a03;
+        --color-warning-fg: #fcd34d;
+        --color-info-bg: #1e3a8a;
+        --color-info-fg: #93c5fd;
+        --color-focus-ring: #60a5fa;
+      }
+      body {
+        background-color: var(--color-background);
+        color: var(--color-text-primary);
+        font-family:
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      :focus-visible {
+        outline: 2px solid var(--color-focus-ring);
+        outline-offset: 2px;
+      }
+      .theme-switcher {
+        position: fixed;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 60;
+        display: flex;
+        gap: 0.25rem;
+        padding: 0.25rem;
+        border-radius: 999px;
+        border: 1px solid var(--color-base-300);
+        background: var(--color-base-100);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+      }
+      .theme-switcher button {
+        font: inherit;
+        font-size: 12px;
+        line-height: 1;
+        padding: 0.35rem 0.7rem;
+        border-radius: 999px;
+        border: 0;
+        background: transparent;
+        color: var(--color-base-content);
+        opacity: 0.65;
+        cursor: pointer;
+      }
+      .theme-switcher button[aria-pressed='true'] {
+        background: var(--color-base-200);
+        opacity: 1;
+      }
+    </style>
+    <script>
+      (function () {
+        try {
+          var t = window.localStorage.getItem('skl-theme');
+          if (t !== 'skl-light' && t !== 'skl-dark') {
+            t = window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'skl-dark'
+              : 'skl-light';
+          }
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-background text-text-primary">
+    <header
+      class="border-border bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 border-b backdrop-blur">
+      <div
+        class="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+        <a href="01-home.html" class="flex items-center gap-2">
+          <img
+            src="../../brand/svg/logo-mark-light.svg"
+            alt=""
+            aria-hidden="true"
+            class="logo-light h-6 w-6" />
+          <img
+            src="../../brand/svg/logo-mark-dark.svg"
+            alt=""
+            aria-hidden="true"
+            class="logo-dark h-6 w-6" />
+          <span
+            class="text-text-primary hidden text-base font-bold tracking-tight sm:inline"
+            >skl</span
+          >
+        </a>
+        <nav class="hidden items-center gap-6 md:flex" aria-label="Primary">
+          <a
+            href="01-home.html"
+            class="text-text-secondary hover:text-text-primary text-sm font-medium"
+            >Home</a
+          >
+          <a
+            href="02-new-job.html"
+            class="text-text-secondary hover:text-text-primary text-sm font-medium"
+            >New job</a
+          >
+          <a
+            href="04-jobs.html"
+            class="text-text-secondary hover:text-text-primary text-sm font-medium"
+            >Jobs</a
+          >
+          <a
+            href="05-algorithms.html"
+            class="text-text-secondary hover:text-text-primary text-sm font-medium"
+            >Algorithms</a
+          >
+        </nav>
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            class="btn btn-ghost btn-sm px-2 theme-toggle"
+            aria-label="Toggle theme">
+            <svg
+              class="icon-md"
+              viewBox="0 0 256 256"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="16"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true">
+              <circle cx="128" cy="128" r="92" />
+              <path
+                d="M128 36v184M36 128h184M62.9 62.9l130.2 130.2M62.9 193.1L193.1 62.9" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-5xl px-4 pt-16 pb-12">
+      <div class="mb-10">
+        <h1
+          class="text-text-primary mb-3 text-3xl font-bold tracking-tight sm:text-4xl">
+          Learning Algorithms
+        </h1>
+        <p class="text-text-secondary text-base leading-relaxed sm:text-lg">
+          All available algorithms in the skl catalogue. Filter by task type and
+          explore parameters, exports, and descriptions.
+        </p>
+      </div>
+
+      <section class="mb-12">
+        <div class="mb-6 flex items-center gap-2">
+          <i class="ph ph-cpu icon-md text-primary" aria-hidden="true"></i>
+          <h2 class="text-text-primary text-2xl font-semibold tracking-tight">
+            Classification
+          </h2>
+          <span class="badge badge-outline">9</span>
+        </div>
+        <p class="text-text-secondary mb-5 text-sm">
+          Predict a discrete class from the selected features.
+        </p>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Logistic Regression
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  logistic_regression
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">classification</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Logistic regression classifier.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Random Forest Classifier
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  random_forest_classifier
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">classification</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Random forest classifier.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_estimators=100</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Gradient Boosting Classifier
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  gradient_boosting_classifier
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">classification</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Gradient boosting classifier.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_estimators=100</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Decision Tree Classifier
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  decision_tree_classifier
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">classification</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Decision tree classifier.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Extra Trees Classifier
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  extra_trees_classifier
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">classification</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Extremely randomized trees classifier.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_estimators=100</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  k-Nearest Neighbours Classifier
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  k_neighbors_classifier
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">classification</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              k-nearest neighbours classifier.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_neighbors=5</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Gaussian Naive Bayes
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  gaussian_naive_bayes
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">classification</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Gaussian Naive Bayes classifier.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Support Vector Machine
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  svm_classifier
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">classification</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Support vector classifier with RBF kernel.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >C=1</span
+                  >
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >kernel=rbf</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  MLP Classifier
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  mlp_classifier
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">classification</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Multi-layer perceptron classifier.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >hidden_layer_sizes=100</span
+                  >
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >max_iter=300</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="mb-6 flex items-center gap-2">
+          <i
+            class="ph ph-arrow-right icon-md text-accent"
+            aria-hidden="true"></i>
+          <h2 class="text-text-primary text-2xl font-semibold tracking-tight">
+            Regression
+          </h2>
+          <span class="badge badge-outline">10</span>
+        </div>
+        <p class="text-text-secondary mb-5 text-sm">Predict a numeric value.</p>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Linear Regression
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  linear_regression
+                </p>
+              </div>
+              <span class="badge badge-secondary badge-sm">regression</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Ordinary least squares linear regression.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Ridge Regression
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  ridge_regression
+                </p>
+              </div>
+              <span class="badge badge-secondary badge-sm">regression</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Ridge regression.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >alpha=1</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Random Forest Regressor
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  random_forest_regressor
+                </p>
+              </div>
+              <span class="badge badge-secondary badge-sm">regression</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Random forest regressor.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_estimators=100</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Decision Tree Regressor
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  decision_tree_regressor
+                </p>
+              </div>
+              <span class="badge badge-secondary badge-sm">regression</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Decision tree regressor.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Extra Trees Regressor
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  extra_trees_regressor
+                </p>
+              </div>
+              <span class="badge badge-secondary badge-sm">regression</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Extremely randomized trees regressor.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_estimators=100</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  k-Nearest Neighbours Regressor
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  k_neighbors_regressor
+                </p>
+              </div>
+              <span class="badge badge-secondary badge-sm">regression</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              k-nearest neighbours regressor.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_neighbors=5</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Lasso Regression
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  lasso_regression
+                </p>
+              </div>
+              <span class="badge badge-secondary badge-sm">regression</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Lasso (L1) regression.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >alpha=1</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Elastic Net Regression
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  elastic_net_regression
+                </p>
+              </div>
+              <span class="badge badge-secondary badge-sm">regression</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Elastic net (L1 + L2) regression.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >alpha=1</span
+                  >
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >l1_ratio=0.5</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Support Vector Regressor
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  svm_regressor
+                </p>
+              </div>
+              <span class="badge badge-secondary badge-sm">regression</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Support vector regressor with RBF kernel.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >C=1</span
+                  >
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >kernel=rbf</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  MLP Regressor
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  mlp_regressor
+                </p>
+              </div>
+              <span class="badge badge-secondary badge-sm">regression</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Multi-layer perceptron regressor.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >hidden_layer_sizes=100</span
+                  >
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >max_iter=300</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-12">
+        <div class="mb-6 flex items-center gap-2">
+          <i class="ph ph-cpu icon-md text-primary" aria-hidden="true"></i>
+          <h2 class="text-text-primary text-2xl font-semibold tracking-tight">
+            Semi-supervised
+          </h2>
+          <span class="badge badge-outline">1</span>
+        </div>
+        <p class="text-text-secondary mb-5 text-sm">
+          Learn from labelled rows and refine with unlabelled ones.
+        </p>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Self-Training Classifier
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  self_training_classifier
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">semi_supervised</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Logistic regression refined with self-training on unlabelled rows.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >threshold=0.75</span
+                  >
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >max_iter=10</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mb-12">
+        <div class="mb-6 flex items-center gap-2">
+          <i
+            class="ph ph-arrow-right icon-md text-accent"
+            aria-hidden="true"></i>
+          <h2 class="text-text-primary text-2xl font-semibold tracking-tight">
+            Clustering
+          </h2>
+          <span class="badge badge-outline">3</span>
+        </div>
+        <p class="text-text-secondary mb-5 text-sm">
+          Group similar rows without a label column.
+        </p>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  K-Means
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">kmeans</p>
+              </div>
+              <span class="badge badge-primary badge-sm">clustering</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Centroid-based clustering.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_clusters=3</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Mini-Batch K-Means
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  mini_batch_kmeans
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">clustering</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Mini-batch centroid clustering for larger CSVs.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_clusters=3</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Gaussian Mixture
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  gaussian_mixture
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm">clustering</span>
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Probabilistic clustering with a Gaussian mixture model.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_components=3</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <div class="mb-6 flex items-center gap-2">
+          <i class="ph ph-cpu icon-md text-primary" aria-hidden="true"></i>
+          <h2 class="text-text-primary text-2xl font-semibold tracking-tight">
+            Anomaly detection
+          </h2>
+          <span class="badge badge-outline">1</span>
+        </div>
+        <p class="text-text-secondary mb-5 text-sm">
+          Flag rows that differ from the rest of the dataset.
+        </p>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div
+            class="card bg-surface border-border rounded-xl border p-6 shadow-sm">
+            <div class="mb-3 flex items-start justify-between gap-4">
+              <div>
+                <h3 class="text-text-primary mb-1 text-lg font-semibold">
+                  Isolation Forest
+                </h3>
+                <p class="text-text-tertiary font-mono text-sm">
+                  isolation_forest
+                </p>
+              </div>
+              <span class="badge badge-primary badge-sm"
+                >anomaly_detection</span
+              >
+            </div>
+            <p class="text-text-secondary mb-4 text-sm leading-relaxed">
+              Tree-based anomaly detection using random isolation splits.
+            </p>
+            <div class="mb-4 space-y-2">
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Exports</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.onnx</span
+                  >
+                  <span class="badge badge-ghost badge-sm font-mono">.pkl</span>
+                  <span class="badge badge-ghost badge-sm font-mono"
+                    >.joblib</span
+                  >
+                </div>
+              </div>
+              <div>
+                <span
+                  class="text-text-tertiary text-xs font-medium tracking-wide uppercase"
+                  >Default Hyperparameters</span
+                >
+                <div class="mt-1 flex flex-wrap gap-1.5">
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >n_estimators=100</span
+                  >
+                  <span class="badge badge-outline badge-sm font-mono"
+                    >contamination=auto</span
+                  >
+                </div>
+              </div>
+            </div>
+            <p
+              class="text-text-tertiary text-xs font-medium tracking-wide uppercase">
+              Family:
+              <span class="font-mono normal-case">sklearn</span>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-border border-t">
+      <div
+        class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-8 sm:flex-row">
+        <span class="text-text-tertiary text-xs"
+          >scikit-learn-client &mdash; prototype only.</span
+        >
+        <p class="text-text-tertiary text-xs">
+          Not a production AutoML service.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+[package]
+name = "llm-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Pure-Rust core for the Local Learning Machine (llm.rs): config, CSV, catalogue, training, charts, storage, ONNX export."
+
+[dependencies]
+chrono.workspace = true
+clap = { version = "=4.6.7", features = ["derive"] }
+linfa.workspace = true
+linfa-trees.workspace = true
+linfa-preprocessing.workspace = true
+linfa-clustering.workspace = true
+ndarray.workspace = true
+ndarray-linalg.workspace = true
+onnx-protobuf.workspace = true
+polars.workspace = true
+polars-lazy.workspace = true
+protobuf.workspace = true
+rand.workspace = true
+rand08.workspace = true
+regex.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sha2.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+uuid.workspace = true
+zip.workspace = true
+
