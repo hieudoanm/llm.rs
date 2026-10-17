@@ -1,0 +1,162 @@
+@import 'tailwindcss';
+
+@plugin 'daisyui' {
+  themes: false;
+  logs: false;
+}
+
+/*
+ * DaisyUI themes. Values mirror
+ * docs/07-ui-ux-design/system/design-tokens.md. Dark theme only.
+ */
+@plugin 'daisyui/theme' {
+  name: 'llm-dark';
+  default: true;
+  prefersdark: true;
+  color-scheme: 'dark';
+
+  --color-base-100: #0f172a;
+  --color-base-200: #1e293b;
+  --color-base-300: #334155;
+  --color-base-content: #e2e8f0;
+
+  --color-primary: #60a5fa;
+  --color-primary-content: #0b1120;
+  --color-secondary: #94a3b8;
+  --color-secondary-content: #0b1120;
+  --color-accent: #2dd4bf;
+  --color-accent-content: #0b1120;
+  --color-neutral: #1e293b;
+  --color-neutral-content: #e2e8f0;
+  --color-info: #60a5fa;
+  --color-info-content: #0b1120;
+  --color-success: #34d399;
+  --color-success-content: #0b1120;
+  --color-warning: #fbbf24;
+  --color-warning-content: #0b1120;
+  --color-error: #f87171;
+  --color-error-content: #0b1120;
+
+  --radius-selector: 9999px;
+  --radius-field: 0.5rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
+
+/*
+ * Extended tokens. Dark values only.
+ */
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono:
+    var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', monospace;
+
+  --color-background: #0b1120;
+  --color-background-secondary: #0f172a;
+  --color-surface: #0f172a;
+  --color-surface-raised: #1e293b;
+  --color-border: #334155;
+  --color-border-light: #1e293b;
+  --color-border-strong: #475569;
+
+  --color-text-primary: #e2e8f0;
+  --color-text-secondary: #94a3b8;
+  --color-text-tertiary: #64748b;
+  --color-text-inverse: #0b1120;
+
+  --color-primary: #60a5fa;
+  --color-primary-hover: #93c5fd;
+  --color-primary-active: #2563eb;
+  --color-primary-content: #0b1120;
+  --color-primary-muted: #172554;
+
+  --color-secondary: #94a3b8;
+  --color-secondary-content: #0b1120;
+
+  --color-accent: #2dd4bf;
+  --color-accent-content: #0b1120;
+
+  --color-success: #34d399;
+  --color-success-content: #0b1120;
+  --color-success-bg: #064e3b;
+  --color-success-fg: #34d399;
+
+  --color-warning: #fbbf24;
+  --color-warning-content: #0b1120;
+  --color-warning-bg: #451a03;
+  --color-warning-fg: #fcd34d;
+
+  --color-error: #f87171;
+  --color-error-content: #0b1120;
+  --color-error-bg: #450a0a;
+  --color-error-fg: #fca5a5;
+
+  --color-info: #60a5fa;
+  --color-info-content: #0b1120;
+  --color-info-bg: #1e3a8a;
+  --color-info-fg: #93c5fd;
+
+  --color-focus-ring: #60a5fa;
+
+  --radius-selector: 9999px;
+  --radius-field: 0.5rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+}
+
+[data-theme='llm-dark'] {
+  color-scheme: dark;
+}
+
+@layer components {
+  .icon-xs {
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .icon-sm {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+  .icon-md {
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+  .icon-lg {
+    font-size: 2rem;
+    line-height: 1;
+  }
+  .icon-xl {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
