@@ -1,0 +1,7 @@
+/* TEAM */
+Project: llm.rs — Machine Learning in Rust
+Role: Local-first CSV to ONNX machine-learning studio
+Repository: https://github.com/hieudoanm/llm.rs
+
+/* THANKS */
+Built with Rust, Next.js, React, Tauri, and the open-source community.
