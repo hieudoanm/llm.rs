@@ -20,7 +20,7 @@
     "openapi:types": "openapi-typescript ../../docs/06-api-specification/backend/openapi.yaml -o src/lib/apiTypes.ts"
   },
   "dependencies": {
-    "@hookform/resolvers": "6.0.2",
+    "@hookform/resolvers": "7.0.1",
     "@tanstack/react-query": "5.105.0",
     "@tanstack/react-virtual": "3.14.24",
     "@visx/axis": "4.0.0",
