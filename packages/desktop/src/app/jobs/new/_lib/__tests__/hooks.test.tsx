@@ -100,6 +100,6 @@ describe('useNewJobWizard create-job request', () => {
     );
     expect(tauriPostTrain.mock.calls[1][0].request).not.toHaveProperty('exportKeras');
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith('/jobs/j1'));
+    await waitFor(() => expect(push).toHaveBeenCalledWith('/job?id=j1'));
   });
 });

@@ -1,7 +1,7 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useParams } from 'next/navigation';
 import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { JobMetadataEditor } from '@/components/jobs/JobMetadataEditor';
@@ -20,13 +20,12 @@ import { JobDownloads } from './_components/JobDownloads';
 export const dynamic = 'force-dynamic';
 
 const JobStatusContent = () => {
-  const params = useParams();
-  const jobId = typeof params === 'object' && 'jobId' in params ? (params.jobId as string) : '';
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get('id') ?? '';
   const queryClient = useQueryClient();
 
   const { data, isLoading, isError, error, refetch } = useQuery<Job, Error>({
     queryKey: ['job', jobId],
-    // The signal aborts the in-flight poll when the page is left.
     queryFn: () => tauriGetJob<Job>(jobId),
     refetchInterval: (query) => {
       const current = query.state.data as Job | undefined;
@@ -37,7 +36,6 @@ const JobStatusContent = () => {
       return failureCount < 3;
     },
     enabled: !!jobId,
-    // A live job is polled, so its cached copy is always stale.
     ...QUERY_CACHE.liveJob,
   });
 
@@ -59,7 +57,6 @@ const JobStatusContent = () => {
     return (
       <div className='mx-auto max-w-5xl px-4 pt-16 pb-12'>
         <h1 className='text-text-primary mb-8 text-xl font-semibold tracking-tight'>Job status</h1>
-        {/* The alert carries the catalogue guidance and the "Back to jobs" action. */}
         <ApiErrorAlert error={error ?? new Error('Job not found.')} onRetry={() => refetch()} />
       </div>
     );
@@ -106,7 +103,7 @@ const JobStatusContent = () => {
         <JobMetrics metrics={data.metrics as Record<string, number>} jobId={jobId} />
       )}
 
-      {isCompleted && data.charts && <JobCharts charts={data.charts} jobId={jobId} />}
+      {isCompleted && data.charts && <JobCharts jobId={jobId} />}
 
       <JobDownloads artefacts={data.artefacts ?? []} jobId={jobId} isTerminal={isTerminal} />
 
@@ -120,8 +117,6 @@ const JobStatusContent = () => {
 };
 
 const JobStatusPage = () => (
-  // A render crash in the detail view falls back to the studio's alert rather
-  // than the framework error page.
   <ErrorBoundary
     title='This job view could not be displayed'
     guidance='Reload the page or return to the jobs list.'>

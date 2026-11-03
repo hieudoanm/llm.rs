@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     'coverage/**',
     'playwright-report/**',
     'test-results/**',
+    // Tauri build artefacts:
+    'src-tauri/target/**',
   ]),
 ]);
 

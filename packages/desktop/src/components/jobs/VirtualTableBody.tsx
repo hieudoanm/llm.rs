@@ -32,6 +32,7 @@ export const VirtualTableBody = ({
   footer,
 }: VirtualTableBodyProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  // eslint-disable-next-line react-hooks/incompatible-library
   const virtualizer = useVirtualizer({
     count,
     getScrollElement: () => scrollRef.current,

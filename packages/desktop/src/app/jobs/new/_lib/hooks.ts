@@ -250,7 +250,7 @@ export const useNewJobWizard = () => {
     onSuccess: (data) => {
       idempotencyKeyRef.current = '';
       clearWizardState();
-      router.push(`/jobs/${data.jobId}`);
+      router.push(`/job?id=${data.jobId}`);
     },
     onError: (error: unknown) => {
       if (!isDatasetNotFound(error)) return;

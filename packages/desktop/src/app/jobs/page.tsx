@@ -194,7 +194,7 @@ const JobsContent = () => {
       </td>
       <td>
         <div className='flex items-center gap-1'>
-          <Link href={`/jobs/${job.jobId}`} className='btn btn-ghost btn-sm'>
+          <Link href={`/job?id=${job.jobId}`} className='btn btn-ghost btn-sm'>
             Open
           </Link>
           <button

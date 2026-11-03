@@ -1,13 +1,3 @@
-export type JobStatus =
-  | 'queued'
-  | 'validating'
-  | 'training'
-  | 'evaluating'
-  | 'exporting'
-  | 'retrying'
-  | 'completed'
-  | 'failed';
-
 /** One downloadable file of a job, straight from the contract. */
 export type Artefact = {
   artefactId: string;
@@ -19,9 +9,7 @@ export type Artefact = {
   createdAt: string;
 };
 
-/**
- * The full job detail (FEATURE-13/18).
- */
+/** The full job detail. */
 export type Job = {
   id: string;
   datasetId: string;
@@ -56,3 +44,13 @@ export type Job = {
   charts: Record<string, unknown> | null;
   artefacts: Artefact[];
 };
+
+export type JobStatus =
+  | 'queued'
+  | 'validating'
+  | 'training'
+  | 'evaluating'
+  | 'exporting'
+  | 'retrying'
+  | 'completed'
+  | 'failed';

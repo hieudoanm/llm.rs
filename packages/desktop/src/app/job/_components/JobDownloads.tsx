@@ -31,7 +31,6 @@ export const JobDownloads = ({ artefacts, jobId, isTerminal }: JobDownloadsProps
   };
 
   const handleDownloadAll = async () => {
-    // Download all artefacts individually.
     for (const artefact of artefacts) {
       await handleDownload(artefact.artefactId, artefact.filename);
     }

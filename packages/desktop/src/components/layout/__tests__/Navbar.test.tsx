@@ -5,6 +5,7 @@ import { Navbar } from '../Navbar';
 
 vi.mock('next/image', () => ({
   default: ({ alt = '', className }: { alt?: string; className?: string }) => {
+    // eslint-disable-next-line @next/next/no-img-element
     return <img alt={alt} className={className} />;
   },
 }));

@@ -150,7 +150,7 @@ const CompareContent = () => {
                         <StatusBadge status={job.status} />
                         <span className='font-mono text-xs'>{job.algorithmId}</span>
                         <span className='badge badge-ghost badge-xs'>{job.taskType}</span>
-                        <Link href={`/jobs/${job.jobId}`} className='link text-xs'>
+                        <Link href={`/job?id=${job.jobId}`} className='link text-xs'>
                           Open job
                         </Link>
                       </div>
