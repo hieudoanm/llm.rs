@@ -14,18 +14,18 @@ Next.js UI for llm.rs, wrapped in Tauri for desktop distribution. The specificat
 - [`docs/03-user-stories/`](../../docs/03-user-stories/) — acceptance
   scenarios.
 - [`docs/06-api-specification.md`](../../docs/06-api-specification.md) — API
-  shapes; contract changes require matching updates in `src/lib/api.ts`.
+  shapes; contract changes require matching updates in `src/lib/tauri.ts`.
 
 ## Layout
 
 - `src/app/` — App Router pages (`page.tsx` home/upload,
   `jobs/[jobId]/page.tsx` detail).
 - `src/components/` — `layout/`, `ui/`, `Providers.tsx`.
-- `src/lib/api.ts` — API client; `API_BASE` comes from `NEXT_PUBLIC_API_URL`,
-  defaulting to `http://127.0.0.1:8000`.
-- `src/lib/apiTyped.ts` + `src/lib/apiTypes.ts` — typed facade over `api.ts`;
-  the types are generated from the committed OpenAPI contract
-  (`pnpm run openapi:types`) and must not be edited by hand.
+- `src/lib/tauri.ts` — Tauri `invoke()` transport layer; every backend call
+  goes through `tauriInvoke` and failures are normalised into `TauriError`.
+  Commands: `list_algorithms`, `upload_dataset_from_bytes`, `train_model`,
+  `get_job`, `list_jobs`, `patch_job`, `get_dataset_insights`, `compare_jobs`,
+  `list_artefacts`, `download_artefact`.
 - `src/lib/queryCache.ts` — the per-query `staleTime`/`gcTime` catalogue.
 - `src/hooks/`, `src/styles/` — shared hooks and global styles.
 - `e2e/` — Playwright specs (`sml.e2e.test.ts` + `fixtures/`).
@@ -36,9 +36,8 @@ Next.js UI for llm.rs, wrapped in Tauri for desktop distribution. The specificat
 pnpm run dev              # next dev; predev frees port 3000
 pnpm run lint             # eslint (CI)
 pnpm exec tsc --noEmit    # typecheck (CI)
-pnpm test                 # vitest unit tests — or `pnpm run test:coverage` for the CI gate
-pnpm run openapi:types    # regenerate src/lib/apiTypes.ts from the committed OpenAPI YAML
-pnpm run build            # next build (CI)
+pnpm run test                 # vitest unit tests — or `pnpm run test:coverage` for the CI gate
+pnpm run build                # next build (CI)
 pnpm exec playwright test # e2e — or `make e2e` from the repository root
 ```
 

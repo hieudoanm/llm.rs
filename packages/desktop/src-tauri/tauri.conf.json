@@ -1,7 +1,7 @@
 {
-  "productName": "Local Learning Machine",
-  "version": "0.1.0",
-  "identifier": "com.llm.desktop",
+  "productName": "LLM",
+  "version": "0.0.1",
+  "identifier": "io.github.hieudoanm.llm",
   "build": {
     "frontendDist": "../out",
     "devUrl": "http://localhost:3000",
@@ -25,6 +25,13 @@
   "plugins": {},
   "bundle": {
     "active": true,
-    "targets": "all"
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
   }
 }
