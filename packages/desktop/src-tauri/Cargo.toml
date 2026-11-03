@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-tauri = { version = "1.8", features = ["dialog-all", "fs-all", "sqlite-all"] }
+tauri = { version = "2", features = [] }
 llm-core = { path = "../../../crates/llm-core" }
 llm-db = { path = "../../../crates/llm-db" }
 serde = { version = "1", features = ["derive"] }
@@ -14,4 +14,4 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 [build-dependencies]
-tauri-build = { version = "1.8", features = [] }
+tauri-build = { version = "2", features = [] }
