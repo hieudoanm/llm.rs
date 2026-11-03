@@ -196,7 +196,7 @@ jobs:
 
       - name: Build Tauri app (all platforms)
         id: tauri
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v0.6.2
         with:
           args: --verbose
         env:
@@ -205,7 +205,7 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
 
       - name: Upload CLI binary to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.6.2
         with:
           files: ${{ github.workspace }}/crates/target/release/llm
           tag_name: ${{ github.ref }}
