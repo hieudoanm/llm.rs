@@ -27,7 +27,7 @@ ndarray-rand = "0.1"
 onnx-protobuf = "0.2.3"
 polars = { version = "0.38", features = ["lazy", "serde", "csv"] }
 polars-lazy = "0.38"
-protobuf = "=3.4.0"
+protobuf = "=3.7.2"
 rand = "0.8"
 regex = "1"
 serde = { version = "1", features = ["derive"] }
