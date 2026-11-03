@@ -1,12 +1,10 @@
 import type { ReactNode } from 'react';
 import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { Navbar } from '../Navbar';
 
 vi.mock('next/image', () => ({
   default: ({ alt = '', className }: { alt?: string; className?: string }) => {
-    // eslint-disable-next-line @next/next/no-img-element -- stand-in for next/image in jsdom
     return <img alt={alt} className={className} />;
   },
 }));
@@ -29,14 +27,7 @@ vi.mock('next/link', () => ({
   ),
 }));
 
-const toggle = (): HTMLElement => screen.getByRole('button', { name: 'Toggle theme' });
-
 describe('Navbar', () => {
-  beforeEach(() => {
-    document.documentElement.setAttribute('data-theme', 'llm-light');
-    window.localStorage.clear();
-  });
-
   it('links to the primary routes', () => {
     render(<Navbar />);
 
@@ -54,33 +45,5 @@ describe('Navbar', () => {
 
     expect(screen.getByRole('button', { name: 'Open navigation' })).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: 'Jobs' })).toHaveLength(2);
-  });
-
-  it('toggles the theme between light and dark', async () => {
-    render(<Navbar />);
-
-    await userEvent.click(toggle());
-    expect(document.documentElement).toHaveAttribute('data-theme', 'llm-dark');
-    expect(window.localStorage.getItem('llm-theme')).toBe('llm-dark');
-
-    await userEvent.click(toggle());
-    expect(document.documentElement).toHaveAttribute('data-theme', 'llm-light');
-    expect(window.localStorage.getItem('llm-theme')).toBe('llm-light');
-  });
-
-  it('still applies the theme when localStorage is unavailable', async () => {
-    const setItem = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
-      throw new Error('storage blocked');
-    });
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-
-    render(<Navbar />);
-    await userEvent.click(toggle());
-
-    expect(document.documentElement).toHaveAttribute('data-theme', 'llm-dark');
-    expect(consoleError).toHaveBeenCalledTimes(1);
-
-    setItem.mockRestore();
-    consoleError.mockRestore();
   });
 });

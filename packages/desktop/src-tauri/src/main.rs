@@ -5,15 +5,13 @@ use llm_core::config::get_settings;
 use llm_core::csv::parse_csv;
 use llm_core::dataframe::DataFrame;
 use llm_core::domain::{Job, JobStatus, TaskType};
-use llm_core::error::LlmResult;
 use llm_core::storage::{ensure_dirs, write_artefact, write_dataset};
 use llm_core::training::{train, TrainingOutput};
 use llm_db::{artefacts, datasets, jobs, Database};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use std::path::PathBuf;
+use std::str::FromStr;
 use std::sync::Mutex;
-use tauri::Manager;
 use uuid::Uuid;
 
 struct AppState {
@@ -168,7 +166,7 @@ async fn train_model(
         .map_err(|e| e.to_string())?;
 
     ensure_dirs().map_err(|e| e.to_string())?;
-    let (storage_key, path, byte_size) = write_artefact(
+    let (storage_key, _path, byte_size) = write_artefact(
         job.id,
         &onnx_bytes,
         &format!("{}.onnx", job.id),

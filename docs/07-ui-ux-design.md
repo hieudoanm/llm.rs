@@ -13,7 +13,7 @@ The design must be:
 - Responsive (mobile, tablet, desktop).
 - Consistent across screens.
 - Explicit about loading, empty, validation-error, network-error, unexpected-error, and success.
-- Themeable in light and dark via DaisyUI, using the `llm-light` and `llm-dark` themes.
+- Themeable via DaisyUI, dark theme only (`skl-dark`).
 
 Every subsystem document below is normative. Where a subsystem document and this index disagree,
 the subsystem document governs.

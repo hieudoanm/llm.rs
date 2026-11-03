@@ -4,9 +4,9 @@ _Part of [07-ui-ux-design.md](../../07-ui-ux-design.md)._
 
 All values below are mirrored by:
 
-- the DaisyUI themes `llm-light` / `llm-dark` in
-  [`packages/frontend/src/styles/globals.css`](../../../packages/frontend/src/styles/globals.css), and
-- the `@theme` / `[data-theme]` blocks in the
+- the DaisyUI theme `skl-dark` in
+  [`packages/desktop/src/styles/globals.css`](../../../packages/desktop/src/styles/globals.css), and
+- the `@theme` block in the
   [prototypes](../prototypes/README.md).
 
 Change a token here, then change it in both places.
@@ -20,18 +20,18 @@ The brand uses its own warm palette, shared by the landing page and the desktop 
 are brand tokens rather than UI-state tokens, so the product can keep its blue primary action
 colour while the mark stays orange.
 
-| Token                | Light     | Dark      | Use                       |
-| -------------------- | --------- | --------- | ------------------------- |
-| `brand-mark`         | `#C2410C` | `#F06B4D` | Mark box                  |
-| `brand-mark-content` | `#FFF7ED` | `#0B1018` | Diagonal line in the mark |
-| `brand-wordmark`     | `#0B1018` | `#F7F1E8` | `llm.rs` wordmark         |
-| `brand-bg`           | `#FFFFFF` | `#0B1018` | Brand page background     |
-| `brand-panel`        | `#F8FAFC` | `#111923` | Brand cards and panels    |
-| `brand-ink`          | `#0B1018` | `#F7F1E8` | Primary brand text        |
-| `brand-muted`        | `#64748B` | `#9DA8B7` | Secondary brand text      |
-| `brand-accent`       | `#C2410C` | `#FFAC70` | Warm accent               |
-| `brand-mint`         | `#047857` | `#76D5A5` | Success and confirmation  |
-| `brand-line`         | `#E2E8F0` | `#24303D` | Brand borders and rules   |
+| Token                | Dark      | Use                       |
+| -------------------- | --------- | ------------------------- |
+| `brand-mark`         | `#F06B4D` | Mark box                  |
+| `brand-mark-content` | `#0B1018` | Diagonal line in the mark |
+| `brand-wordmark`     | `#F7F1E8` | `llm.rs` wordmark         |
+| `brand-bg`           | `#0B1018` | Brand page background     |
+| `brand-panel`        | `#111923` | Brand cards and panels    |
+| `brand-ink`          | `#F7F1E8` | Primary brand text        |
+| `brand-muted`        | `#9DA8B7` | Secondary brand text      |
+| `brand-accent`       | `#FFAC70` | Warm accent               |
+| `brand-mint`         | `#76D5A5` | Success and confirmation  |
+| `brand-line`         | `#24303D` | Brand borders and rules   |
 
 ## Colour
 
@@ -41,58 +41,58 @@ Tokens are exposed to Tailwind as `--color-<name>`, so `--color-text-primary` is
 
 ### Semantic (DaisyUI)
 
-| Token               | Light     | Dark      | Use                             |
-| ------------------- | --------- | --------- | ------------------------------- |
-| `base-100`          | `#FFFFFF` | `#0F172A` | Surface                         |
-| `base-200`          | `#F1F5F9` | `#1E293B` | Raised surface / default button |
-| `base-300`          | `#CBD5E1` | `#334155` | Borders                         |
-| `base-content`      | `#0F172A` | `#E2E8F0` | Text on base                    |
-| `primary`           | `#2563EB` | `#60A5FA` | Train CTA                       |
-| `primary-content`   | `#FFFFFF` | `#0B1120` | Text on primary                 |
-| `secondary`         | `#64748B` | `#94A3B8` | Secondary actions               |
-| `secondary-content` | `#FFFFFF` | `#0B1120` | Text on secondary               |
-| `accent`            | `#0D9488` | `#2DD4BF` | ONNX / success emphasis         |
-| `accent-content`    | `#FFFFFF` | `#0B1120` | Text on accent                  |
-| `neutral`           | `#0F172A` | `#1E293B` | Neutral surfaces                |
-| `neutral-content`   | `#FFFFFF` | `#E2E8F0` | Text on neutral                 |
-| `info`              | `#3B82F6` | `#60A5FA` | Informational                   |
-| `info-content`      | `#FFFFFF` | `#0B1120` | Text on info                    |
-| `success`           | `#10B981` | `#34D399` | Completed                       |
-| `success-content`   | `#FFFFFF` | `#0B1120` | Text on success                 |
-| `warning`           | `#F59E0B` | `#FBBF24` | Queued / in progress            |
-| `warning-content`   | `#78350F` | `#0B1120` | Text on warning                 |
-| `error`             | `#EF4444` | `#F87171` | Failed / validation             |
-| `error-content`     | `#FFFFFF` | `#0B1120` | Text on error                   |
+| Token               | Dark      | Use                             |
+| ------------------- | --------- | ------------------------------- |
+| `base-100`          | `#0F172A` | Surface                         |
+| `base-200`          | `#1E293B` | Raised surface / default button |
+| `base-300`          | `#334155` | Borders                         |
+| `base-content`      | `#E2E8F0` | Text on base                    |
+| `primary`           | `#60A5FA` | Train CTA                       |
+| `primary-content`   | `#0B1120` | Text on primary                 |
+| `secondary`         | `#94A3B8` | Secondary actions               |
+| `secondary-content` | `#0B1120` | Text on secondary               |
+| `accent`            | `#2DD4BF` | ONNX / success emphasis         |
+| `accent-content`    | `#0B1120` | Text on accent                  |
+| `neutral`           | `#1E293B` | Neutral surfaces                |
+| `neutral-content`   | `#E2E8F0` | Text on neutral                 |
+| `info`              | `#60A5FA` | Informational                   |
+| `info-content`      | `#0B1120` | Text on info                    |
+| `success`           | `#34D399` | Completed                       |
+| `success-content`   | `#0B1120` | Text on success                 |
+| `warning`           | `#FBBF24` | Queued / in progress            |
+| `warning-content`   | `#0B1120` | Text on warning                 |
+| `error`             | `#F87171` | Failed / validation             |
+| `error-content`     | `#0B1120` | Text on error                   |
 
 ### llm extended
 
-| Token                       | Light                 | Dark                  | Use                        |
-| --------------------------- | --------------------- | --------------------- | -------------------------- |
-| `background`                | `#FFFFFF`             | `#0B1120`             | Page background            |
-| `background-secondary`      | `#F8FAFC`             | `#0F172A`             | Alternating section        |
-| `surface`                   | `#FFFFFF`             | `#0F172A`             | Card surface               |
-| `surface-raised`            | `#F8FAFC`             | `#1E293B`             | Inset / icon surface       |
-| `border`                    | `#E2E8F0`             | `#334155`             | Default border             |
-| `border-light`              | `#F1F5F9`             | `#1E293B`             | Subtle divider             |
-| `border-strong`             | `#94A3B8`             | `#475569`             | Emphasised border          |
-| `text-primary`              | `#0F172A`             | `#E2E8F0`             | Body text                  |
-| `text-secondary`            | `#64748B`             | `#94A3B8`             | Secondary text             |
-| `text-tertiary`             | `#94A3B8`             | `#64748B`             | Helper text                |
-| `text-inverse`              | `#FFFFFF`             | `#0B1120`             | Text on dark / light block |
-| `primary-hover`             | `#1D4ED8`             | `#93C5FD`             | Primary hover              |
-| `primary-active`            | `#1E40AF`             | `#2563EB`             | Primary active             |
-| `primary-muted`             | `#EFF6FF`             | `#172554`             | Primary tint               |
-| `success-bg` / `success-fg` | `#D1FAE5` / `#047857` | `#064E3B` / `#34D399` | Success badge              |
-| `warning-bg` / `warning-fg` | `#FEF3C7` / `#92400E` | `#451A03` / `#FCD34D` | Warning badge              |
-| `error-bg` / `error-fg`     | `#FEE2E2` / `#B91C1C` | `#450A0A` / `#FCA5A5` | Error badge                |
-| `info-bg` / `info-fg`       | `#DBEAFE` / `#1D4ED8` | `#1E3A8A` / `#93C5FD` | Info badge                 |
-| `focus-ring`                | `#2563EB`             | `#60A5FA`             | `:focus-visible` outline   |
+| Token                       | Dark                  | Use                        |
+| --------------------------- | --------------------- | -------------------------- |
+| `background`                | `#0B1120`             | Page background            |
+| `background-secondary`      | `#0F172A`             | Alternating section        |
+| `surface`                   | `#0F172A`             | Card surface               |
+| `surface-raised`            | `#1E293B`             | Inset / icon surface       |
+| `border`                    | `#334155`             | Default border             |
+| `border-light`              | `#1E293B`             | Subtle divider             |
+| `border-strong`             | `#475569`             | Emphasised border          |
+| `text-primary`              | `#E2E8F0`             | Body text                  |
+| `text-secondary`            | `#94A3B8`             | Secondary text             |
+| `text-tertiary`             | `#64748B`             | Helper text                |
+| `text-inverse`              | `#0B1120`             | Text on dark block         |
+| `primary-hover`             | `#93C5FD`             | Primary hover              |
+| `primary-active`            | `#2563EB`             | Primary active             |
+| `primary-muted`             | `#172554`             | Primary tint               |
+| `success-bg` / `success-fg` | `#064E3B` / `#34D399` | Success badge              |
+| `warning-bg` / `warning-fg` | `#451A03` / `#FCD34D` | Warning badge              |
+| `error-bg` / `error-fg`     | `#450A0A` / `#FCA5A5` | Error badge                |
+| `info-bg` / `info-fg`       | `#1E3A8A` / `#93C5FD` | Info badge                 |
+| `focus-ring`                | `#60A5FA`             | `:focus-visible` outline   |
 
 Rules:
 
 1. Do not use raw hex in components when a semantic class exists.
 2. Status colours are always used as a pair (`bg-<x>-bg` with `text-<x>-fg`) so contrast holds.
-3. Keep the `light` and `dark` values in step — every token has both.
+3. Only dark values are defined; the app ships with a single dark theme.
 
 ## Typography
 
@@ -111,5 +111,5 @@ Use the Tailwind scale: page padding `p-4 md:p-8`, card `p-6`, stack `gap-4`.
 ## Radius and shadow
 
 Use DaisyUI defaults (`rounded-box`, `shadow`, `shadow-sm`). Cards for upload, mapping, and
-metrics. Radius is configured once in the themes (`--radius-selector`, `--radius-field`,
+metrics. Radius is configured once in the theme (`--radius-selector`, `--radius-field`,
 `--radius-box`).

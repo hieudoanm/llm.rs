@@ -18,7 +18,6 @@ components so pages never copy them. The wrappers live in
 | Stepper          | —               | `steps`                                                 | Job lifecycle / wizard                                                                                                                                                         |
 | Loading          | —               | `loading loading-spinner`                               | Buttons and page-level waits                                                                                                                                                   |
 | Table            | —               | `table`                                                 | Column preview, jobs history, metrics                                                                                                                                          |
-| Theme controller | `Navbar` toggle | `data-theme` on `<html>`                                | Light/dark, persisted                                                                                                                                                          |
 
 Rules:
 

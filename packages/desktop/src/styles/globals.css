@@ -7,50 +7,11 @@
 
 /*
  * DaisyUI themes. Values mirror
- * docs/07-ui-ux-design/system/design-tokens.md and the prototypes under
- * docs/07-ui-ux-design/prototypes. Change a token in all three places.
+ * docs/07-ui-ux-design/system/design-tokens.md. Dark theme only.
  */
 @plugin 'daisyui/theme' {
-  name: 'skl-light';
-  default: true;
-  prefersdark: false;
-  color-scheme: 'light';
-
-  --color-base-100: #ffffff;
-  --color-base-200: #f1f5f9;
-  --color-base-300: #cbd5e1;
-  --color-base-content: #0f172a;
-
-  --color-primary: #2563eb;
-  --color-primary-content: #ffffff;
-  --color-secondary: #64748b;
-  --color-secondary-content: #ffffff;
-  --color-accent: #0d9488;
-  --color-accent-content: #ffffff;
-  --color-neutral: #0f172a;
-  --color-neutral-content: #ffffff;
-  --color-info: #3b82f6;
-  --color-info-content: #ffffff;
-  --color-success: #10b981;
-  --color-success-content: #ffffff;
-  --color-warning: #f59e0b;
-  --color-warning-content: #78350f;
-  --color-error: #ef4444;
-  --color-error-content: #ffffff;
-
-  --radius-selector: 9999px;
-  --radius-field: 0.5rem;
-  --radius-box: 0.5rem;
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
-  --border: 1px;
-  --depth: 1;
-  --noise: 0;
-}
-
-@plugin 'daisyui/theme' {
   name: 'skl-dark';
-  default: false;
+  default: true;
   prefersdark: true;
   color-scheme: 'dark';
 
@@ -87,71 +48,13 @@
 }
 
 /*
- * Extended tokens. The light values are the defaults; the dark block below
- * overrides the ones that differ. `font-*` variables come from next/font.
+ * Extended tokens. Dark values only.
  */
 @theme {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono:
     var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     'Liberation Mono', monospace;
-
-  --color-background: #ffffff;
-  --color-background-secondary: #f8fafc;
-  --color-surface: #ffffff;
-  --color-surface-raised: #f8fafc;
-  --color-border: #e2e8f0;
-  --color-border-light: #f1f5f9;
-  --color-border-strong: #94a3b8;
-
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #64748b;
-  --color-text-tertiary: #94a3b8;
-  --color-text-inverse: #ffffff;
-
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-active: #1e40af;
-  --color-primary-content: #ffffff;
-  --color-primary-muted: #eff6ff;
-
-  --color-secondary: #64748b;
-  --color-secondary-content: #ffffff;
-
-  --color-accent: #0d9488;
-  --color-accent-content: #ffffff;
-
-  --color-success: #10b981;
-  --color-success-content: #ffffff;
-  --color-success-bg: #d1fae5;
-  --color-success-fg: #047857;
-
-  --color-warning: #f59e0b;
-  --color-warning-content: #78350f;
-  --color-warning-bg: #fef3c7;
-  --color-warning-fg: #92400e;
-
-  --color-error: #ef4444;
-  --color-error-content: #ffffff;
-  --color-error-bg: #fee2e2;
-  --color-error-fg: #b91c1c;
-
-  --color-info: #3b82f6;
-  --color-info-content: #ffffff;
-  --color-info-bg: #dbeafe;
-  --color-info-fg: #1d4ed8;
-
-  --color-focus-ring: #2563eb;
-
-  --radius-selector: 9999px;
-  --radius-field: 0.5rem;
-  --radius-box: 0.5rem;
-  --size-selector: 0.25rem;
-  --size-field: 0.25rem;
-}
-
-[data-theme='skl-dark'] {
-  color-scheme: dark;
 
   --color-background: #0b1120;
   --color-background-secondary: #0f172a;
@@ -199,6 +102,16 @@
   --color-info-fg: #93c5fd;
 
   --color-focus-ring: #60a5fa;
+
+  --radius-selector: 9999px;
+  --radius-field: 0.5rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+}
+
+[data-theme='skl-dark'] {
+  color-scheme: dark;
 }
 
 @layer components {
@@ -222,14 +135,6 @@
     font-size: 3rem;
     line-height: 1;
   }
-}
-
-/* Theme-only elements swap with the active theme (brand marks, theme icon). */
-[data-theme='skl-dark'] .theme-light {
-  display: none;
-}
-[data-theme='skl-light'] .theme-dark {
-  display: none;
 }
 
 body {

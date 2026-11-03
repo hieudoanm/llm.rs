@@ -229,12 +229,12 @@ job summary read them directly and need no new key. For reinforcement learning, 
   `LineChart`, `Heatmap`, `Donut`, `SilhouettePlot`, `FeatureImportance`, `ChartWrapper` — each
   taking a typed discriminated-union prop and delegating scales, axes, and tooltips to visx. The
   heatmap (C1) composes `@visx/group` rectangles.
-- Colours come from the semantic tokens and must keep AA contrast on `base-100` in both themes; never
+- Colours come from the semantic tokens and must keep AA contrast on `base-100`; never
   hard-code hex values.
 - **Rejected:** **Recharts 3.x** — drags Redux Toolkit, react-redux, immer, and `victory-vendor` into
   a fixed, pre-aggregated set and still cannot draw the confusion-matrix heatmap. **react-chartjs-2**
   and **echarts-for-react** — Canvas renders no selectable text and ignores CSS token theming, which
-  breaks the accessibility fallback and light/dark theming. **Hand-rolled SVG** — would reimplement
+  breaks the accessibility fallback and theming. **Hand-rolled SVG** — would reimplement
   scales, axes, and tooltips that visx already provides.
 
 ## 6. Accessibility

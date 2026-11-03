@@ -9,7 +9,7 @@
     "dev:tauri": "cargo dev --cwd src-tauri",
     "prebuild": "rimraf .next",
     "build": "next build",
-    "build:tauri": "tauri build --cwd src-tauri",
+    "build:tauri": "tauri build",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --cache --write .",

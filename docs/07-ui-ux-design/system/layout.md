@@ -5,7 +5,7 @@ _Part of [07-ui-ux-design.md](../../07-ui-ux-design.md)._
 ## Shell
 
 - Top navbar (sticky): the llm [mark](../brand/README.md) linking home, links
-  **Jobs** / **Algorithms**, and a theme toggle.
+  **Jobs** / **Algorithms**.
 - Main: `max-w-5xl mx-auto` for forms and detail; `max-w-6xl` for the history table.
 - Footer: local-only disclaimer ("Not a production AutoML service").
 
@@ -31,6 +31,4 @@ below `md`.
 
 ## Theme
 
-`<html data-theme>` is set to `llm-light` or `llm-dark`. An inline script applies the stored
-theme (or `prefers-color-scheme`) before first paint to avoid a flash; the toggle persists the
-choice to `localStorage` under `llm-theme`.
+`<html data-theme='skl-dark'>` is always set — the app ships with a single dark theme.

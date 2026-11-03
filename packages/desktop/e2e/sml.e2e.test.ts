@@ -128,30 +128,10 @@ const verifyArtefacts = async (page: Page, jobId: string) => {
 };
 
 test.describe('Demo Scene 1: Title & Branding', () => {
-  test('home page shows llm branding and feature grid', async ({ page }) => {
+  test('home page redirects to new job', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('h1')).toContainText('llm-client');
+    await expect(page).toHaveURL(/\/jobs\/new/);
     await expect(page.getByRole('link', { name: 'Train a model' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'View jobs' })).toBeVisible();
-    await expect(page.getByText('CSV upload')).toBeVisible();
-    await expect(page.getByText('Task-aware models')).toBeVisible();
-    await expect(page.getByText('ONNX export')).toBeVisible();
-    await expect(page.getByText('Upload dataset')).toBeVisible();
-    await expect(page.getByText('Map and configure')).toBeVisible();
-    await expect(page.getByText('Train and download')).toBeVisible();
-    await expect(page.getByText('Ready to train your first model?')).toBeVisible();
-  });
-});
-
-test.describe('Demo Scene 2: Theme Toggle', () => {
-  test('toggles between llm-light and llm-dark themes', async ({ page }) => {
-    await page.goto('/');
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'llm-light');
-    const toggle = page.getByLabel('Toggle theme');
-    await toggle.click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'llm-dark');
-    await toggle.click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'llm-light');
   });
 });
 
@@ -402,19 +382,5 @@ test.describe('Demo Scene 13: Unsupervised Workflows', () => {
     expect(anomalyJob.metrics?.anomalyRate).toBeLessThanOrEqual(1);
     await expect(page.getByText('Anomaly rate')).toBeVisible({ timeout: 10000 });
     await verifyArtefacts(page, anomalyJobId);
-  });
-});
-
-test.describe('Demo Scene 14: Dark Theme Walkthrough', () => {
-  test('renders key flows in dark theme', async ({ page }) => {
-    await page.goto('/');
-    const toggle = page.getByLabel('Toggle theme');
-    await toggle.click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'llm-dark');
-    await expect(page.locator('h1')).toContainText('llm-client');
-    await page.getByRole('link', { name: 'Train a model' }).click();
-    await expect(page.locator('h1')).toContainText('New job', { timeout: 10000 });
-    await toggle.click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'llm-light');
   });
 });

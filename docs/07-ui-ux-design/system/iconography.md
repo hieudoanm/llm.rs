@@ -12,4 +12,4 @@ glyphs.
 - Semantic icons (download, error, theme) also have a name on the control.
 
 Suggested set: `PiUpload`, `PiTable`, `PiCpu`, `PiDownload`, `PiCheckCircle`, `PiWarningCircle`,
-`PiInfo`, `PiSun`, `PiMoon`.
+`PiInfo`.

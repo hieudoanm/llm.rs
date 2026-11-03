@@ -6,8 +6,8 @@ Static HTML prototypes for the llm-client (llm) interface, with scripts to captu
 
 - **Static, dependency-free HTML.** Each page is a single self-contained file you can open directly in a browser — no build step, no server.
 - **Styling via CDN.** Tailwind CSS v4 (browser build) and DaisyUI v5 are loaded from a CDN and configured in an inline `@theme` block that mirrors the design tokens. **Prototype-only** — production uses a compiled, purged stylesheet.
-- **Both themes.** Every page ships with `llm-light` and `llm-dark` and a theme switcher, so every screen can be reviewed in both modes.
-- **Reproducible screenshots.** A Playwright script renders every page in both themes to `images/light/` and `images/dark/`.
+- **Dark theme only.** Every page ships with `skl-dark`, matching the production app.
+- **Reproducible screenshots.** A Playwright script renders every page in dark mode to `images/dark/`.
 
 ## 2. Structure
 
@@ -15,9 +15,8 @@ Static HTML prototypes for the llm-client (llm) interface, with scripts to captu
 07-ui-ux-design/prototypes/
 ├── html/              # HTML prototypes (numbered 00-05)
 ├── images/
-│   ├── light/         # llm-light PNG screenshots
-│   └── dark/          # llm-dark PNG screenshots
-├── screenshot.py      # Renders every HTML file in both themes
+│   └── dark/          # skl-dark PNG screenshots
+├── screenshot.py      # Renders every HTML file in dark theme
 ├── screenshot.sh      # Runs setup + screenshot.py (uv + Playwright)
 ├── pyproject.toml     # Rust dependencies (managed with uv)
 └── README.md          # This file
@@ -50,7 +49,7 @@ rust3 -m http.server 8080 --directory html
 
 The routes map to the app router: `/`, `/jobs/new`, `/jobs/[jobId]`, `/jobs`, `/algorithms`.
 
-Each screen is captured in **both** themes under its own name: `images/light/<n>-<name>.png` is the `llm-light` capture and `images/dark/<n>-<name>.png` is the `llm-dark` capture.
+Each screen is captured in dark theme under its own name: `images/dark/<n>-<name>.png` is the `skl-dark` capture.
 
 ## 5. Generating screenshots
 
@@ -72,27 +71,23 @@ uv run screenshot.py
 The script:
 
 1. Reads every `html/*.html` file (sorted by name).
-2. Opens it in headless Chromium, sets `localStorage['llm-theme']`, and reloads.
+2. Opens it in headless Chromium, sets `data-theme='skl-dark'` on `<html>`, and reloads.
 3. Takes a full-page screenshot at a 1920×1080 viewport.
-4. Writes `images/light/<name>.png` and `images/dark/<name>.png`.
+4. Writes `images/dark/<name>.png`.
 
 The `.venv/` directory and `uv.lock` are created by `uv` and are gitignored.
 
-## 6. Theme switcher
+## 6. Tokens
 
-The floating control in the bottom-right corner is a **prototype affordance**, not part of the product UI. It sets `data-theme` on `<html>`, persists the choice in `localStorage` under the key `llm-theme`, and falls back to `prefers-color-scheme`. A small inline script runs before paint to avoid a flash of the wrong theme.
-
-## 7. Tokens
-
-The prototypes use the design tokens directly through utility classes generated from the `@theme` block (for example `bg-base-100`, `text-text-primary`, `bg-primary`, `text-error-fg`). The canonical, light/dark table lives in the Colour section of [`design-tokens.md`](../system/design-tokens.md#colour) — if a token changes there, update `@theme` and the `[data-theme='llm-light']` / `[data-theme='llm-dark']` blocks in these files to match.
+The prototypes use the design tokens directly through utility classes generated from the `@theme` block (for example `bg-base-100`, `text-text-primary`, `bg-primary`, `text-error-fg`). The canonical table lives in [`design-tokens.md`](../system/design-tokens.md#colour) — if a token changes there, update `@theme` and the `[data-theme='skl-dark']` block in these files to match.
 
 Job status colours follow [`states.md`](../system/states.md): queued/validating/training/evaluating/exporting use `warning`, completed uses `success`, failed uses `error` — status colour pairs are always used together (`badge badge-warning` with `text-warning-content`) to preserve contrast.
 
-## 8. Keeping prototypes in sync
+## 7. Keeping prototypes in sync
 
 These files are illustrative. When the design doc changes:
 
-1. Update the token values in the `@theme` block and the `[data-theme='llm-light']` / `[data-theme='llm-dark']` blocks.
+1. Update the token values in the `@theme` block and the `[data-theme='skl-dark']` block.
 2. Update the affected screens.
 3. Regenerate screenshots with `./screenshot.sh` and commit the HTML and PNG changes together.
 4. Keep the pages consistent with the component rules in [`../../07-ui-ux-design.md`](../../07-ui-ux-design.md) — DaisyUI first, Tailwind second, custom CSS last.
