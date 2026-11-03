@@ -52,40 +52,6 @@ jobs:
           path: ${{ github.workspace }}/crates/target/release/llm
           retention-days: 7
 
-  desktop-frontend:
-    name: Desktop Frontend
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7.0.1
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6.1.1
-        with:
-          version: 12.16.1
-
-      - name: Set up Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v7.1.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-
-      - name: Install desktop dependencies
-        working-directory: ${{ github.workspace }}/packages/desktop
-        run: pnpm install --frozen-lockfile
-
-      - name: Build frontend (out folder)
-        working-directory: ${{ github.workspace }}/packages/desktop
-        run: pnpm run build
-
-      - name: Upload frontend out folder
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: llm-desktop-frontend-out
-          path: ${{ github.workspace }}/packages/desktop/out
-          retention-days: 7
-
   desktop-build:
     name: Desktop App (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -121,6 +87,9 @@ jobs:
       - name: Install desktop dependencies
         working-directory: ${{ github.workspace }}/packages/desktop
         run: pnpm install --frozen-lockfile
+
+      - name: Install cargo-tauri
+        run: cargo install cargo-tauri --version 1.8.0
 
       - name: Build frontend
         working-directory: ${{ github.workspace }}/packages/desktop
