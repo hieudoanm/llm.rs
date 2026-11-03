@@ -12,7 +12,7 @@ path = "src/main.rs"
 [dependencies]
 anyhow.workspace = true
 chrono.workspace = true
-clap = { version = "4", features = ["derive"] }
+clap = { version = "=4.6.7", features = ["derive"] }
 llm-core = { path = "../llm-core" }
 llm-db = { path = "../llm-db" }
 polars.workspace = true
