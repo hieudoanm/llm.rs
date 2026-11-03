@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { ApiAlert } from '@/components/ui/ApiAlert';
-import { ApiError } from '@/lib/api';
+import { TauriError } from '@/lib/tauri';
 import { MAX_NAME_LENGTH, MAX_TAGS, MAX_TAG_LENGTH } from '@/lib/constants';
 import { PiPlus, PiX } from 'react-icons/pi';
 
@@ -86,7 +86,7 @@ export const JobMetadataEditor = ({
       onSaved?.(result);
     } catch (cause) {
       setSaved(false);
-      setError(cause instanceof ApiError ? cause.message : 'The metadata could not be saved.');
+      setError(cause instanceof TauriError ? cause.message : 'The metadata could not be saved.');
     } finally {
       setSaving(false);
     }

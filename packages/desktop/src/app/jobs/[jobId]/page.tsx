@@ -6,11 +6,10 @@ import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { JobMetadataEditor } from '@/components/jobs/JobMetadataEditor';
 import { DatasetInsightsPanel } from '@/components/jobs/DatasetInsightsPanel';
-import { apiPatch, ApiError } from '@/lib/api';
-import { apiGetPath } from '@/lib/apiTyped';
+import { tauriGetJob, tauriPatchJob, TauriError } from '@/lib/tauri';
 import { QUERY_CACHE } from '@/lib/queryCache';
 import { TERMINAL_STATUSES } from './_lib/constants';
-import { type Job } from './_lib/types';
+import { type Job, type JobStatus } from './_lib/types';
 import { JobHeader } from './_components/JobHeader';
 import { JobStepper } from './_components/JobStepper';
 import { JobDetails } from './_components/JobDetails';
@@ -28,13 +27,13 @@ const JobStatusContent = () => {
   const { data, isLoading, isError, error, refetch } = useQuery<Job, Error>({
     queryKey: ['job', jobId],
     // The signal aborts the in-flight poll when the page is left.
-    queryFn: ({ signal }) => apiGetPath('/api/v1/jobs/{job_id}', { job_id: jobId }, { signal }),
+    queryFn: () => tauriGetJob<Job>(jobId),
     refetchInterval: (query) => {
       const current = query.state.data as Job | undefined;
-      return current && TERMINAL_STATUSES.includes(current.status) ? false : 1000;
+      return current && TERMINAL_STATUSES.includes(current.status as JobStatus) ? false : 1000;
     },
     retry: (failureCount, failure) => {
-      if (failure instanceof ApiError && failure.status === 404) return false;
+      if (failure instanceof TauriError && failure.serverCode === 'DATASET_NOT_FOUND') return false;
       return failureCount < 3;
     },
     enabled: !!jobId,
@@ -66,7 +65,7 @@ const JobStatusContent = () => {
     );
   }
 
-  const isTerminal = TERMINAL_STATUSES.includes(data.status);
+  const isTerminal = TERMINAL_STATUSES.includes(data.status as JobStatus);
   const isCompleted = data.status === 'completed';
   const isFailed = data.status === 'failed';
 
@@ -78,29 +77,24 @@ const JobStatusContent = () => {
         Job status: {data.status}
       </p>
 
-      {isFailed && data.error && (
+      {isFailed && data.errorCode && data.errorMessage && (
         <ApiErrorAlert
           error={
-            new ApiError(
-              'HTTP_ERROR',
-              data.error.message,
-              500,
-              undefined,
-              { code: data.error.code },
-              data.error.code,
-            )
+            new TauriError('INVOKE_ERROR', data.errorMessage, 500, undefined, data.errorCode, {
+              code: data.errorCode,
+            })
           }
         />
       )}
 
-      <JobStepper status={data.status} />
+      <JobStepper status={data.status as JobStatus} />
 
       <JobMetadataEditor
         jobId={jobId}
         name={data.name ?? null}
         tags={data.tags ?? []}
         onSave={async (metadata) => {
-          const updated = await apiPatch<Job>(`/api/v1/jobs/${jobId}`, metadata);
+          const updated = await tauriPatchJob<Job>(jobId, metadata.name ?? null, metadata.tags);
           void queryClient.invalidateQueries({ queryKey: ['job', jobId] });
           return { name: updated.name ?? null, tags: updated.tags ?? [] };
         }}
@@ -109,7 +103,7 @@ const JobStatusContent = () => {
       <JobDetails job={data} />
 
       {isCompleted && data.metrics && Object.keys(data.metrics).length > 0 && (
-        <JobMetrics metrics={data.metrics} jobId={jobId} />
+        <JobMetrics metrics={data.metrics as Record<string, number>} jobId={jobId} />
       )}
 
       {isCompleted && data.charts && <JobCharts charts={data.charts} jobId={jobId} />}

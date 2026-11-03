@@ -3,10 +3,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const apiGet = vi.fn();
-vi.mock('@/lib/api', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@/lib/api')>();
-  return { ...actual, apiGet: (...args: unknown[]) => apiGet(...args) };
+const tauriGetDatasetInsights = vi.fn();
+vi.mock('@/lib/tauri', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/tauri')>();
+  return {
+    ...actual,
+    tauriGetDatasetInsights: (...args: unknown[]) => tauriGetDatasetInsights(...args),
+  };
 });
 
 import { DatasetInsightsPanel } from '../DatasetInsightsPanel';
@@ -66,19 +69,19 @@ const wrapper = ({ children }: { children: ReactNode }) => {
 };
 
 beforeEach(() => {
-  apiGet.mockReset();
+  tauriGetDatasetInsights.mockReset();
 });
 
 describe('DatasetInsightsPanel', () => {
   it('shows a loading state first', () => {
-    apiGet.mockReturnValue(new Promise(() => undefined));
+    tauriGetDatasetInsights.mockReturnValue(new Promise(() => undefined));
     render(<DatasetInsightsPanel datasetId='d1' />, { wrapper });
 
     expect(screen.getByRole('status', { name: 'Loading dataset insights' })).toBeInTheDocument();
   });
 
   it('renders the dataset summary', async () => {
-    apiGet.mockResolvedValue(insights);
+    tauriGetDatasetInsights.mockResolvedValue(insights);
     render(<DatasetInsightsPanel datasetId='d1' />, { wrapper });
 
     await waitFor(() => expect(screen.getByText('1000')).toBeInTheDocument());
@@ -87,7 +90,7 @@ describe('DatasetInsightsPanel', () => {
   });
 
   it('renders the warnings with their suggested action', async () => {
-    apiGet.mockResolvedValue(insights);
+    tauriGetDatasetInsights.mockResolvedValue(insights);
     render(<DatasetInsightsPanel datasetId='d1' />, { wrapper });
 
     await waitFor(() =>
@@ -99,7 +102,7 @@ describe('DatasetInsightsPanel', () => {
   });
 
   it('renders the column table with the notes', async () => {
-    apiGet.mockResolvedValue(insights);
+    tauriGetDatasetInsights.mockResolvedValue(insights);
     render(<DatasetInsightsPanel datasetId='d1' />, { wrapper });
 
     await waitFor(() => expect(screen.getAllByText('feature1').length).toBeGreaterThan(0));
@@ -110,21 +113,21 @@ describe('DatasetInsightsPanel', () => {
   });
 
   it('renders the preview rows', async () => {
-    apiGet.mockResolvedValue(insights);
+    tauriGetDatasetInsights.mockResolvedValue(insights);
     render(<DatasetInsightsPanel datasetId='d1' />, { wrapper });
 
     await waitFor(() => expect(screen.getByText('First rows of the dataset')).toBeInTheDocument());
   });
 
   it('queries the insights endpoint of the dataset', async () => {
-    apiGet.mockResolvedValue(insights);
+    tauriGetDatasetInsights.mockResolvedValue(insights);
     render(<DatasetInsightsPanel datasetId='d1' />, { wrapper });
 
-    await waitFor(() => expect(apiGet).toHaveBeenCalledWith('/api/v1/datasets/d1/insights'));
+    await waitFor(() => expect(tauriGetDatasetInsights).toHaveBeenCalledWith('d1'));
   });
 
   it('shows an error state when the insights cannot be loaded', async () => {
-    apiGet.mockRejectedValue(new Error('boom'));
+    tauriGetDatasetInsights.mockRejectedValue(new Error('boom'));
     render(<DatasetInsightsPanel datasetId='d1' />, { wrapper });
 
     await waitFor(() =>

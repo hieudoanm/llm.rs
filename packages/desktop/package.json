@@ -7,7 +7,7 @@
     "dev": "concurrently \"pnpm:dev:web\" \"pnpm:dev:tauri\"",
     "dev:web": "next dev",
     "dev:tauri": "cargo dev --cwd src-tauri",
-    "prebuild": "rimraf .next",
+    "prebuild": "rimraf .next out",
     "build": "next build",
     "build:tauri": "tauri build",
     "start": "next start",

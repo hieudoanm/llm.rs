@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { apiGet, apiPost, apiUpload } from '@/lib/api';
+import { tauriGetAlgorithms, tauriPostDataset, tauriPostTrain } from '@/lib/tauri';
 import { QUERY_CACHE } from '@/lib/queryCache';
 import { TaskType, WizardStep, ExportFormat, Dataset, Algorithm, JobAccepted } from './types';
 import { LABEL_TASKS, RL_TASK, HYPERPARAMETER_FIELDS } from './constants';
@@ -16,12 +16,9 @@ import { validateWizard, type ValidationIssue } from './validation';
 
 /** True when the backend reports that the dataset no longer exists. */
 const isDatasetNotFound = (error: unknown): boolean => {
-  const candidate = error as { status?: number; serverCode?: string; code?: string } | null;
+  const candidate = error as { serverCode?: string; code?: string } | null;
   if (!candidate) return false;
-  return (
-    candidate.status === 404 &&
-    (candidate.serverCode === 'DATASET_NOT_FOUND' || candidate.code === 'DATASET_NOT_FOUND')
-  );
+  return candidate.serverCode === 'DATASET_NOT_FOUND' || candidate.code === 'DATASET_NOT_FOUND';
 };
 
 /** The dataset of a restored session. */
@@ -98,7 +95,11 @@ export const useNewJobWizard = () => {
   ]);
 
   const uploadMutation = useMutation({
-    mutationFn: (formData: FormData) => apiUpload<Dataset>('/api/v1/datasets', formData),
+    mutationFn: async (file: File) => {
+      const arrayBuffer = await file.arrayBuffer();
+      const bytes = new Uint8Array(arrayBuffer);
+      return tauriPostDataset<Dataset>(bytes, file.name);
+    },
     onSuccess: (data) => {
       setDataset(data);
       setUploadError(null);
@@ -111,7 +112,7 @@ export const useNewJobWizard = () => {
 
   const { data: algorithmsData, isLoading: loadingAlgorithms } = useQuery({
     queryKey: ['algorithms', taskType],
-    queryFn: () => apiGet<{ algorithms: Algorithm[] }>(`/api/v1/algorithms?taskType=${taskType}`),
+    queryFn: () => tauriGetAlgorithms<{ algorithms: Algorithm[] }>(taskType),
     select: (data) => data.algorithms,
     ...QUERY_CACHE.catalogue,
   });
@@ -223,7 +224,7 @@ export const useNewJobWizard = () => {
   );
 
   const createJobMutation = useMutation<JobAccepted, Error, void>({
-    mutationFn: () => {
+    mutationFn: async () => {
       if (!dataset) throw new Error('Missing dataset');
       const body: Record<string, unknown> = {
         datasetId: dataset.datasetId,
@@ -244,9 +245,7 @@ export const useNewJobWizard = () => {
       // One key per job configuration: retries reuse it (so a double-submit
       // cannot start two jobs) while a new job after success gets a fresh key.
       if (!idempotencyKeyRef.current) idempotencyKeyRef.current = crypto.randomUUID();
-      return apiPost<JobAccepted>('/api/v1/jobs', body, {
-        headers: { 'Idempotency-Key': idempotencyKeyRef.current },
-      });
+      return tauriPostTrain<JobAccepted>({ request: body });
     },
     onSuccess: (data) => {
       idempotencyKeyRef.current = '';
@@ -274,9 +273,7 @@ export const useNewJobWizard = () => {
     setUploadError(null);
     setNotice(null);
     setSelectedFile({ name: file.name, size: file.size });
-    const formData = new FormData();
-    formData.append('file', file);
-    uploadMutation.mutate(formData);
+    uploadMutation.mutate(file);
   };
 
   const toggleFeature = (name: string) => {

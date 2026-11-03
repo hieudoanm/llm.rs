@@ -2,9 +2,9 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
-  experimental: {
-    agentFeedback: true,
-  },
+  output: 'export',
+  reactStrictMode: true,
+  trailingSlash: true,
   turbopack: {
     rules: {
       '*.css': {

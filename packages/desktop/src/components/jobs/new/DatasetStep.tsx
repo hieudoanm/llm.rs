@@ -9,7 +9,7 @@ import type { ValidationIssue } from '@/app/jobs/new/_lib/validation';
 type Props = {
   dataset: Dataset | null;
   uploadError: string | null;
-  uploadMutation: UseMutationResult<Dataset, Error, FormData>;
+  uploadMutation: UseMutationResult<Dataset, Error, File>;
   onUpload: (file: File) => void;
   onChangeFile: () => void;
   onContinue: () => void;

@@ -8,7 +8,7 @@ import { StatusBadge, type JobStatus } from '@/components/ui/StatusBadge';
 import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { QUERY_CACHE } from '@/lib/queryCache';
-import { apiGet } from '@/lib/api';
+import { tauriGetCompareJobs } from '@/lib/tauri';
 import {
   allMetricKeys,
   formatMetric,
@@ -69,9 +69,9 @@ const CompareContent = () => {
     .map((id) => id.trim())
     .filter((id) => id.length > 0);
 
-  const { data, isLoading, isError, error, refetch } = useQuery<ComparisonResponse>({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['job-comparison', ids.join(',')],
-    queryFn: () => apiGet<ComparisonResponse>(`/api/v1/jobs/compare?ids=${ids.join(',')}`),
+    queryFn: () => tauriGetCompareJobs<ComparisonResponse>(ids),
     enabled: ids.length >= 2,
     retry: false,
     ...QUERY_CACHE.comparison,

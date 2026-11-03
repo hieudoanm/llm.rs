@@ -7,7 +7,7 @@
  * guidance shown next to an error.
  */
 
-import { API_BASE, type ApiError } from './api';
+import type { TauriError } from './tauri';
 
 export interface ErrorGuidance {
   /** A short heading. */
@@ -176,9 +176,9 @@ export const ERROR_GUIDANCE: Record<string, ErrorGuidance> = {
     action: 'Retry',
     retryable: true,
   },
-  NETWORK_ERROR: {
-    title: 'Cannot reach the API',
-    message: 'The request did not reach the backend at {apiUrl}. Check that the stack is running.',
+  INVOKE_ERROR: {
+    title: 'Cannot reach the backend',
+    message: 'The request did not reach the backend. Check that the app is running.',
     action: 'Retry',
     retryable: true,
   },
@@ -219,7 +219,6 @@ export const FALLBACK_GUIDANCE: ErrorGuidance = {
 
 /** The default context used to interpolate the catalogue placeholders. */
 export const defaultGuidanceContext = (): GuidanceContext => ({
-  apiUrl: API_BASE,
   limit: 10,
   attempts: 2,
   timeout: 15000,
@@ -229,10 +228,10 @@ export const defaultGuidanceContext = (): GuidanceContext => ({
  * Look up the guidance for an error.
  *
  * The backend's own code wins over the transport code, so a `VALIDATION_ERROR`
- * from the server is never flattened into the generic `HTTP_ERROR` guidance.
+ * from the server is never flattened into the generic `INVOKE_ERROR` guidance.
  */
 export const guidanceFor = (
-  error: Pick<ApiError, 'code' | 'serverCode' | 'details'> | null | undefined,
+  error: Pick<TauriError, 'code' | 'serverCode' | 'details'> | null | undefined,
   context: GuidanceContext = {},
 ): ErrorGuidance => {
   if (!error) return FALLBACK_GUIDANCE;
@@ -266,13 +265,13 @@ export const guidanceFor = (
  * server complained about.
  */
 export const errorDetails = (
-  error: Pick<ApiError, 'code' | 'serverCode' | 'details' | 'status'> | null | undefined,
+  error: Pick<TauriError, 'code' | 'serverCode' | 'details' | 'status'> | null | undefined,
 ): string[] => {
   if (!error) return [];
   const lines: string[] = [];
   const serverCode = error.serverCode;
   if (serverCode && serverCode !== error.code) lines.push(`Backend code: ${serverCode}`);
-  if (error.status) lines.push(`HTTP status: ${error.status}`);
+  if (error.status) lines.push(`Status: ${error.status}`);
   const details = error.details ?? {};
   const fields = details.fields;
   if (Array.isArray(fields)) {

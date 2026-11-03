@@ -1,5 +1,5 @@
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { type Job } from '../_lib/types';
+import { type Job, type JobStatus } from '../_lib/types';
 
 interface JobDetailsProps {
   job: Job;
@@ -11,7 +11,7 @@ export const JobDetails = ({ job }: JobDetailsProps) => {
       <div className='card bg-base-100 p-6 shadow'>
         <p className='text-text-secondary text-sm font-medium'>Status</p>
         <p className='mt-1'>
-          <StatusBadge status={job.status} />
+          <StatusBadge status={job.status as JobStatus} />
         </p>
       </div>
       <div className='card bg-base-100 p-6 shadow'>

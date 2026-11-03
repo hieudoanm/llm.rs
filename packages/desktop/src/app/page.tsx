@@ -1,7 +1,8 @@
 'use client';
 
 import NewJob from '@/app/jobs/new/page';
+import type { NextPage } from 'next';
 
-export default function AppRoot() {
-  return <NewJob />;
-}
+const HomePage: NextPage = () => <NewJob />;
+
+export default HomePage;

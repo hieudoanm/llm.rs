@@ -10,7 +10,7 @@
  * docs/07-ui-ux-design/system/design-tokens.md. Dark theme only.
  */
 @plugin 'daisyui/theme' {
-  name: 'skl-dark';
+  name: 'llm-dark';
   default: true;
   prefersdark: true;
   color-scheme: 'dark';
@@ -110,7 +110,7 @@
   --size-field: 0.25rem;
 }
 
-[data-theme='skl-dark'] {
+[data-theme='llm-dark'] {
   color-scheme: dark;
 }
 

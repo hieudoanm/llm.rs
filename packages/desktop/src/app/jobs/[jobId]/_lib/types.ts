@@ -1,12 +1,58 @@
-import type { components } from '@/lib/apiTypes';
+export type JobStatus =
+  | 'queued'
+  | 'validating'
+  | 'training'
+  | 'evaluating'
+  | 'exporting'
+  | 'retrying'
+  | 'completed'
+  | 'failed';
 
 /** One downloadable file of a job, straight from the contract. */
-export type Artefact = components['schemas']['ArtefactResponse'];
+export type Artefact = {
+  artefactId: string;
+  jobId: string;
+  format: string;
+  filename: string;
+  byteSize: number;
+  storageKey: string;
+  createdAt: string;
+};
 
 /**
  * The full job detail (FEATURE-13/18).
- *
- * Taken from the generated contract rather than retyped, so a schema change in
- * the OpenAPI document surfaces here at build time.
  */
-export type Job = components['schemas']['JobResponse'];
+export type Job = {
+  id: string;
+  datasetId: string;
+  taskType: string;
+  algorithmId: string;
+  featureColumns: string[];
+  labelColumn: string | null;
+  rlColumns: {
+    actionColumn: string;
+    rewardColumn: string;
+    nextStateColumns: string[];
+    doneColumn: string | null;
+    episodeColumn: string | null;
+  } | null;
+  hyperparameters: Record<string, unknown>;
+  splitRatio: number;
+  randomSeed: number;
+  exportPkl: boolean;
+  exportJoblib: boolean;
+  status: string;
+  errorCode: string | null;
+  errorMessage: string | null;
+  libraryVersions: Record<string, unknown> | null;
+  name: string | null;
+  tags: string[];
+  attempts: number;
+  maxAttempts: number;
+  nextAttemptAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  metrics: Record<string, unknown> | null;
+  charts: Record<string, unknown> | null;
+  artefacts: Artefact[];
+};

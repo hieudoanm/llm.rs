@@ -1,6 +1,8 @@
+'use client';
+
 import { cn } from '@/lib/cn';
-import { API_BASE } from '@/lib/api';
 import { PiDownload, PiFileZip } from 'react-icons/pi';
+import { tauriDownloadArtefact } from '@/lib/tauri';
 import { type Artefact } from '../_lib/types';
 
 interface JobDownloadsProps {
@@ -10,6 +12,31 @@ interface JobDownloadsProps {
 }
 
 export const JobDownloads = ({ artefacts, jobId, isTerminal }: JobDownloadsProps) => {
+  const handleDownload = async (artefactId: string, filename: string) => {
+    try {
+      const base64 = await tauriDownloadArtefact(jobId, artefactId);
+      const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+      const blob = new Blob([bytes]);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch {
+      // Download failed silently; the error boundary handles it.
+    }
+  };
+
+  const handleDownloadAll = async () => {
+    // Download all artefacts individually.
+    for (const artefact of artefacts) {
+      await handleDownload(artefact.artefactId, artefact.filename);
+    }
+  };
+
   return (
     <section className='mb-8'>
       <h2 className='text-text-primary mb-4 text-lg font-semibold'>Downloads</h2>
@@ -20,14 +47,13 @@ export const JobDownloads = ({ artefacts, jobId, isTerminal }: JobDownloadsProps
             artefact.format === 'onnx' ? 'btn-primary' : 'btn-ghost',
           );
           return isTerminal ? (
-            <a
+            <button
               key={artefact.artefactId}
-              href={`${API_BASE}/api/v1/jobs/${jobId}/artefacts/${artefact.artefactId}`}
-              download={artefact.filename}
+              onClick={() => handleDownload(artefact.artefactId, artefact.filename)}
               className={className}>
               <span>{artefact.filename}</span>
               <PiDownload className='icon-sm' aria-hidden='true' />
-            </a>
+            </button>
           ) : (
             <span
               key={artefact.artefactId}
@@ -39,13 +65,12 @@ export const JobDownloads = ({ artefacts, jobId, isTerminal }: JobDownloadsProps
           );
         })}
         {artefacts.length > 0 && isTerminal && (
-          <a
-            href={`${API_BASE}/api/v1/jobs/${jobId}/artefacts.zip`}
-            download
+          <button
+            onClick={handleDownloadAll}
             className='btn btn-outline flex items-center justify-between'>
             <span>Download all</span>
             <PiFileZip className='icon-sm' aria-hidden='true' />
-          </a>
+          </button>
         )}
         {artefacts.length === 0 && (
           <p className='text-text-secondary text-sm'>

@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => (
   <html
     lang='en'
-    data-theme='skl-dark'
+    data-theme='llm-dark'
     suppressHydrationWarning
     className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}>
     <body className='flex min-h-full flex-col'>

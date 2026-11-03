@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { JobMetadataEditor, isValidTag, normaliseTag } from '../JobMetadataEditor';
-import { ApiError } from '@/lib/api';
+import { TauriError } from '@/lib/tauri';
 
 describe('normaliseTag', () => {
   it('trims and lowercases the tag', () => {
@@ -90,7 +90,9 @@ describe('JobMetadataEditor', () => {
   });
 
   it('shows the error of a failed save', async () => {
-    const onSave = vi.fn().mockRejectedValue(new ApiError('HTTP_ERROR', 'Name is too long', 422));
+    const onSave = vi
+      .fn()
+      .mockRejectedValue(new TauriError('INVOKE_ERROR', 'Name is too long', 422));
     render(<JobMetadataEditor jobId='j1' name={null} tags={[]} onSave={onSave} />);
 
     await userEvent.click(screen.getByRole('button', { name: 'Save' }));

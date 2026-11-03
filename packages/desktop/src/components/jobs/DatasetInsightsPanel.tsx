@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { apiGet } from '@/lib/api';
+import { tauriGetDatasetInsights } from '@/lib/tauri';
 import { QUERY_CACHE } from '@/lib/queryCache';
 import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 
@@ -100,7 +100,7 @@ export const DatasetInsightsPanel = ({
 }: DatasetInsightsPanelProps) => {
   const { data, isLoading, isError, refetch } = useQuery<DatasetInsights>({
     queryKey: ['dataset-insights', datasetId],
-    queryFn: () => apiGet<DatasetInsights>(`/api/v1/datasets/${datasetId}/insights`),
+    queryFn: () => tauriGetDatasetInsights<DatasetInsights>(datasetId),
     enabled: !!datasetId,
     retry: false,
     // A dataset profile is immutable once uploaded.

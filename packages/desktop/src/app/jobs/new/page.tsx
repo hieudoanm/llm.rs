@@ -25,7 +25,7 @@ const targetFor = (issue: ValidationIssue): string | undefined =>
     ? `hp-${issue.field.replace('hyperparameter-', '')}`
     : undefined);
 
-function NewJobWizard() {
+const NewJobWizard = () => {
   const {
     step,
     setStep,
@@ -328,7 +328,7 @@ function NewJobWizard() {
       )}
     </div>
   );
-}
+};
 
 const NewJob = () => (
   // A render crash mid-wizard falls back to the studio's alert rather than the

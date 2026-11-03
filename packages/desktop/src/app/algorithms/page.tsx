@@ -2,7 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { ApiAlert } from '@/components/ui/ApiAlert';
-import { apiGet, ApiError } from '@/lib/api';
+import { tauriGetAlgorithms, TauriError } from '@/lib/tauri';
 import { QUERY_CACHE } from '@/lib/queryCache';
 import { PiCpu, PiArrowRight } from 'react-icons/pi';
 import type { IconType } from 'react-icons';
@@ -121,7 +121,7 @@ const AlgorithmCard = ({ algo }: { algo: Algorithm }) => (
 const AlgorithmsPage = () => {
   const { data, isLoading, isError, error } = useQuery<AlgorithmsResponse, Error>({
     queryKey: ['algorithms'],
-    queryFn: () => apiGet<AlgorithmsResponse>('/api/v1/algorithms'),
+    queryFn: () => tauriGetAlgorithms<AlgorithmsResponse>(),
     ...QUERY_CACHE.catalogue,
   });
 
@@ -146,7 +146,7 @@ const AlgorithmsPage = () => {
         <ApiAlert
           variant='error'
           title='Unable to load algorithms'
-          message={error instanceof ApiError ? error.message : 'Failed to fetch algorithms'}
+          message={error instanceof TauriError ? error.message : 'Failed to fetch algorithms'}
         />
       </div>
     );

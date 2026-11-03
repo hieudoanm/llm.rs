@@ -2,16 +2,15 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { ApiErrorAlert } from '../ApiErrorAlert';
-import { ApiError } from '@/lib/api';
+import { TauriError } from '@/lib/tauri';
 
 describe('ApiErrorAlert', () => {
   it('shows the catalogue guidance of the backend code', () => {
-    const error = new ApiError(
-      'HTTP_ERROR',
+    const error = new TauriError(
+      'INVOKE_ERROR',
       'Column "price" is missing',
       422,
       'req-1',
-      undefined,
       'INSUFFICIENT_LABELS',
     );
 
@@ -24,17 +23,17 @@ describe('ApiErrorAlert', () => {
   });
 
   it('lists the raw code and the status in the details', () => {
-    const error = new ApiError('HTTP_ERROR', 'boom', 500, 'req-1', undefined, 'INTERNAL_ERROR');
+    const error = new TauriError('INVOKE_ERROR', 'boom', 500, 'req-1', 'INTERNAL_ERROR');
 
     render(<ApiErrorAlert error={error} />);
 
     expect(screen.getByText('Backend code: INTERNAL_ERROR')).toBeInTheDocument();
-    expect(screen.getByText('HTTP status: 500')).toBeInTheDocument();
+    expect(screen.getByText('Status: 500')).toBeInTheDocument();
   });
 
   it('offers a retry action when a handler is given', async () => {
     const onRetry = vi.fn();
-    const error = new ApiError('NETWORK_ERROR', 'boom', 0);
+    const error = new TauriError('INVOKE_ERROR', 'boom', 0);
 
     render(<ApiErrorAlert error={error} onRetry={onRetry} />);
 
@@ -43,7 +42,7 @@ describe('ApiErrorAlert', () => {
   });
 
   it('offers the catalogue action when there is no retry handler', () => {
-    const error = new ApiError('HTTP_ERROR', 'boom', 404, undefined, undefined, 'JOB_NOT_FOUND');
+    const error = new TauriError('INVOKE_ERROR', 'boom', 404, undefined, 'JOB_NOT_FOUND');
 
     render(<ApiErrorAlert error={error} />);
 
@@ -55,7 +54,7 @@ describe('ApiErrorAlert', () => {
 
   it('prefers the catalogue remedy over a retry when retrying cannot help', () => {
     const onRetry = vi.fn();
-    const error = new ApiError('HTTP_ERROR', 'boom', 404, undefined, undefined, 'JOB_NOT_FOUND');
+    const error = new TauriError('INVOKE_ERROR', 'boom', 404, undefined, 'JOB_NOT_FOUND');
 
     render(<ApiErrorAlert error={error} onRetry={onRetry} />);
 
@@ -65,7 +64,7 @@ describe('ApiErrorAlert', () => {
 
   it('labels the retry action with the catalogue action', async () => {
     const onRetry = vi.fn();
-    const error = new ApiError('HTTP_ERROR', 'boom', 500, undefined, undefined, 'EXPORT_FAILED');
+    const error = new TauriError('INVOKE_ERROR', 'boom', 500, undefined, 'EXPORT_FAILED');
 
     render(<ApiErrorAlert error={error} onRetry={onRetry} />);
 

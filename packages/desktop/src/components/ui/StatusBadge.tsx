@@ -1,16 +1,19 @@
 'use client';
 
 import { cn } from '@/lib/cn';
-import type { components } from '@/lib/apiTypes';
 
 /**
- * The status vocabulary of the API contract.
- *
- * Derived from the generated schema rather than retyped, so a new status in
- * the OpenAPI document breaks this file at build time instead of rendering an
- * unstyled badge at runtime.
+ * The status vocabulary of the job lifecycle.
  */
-export type JobStatus = components['schemas']['JobStatus'];
+export type JobStatus =
+  | 'queued'
+  | 'validating'
+  | 'training'
+  | 'evaluating'
+  | 'exporting'
+  | 'retrying'
+  | 'completed'
+  | 'failed';
 
 const STATUS_BADGE: Record<JobStatus, string> = {
   queued: 'badge-warning',

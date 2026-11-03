@@ -59,34 +59,4 @@ describe('JobSelectionBar', () => {
 
     expect(screen.queryByRole('link', { name: 'Compare' })).not.toBeInTheDocument();
   });
-
-  it('offers the bulk download when a job has artefacts', () => {
-    render(
-      <JobSelectionBar
-        jobs={jobs}
-        onRemove={vi.fn()}
-        onClear={vi.fn()}
-        downloadHref='http://127.0.0.1:8000/api/v1/jobs/artefacts.zip?ids=j1,j2'
-        hasArtefacts
-      />,
-    );
-
-    expect(screen.getByRole('link', { name: /Download all \(2\)/ })).toHaveAttribute(
-      'href',
-      'http://127.0.0.1:8000/api/v1/jobs/artefacts.zip?ids=j1,j2',
-    );
-  });
-
-  it('hides the bulk download without artefacts', () => {
-    render(
-      <JobSelectionBar
-        jobs={jobs}
-        onRemove={vi.fn()}
-        onClear={vi.fn()}
-        downloadHref='http://127.0.0.1:8000/api/v1/jobs/artefacts.zip?ids=j1,j2'
-      />,
-    );
-
-    expect(screen.queryByRole('link', { name: /Download all/ })).not.toBeInTheDocument();
-  });
 });

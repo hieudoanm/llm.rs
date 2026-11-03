@@ -4,15 +4,15 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const push = vi.fn();
-const apiPost = vi.fn();
-const apiGet = vi.fn();
-const apiUpload = vi.fn();
+const tauriPostTrain = vi.fn();
+const tauriGetAlgorithms = vi.fn();
+const tauriPostDataset = vi.fn();
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }));
-vi.mock('@/lib/api', () => ({
-  apiGet: (...args: unknown[]) => apiGet(...args),
-  apiPost: (...args: unknown[]) => apiPost(...args),
-  apiUpload: (...args: unknown[]) => apiUpload(...args),
+vi.mock('@/lib/tauri', () => ({
+  tauriGetAlgorithms: (...args: unknown[]) => tauriGetAlgorithms(...args),
+  tauriPostDataset: (...args: unknown[]) => tauriPostDataset(...args),
+  tauriPostTrain: (...args: unknown[]) => tauriPostTrain(...args),
 }));
 
 import { useNewJobWizard } from '../hooks';
@@ -35,11 +35,11 @@ const wrapper = ({ children }: { children: ReactNode }) => {
 
 beforeEach(() => {
   push.mockReset();
-  apiPost.mockReset();
-  apiGet.mockReset();
-  apiUpload.mockReset();
-  apiGet.mockResolvedValue({ algorithms: [] });
-  apiPost.mockResolvedValue({
+  tauriPostTrain.mockReset();
+  tauriGetAlgorithms.mockReset();
+  tauriPostDataset.mockReset();
+  tauriGetAlgorithms.mockResolvedValue({ algorithms: [] });
+  tauriPostTrain.mockResolvedValue({
     jobId: 'j1',
     status: 'queued',
     datasetId: 'd1',
@@ -50,7 +50,7 @@ beforeEach(() => {
 });
 
 describe('useNewJobWizard create-job request', () => {
-  it('sends the selected export flags and an Idempotency-Key header', async () => {
+  it('sends the selected export flags', async () => {
     const { result } = renderHook(() => useNewJobWizard(), { wrapper });
 
     act(() => {
@@ -66,17 +66,15 @@ describe('useNewJobWizard create-job request', () => {
       await result.current.createJobMutation.mutateAsync();
     });
 
-    const [path, body, init] = apiPost.mock.calls[0];
-    expect(path).toBe('/api/v1/jobs');
-    expect(body.exportPkl).toBe(true);
-    expect(body.exportJoblib).toBe(true);
+    const [args] = tauriPostTrain.mock.calls[0];
+    expect(args.request.exportPkl).toBe(true);
+    expect(args.request.exportJoblib).toBe(true);
     // Keras is not a real export format; the request must never send it
     // (`extra='forbid'` on CreateJobRequest would reject it anyway).
-    expect(body).not.toHaveProperty('exportKeras');
-    expect(typeof init.headers['Idempotency-Key']).toBe('string');
+    expect(args.request).not.toHaveProperty('exportKeras');
   });
 
-  it('reuses one key across retries and clears it after success', async () => {
+  it('retries on failure and creates a job on success', async () => {
     const { result } = renderHook(() => useNewJobWizard(), { wrapper });
 
     act(() => {
@@ -86,7 +84,7 @@ describe('useNewJobWizard create-job request', () => {
       result.current.handleAlgorithmChange('logistic_regression');
     });
 
-    apiPost.mockRejectedValueOnce(new Error('network'));
+    tauriPostTrain.mockRejectedValueOnce(new Error('network'));
     await act(async () => {
       await result.current.createJobMutation.mutateAsync().catch(() => undefined);
     });
@@ -94,17 +92,14 @@ describe('useNewJobWizard create-job request', () => {
       await result.current.createJobMutation.mutateAsync();
     });
 
-    const firstKey = apiPost.mock.calls[0][2].headers['Idempotency-Key'];
-    const secondKey = apiPost.mock.calls[1][2].headers['Idempotency-Key'];
-    expect(secondKey).toBe(firstKey);
+    expect(tauriPostTrain).toHaveBeenCalledTimes(2);
+    expect(tauriPostTrain.mock.calls[1][0].request).toHaveProperty('datasetId', 'd1');
+    expect(tauriPostTrain.mock.calls[1][0].request).toHaveProperty(
+      'algorithmId',
+      'logistic_regression',
+    );
+    expect(tauriPostTrain.mock.calls[1][0].request).not.toHaveProperty('exportKeras');
 
     await waitFor(() => expect(push).toHaveBeenCalledWith('/jobs/j1'));
-
-    // A new job after success starts with a fresh key.
-    await act(async () => {
-      await result.current.createJobMutation.mutateAsync();
-    });
-    const thirdKey = apiPost.mock.calls[2][2].headers['Idempotency-Key'];
-    expect(thirdKey).not.toBe(firstKey);
   });
 });

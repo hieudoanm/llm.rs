@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { StatusBadge, type JobStatus } from '@/components/ui/StatusBadge';
-import { PiDownload, PiX } from 'react-icons/pi';
+import { PiX } from 'react-icons/pi';
 
 export interface SelectedJob {
   jobId: string;
@@ -15,8 +15,6 @@ interface JobSelectionBarProps {
   jobs: SelectedJob[];
   onRemove: (jobId: string) => void;
   onClear: () => void;
-  /** The href of the bulk download of the selected jobs. */
-  downloadHref?: string;
   /** True when at least one selected job may have artefacts. */
   hasArtefacts?: boolean;
   /** The maximum number of jobs that may be selected. */
@@ -26,17 +24,10 @@ interface JobSelectionBarProps {
 /**
  * The persistent selection bar of the jobs page.
  *
- * It shows the selected jobs, offers the comparison and the bulk download, and
- * explains the cap when the selection is full.
+ * It shows the selected jobs, offers the comparison, and explains the cap when
+ * the selection is full.
  */
-export const JobSelectionBar = ({
-  jobs,
-  onRemove,
-  onClear,
-  downloadHref,
-  hasArtefacts = false,
-  max = 5,
-}: JobSelectionBarProps) => {
+export const JobSelectionBar = ({ jobs, onRemove, onClear, max = 5 }: JobSelectionBarProps) => {
   if (jobs.length === 0) return null;
 
   return (
@@ -67,12 +58,6 @@ export const JobSelectionBar = ({
         </ul>
 
         <div className='ml-auto flex items-center gap-2'>
-          {downloadHref && hasArtefacts && (
-            <a href={downloadHref} className='btn btn-sm' download>
-              <PiDownload className='icon-sm' aria-hidden='true' />
-              Download all ({jobs.length})
-            </a>
-          )}
           {jobs.length >= 2 && (
             <Link
               href={`/jobs/compare?ids=${jobs.map((job) => job.jobId).join(',')}`}

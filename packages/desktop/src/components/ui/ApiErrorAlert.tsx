@@ -1,7 +1,7 @@
 'use client';
 
 import { ApiAlert, type AlertAction } from '@/components/ui/ApiAlert';
-import { ApiError } from '@/lib/api';
+import { TauriError } from '@/lib/tauri';
 import { errorDetails, guidanceFor } from '@/lib/errors';
 
 export interface ApiErrorAlertProps {
@@ -29,7 +29,7 @@ export interface ApiErrorAlertProps {
  * handler, labelled with the catalogue action when it defines one.
  */
 export const ApiErrorAlert = ({ error, onRetry, retryLabel, className }: ApiErrorAlertProps) => {
-  const apiError = error instanceof ApiError ? error : null;
+  const apiError = error instanceof TauriError ? error : null;
   const guidance = guidanceFor(apiError);
   const details = errorDetails(apiError);
 

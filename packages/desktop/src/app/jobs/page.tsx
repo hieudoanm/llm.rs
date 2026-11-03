@@ -4,16 +4,14 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { StatusBadge } from '@/components/ui/StatusBadge';
+import { StatusBadge, type JobStatus } from '@/components/ui/StatusBadge';
 import { ApiErrorAlert } from '@/components/ui/ApiErrorAlert';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
-import type { components } from '@/lib/apiTypes';
 import { JobFilterBar } from '@/components/jobs/JobFilterBar';
 import { JobSelectionBar, type SelectedJob } from '@/components/jobs/JobSelectionBar';
 import { JobMetadataEditor } from '@/components/jobs/JobMetadataEditor';
 import { VirtualTableBody } from '@/components/jobs/VirtualTableBody';
-import { API_BASE, apiPatch } from '@/lib/api';
-import { apiGetTyped } from '@/lib/apiTyped';
+import { tauriGetAlgorithms, tauriGetJobs, tauriPatchJob } from '@/lib/tauri';
 import { MAX_COMPARE_JOBS } from '@/lib/constants';
 import { QUERY_CACHE, keepPrevious } from '@/lib/queryCache';
 import {
@@ -21,7 +19,6 @@ import {
   fromQueryString,
   hasActiveFilters,
   readStoredFilters,
-  toQueryParams,
   toQueryString,
   writeStoredFilters,
   type JobFilters,
@@ -30,9 +27,19 @@ import {
 export const dynamic = 'force-dynamic';
 
 /** The list response, straight from the committed contract. */
-type JobList = components['schemas']['JobListResponse'];
+type JobList = {
+  jobs: Array<{
+    jobId: string;
+    name: string | null;
+    status: string;
+    taskType: string;
+    algorithmId: string;
+    createdAt: string;
+    tags: string[];
+  }>;
+};
 /** One row of the list. */
-type JobItem = components['schemas']['JobAcceptedResponse'];
+type JobItem = JobList['jobs'][number];
 
 interface JobMetadata {
   name: string | null;
@@ -109,7 +116,7 @@ const JobsContent = () => {
   const query = toQueryString(filters);
   const { data, isLoading, isError, error, refetch } = useQuery<JobList>({
     queryKey: ['jobs', query],
-    queryFn: () => apiGetTyped('/api/v1/jobs', { limit: 50, ...toQueryParams(filters) }),
+    queryFn: () => tauriGetJobs<JobList>(),
     ...QUERY_CACHE.history,
     // Changing a filter keeps the previous rows on screen while the next set
     // loads, instead of flashing an empty list.
@@ -118,13 +125,13 @@ const JobsContent = () => {
 
   const { data: algorithmsData } = useQuery<{ algorithms: { algorithmId: string }[] }>({
     queryKey: ['algorithms', 'all'],
-    queryFn: () => apiGetTyped('/api/v1/algorithms'),
+    queryFn: () => tauriGetAlgorithms<{ algorithms: { algorithmId: string }[] }>(),
     ...QUERY_CACHE.catalogue,
   });
 
   const metadataMutation = useMutation({
     mutationFn: ({ jobId, metadata }: { jobId: string; metadata: JobMetadata }) =>
-      apiPatch<JobMetadata>(`/api/v1/jobs/${jobId}`, metadata),
+      tauriPatchJob<JobMetadata>(jobId, metadata.name ?? null, metadata.tags),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['jobs'] });
       setEditing(null);
@@ -140,7 +147,7 @@ const JobsContent = () => {
     .map((job) => ({
       jobId: job.jobId,
       name: job.name,
-      status: job.status,
+      status: job.status as JobStatus,
       algorithmId: job.algorithmId,
     }));
 
@@ -157,19 +164,13 @@ const JobsContent = () => {
   };
 
   const selectionFull = selection.length >= MAX_COMPARE_JOBS;
-  const downloadHref = selection.length
-    ? `${API_BASE}/api/v1/jobs/artefacts.zip?ids=${selection.join(',')}`
-    : undefined;
 
   /** One row of the virtualised history table (FEATURE-18). */
   const renderJobRow = (job: JobItem) => (
     <>
       <td className='text-text-secondary text-sm'>{new Date(job.createdAt).toLocaleString()}</td>
       <td>
-        <StatusBadge status={job.status} />
-        {typeof job.queuePosition === 'number' && job.queuePosition > 0 && (
-          <span className='text-text-tertiary ml-1 text-xs'>#{job.queuePosition}</span>
-        )}
+        <StatusBadge status={job.status as JobStatus} />
       </td>
       <td>
         <span className='badge badge-ghost badge-sm'>{job.taskType}</span>
@@ -205,12 +206,6 @@ const JobsContent = () => {
             onClick={() => toggleSelection(job.jobId)}>
             {selection.includes(job.jobId) ? 'Selected' : 'Compare'}
           </button>
-          <a
-            href={`${API_BASE}/api/v1/jobs/${job.jobId}/artefacts.zip`}
-            className='btn btn-ghost btn-sm'
-            download>
-            Download
-          </a>
           <button
             type='button'
             className='btn btn-ghost btn-sm'
@@ -334,7 +329,6 @@ const JobsContent = () => {
         jobs={selectedJobs}
         onRemove={(jobId) => updateParams({ selection: selection.filter((id) => id !== jobId) })}
         onClear={() => updateParams({ selection: [] })}
-        downloadHref={downloadHref}
         hasArtefacts={selectedJobs.some((job) => job.status === 'completed')}
       />
     </div>
