@@ -23,7 +23,7 @@ env:
 
 jobs:
   cli:
-    name: CLI (Rust)
+    name: CLI
     runs-on: ubuntu-latest
 
     steps:
@@ -88,7 +88,6 @@ jobs:
 
   desktop-build:
     name: Desktop App (${{ matrix.os }})
-    needs: [desktop-frontend]
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -106,7 +105,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libssl-dev
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6.1.1
@@ -123,11 +122,9 @@ jobs:
         working-directory: ${{ github.workspace }}/packages/desktop
         run: pnpm install --frozen-lockfile
 
-      - name: Download frontend out folder
-        uses: actions/download-artifact@v4.1.7
-        with:
-          name: llm-desktop-frontend-out
-          path: ${{ github.workspace }}/packages/desktop/out
+      - name: Build frontend
+        working-directory: ${{ github.workspace }}/packages/desktop
+        run: pnpm run build
 
       - name: Build Tauri app
         working-directory: ${{ github.workspace }}/packages/desktop
@@ -167,6 +164,8 @@ jobs:
       - name: Build landing page
         working-directory: ${{ github.workspace }}/packages/landing
         run: pnpm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://hieudoanm.github.io/llm.rs
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5.0.0
@@ -210,7 +209,7 @@ jobs:
       - name: Install system dependencies (Linux)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libssl-dev
 
       - name: Build CLI binary
         working-directory: ${{ github.workspace }}/crates
