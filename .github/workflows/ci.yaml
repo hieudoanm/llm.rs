@@ -7,6 +7,11 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -101,7 +106,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6.1.1
@@ -119,7 +124,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Download frontend out folder
-        uses: actions/download-artifact@v8.0.2
+        uses: actions/download-artifact@v4.1.7
         with:
           name: llm-desktop-frontend-out
           path: ${{ github.workspace }}/packages/desktop/out
@@ -138,6 +143,7 @@ jobs:
   landing:
     name: Landing Page
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
@@ -151,7 +157,7 @@ jobs:
       - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .nvmrc
           cache: pnpm
 
       - name: Install landing dependencies
@@ -162,19 +168,26 @@ jobs:
         working-directory: ${{ github.workspace }}/packages/landing
         run: pnpm run build
 
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: ${{ github.workspace }}/packages/landing/out
+
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/master'
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ${{ github.workspace }}/packages/landing/out
-          destination_dir: .
+        id: deployment
+        uses: actions/deploy-pages@v5.0.1
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
   release:
     name: Publish Release Artifacts
     needs: [cli, desktop-build]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - name: Checkout repository
@@ -197,7 +210,7 @@ jobs:
       - name: Install system dependencies (Linux)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.0-dev libappindicator3-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev
 
       - name: Build CLI binary
         working-directory: ${{ github.workspace }}/crates
