@@ -13,33 +13,36 @@ license = "MIT"
 authors = ["llm contributors"]
 
 [workspace.dependencies]
-anyhow = "1"
-base64 = "0.22"
-chrono = { version = "0.4", features = ["serde"] }
-flate2 = "1"
-linfa = "0.7"
-linfa-trees = "0.7"
-linfa-preprocessing = "0.7"
-linfa-clustering = "0.7"
-ndarray = "0.15"
-ndarray-linalg = "0.15"
-ndarray-rand = "0.1"
-onnx-protobuf = "0.2.3"
-polars = { version = "0.38", features = ["lazy", "serde", "csv"] }
-polars-lazy = "0.38"
-protobuf = "=3.7.2"
-rand = "0.8"
-regex = "1"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-sha2 = "0.10"
-sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "sqlite", "macros"] }
-thiserror = "2"
-tokio = { version = "1", features = ["full"] }
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-uuid = { version = "1", features = ["v4", "serde"] }
-zip = { version = "9", default-features = false, features = ["deflate"] }
+anyhow = "=1.0.104"
+axum = { version = "=0.8.9", features = ["multipart"] }
+base64 = "=0.22.1"
+chrono = { version = "=0.4.45", features = ["serde"] }
+flate2 = "=1.1.10"
+linfa = "=0.7.1"
+linfa-trees = "=0.7.1"
+linfa-preprocessing = "=0.7.1"
+linfa-clustering = "=0.7.1"
+ndarray = "=0.15.6"
+ndarray-linalg = "=0.15.0"
+ndarray-rand = "=0.1.1"
+onnx-protobuf = "=0.2.3"
+polars = { version = "=0.38.3", features = ["lazy", "serde", "csv"] }
+polars-lazy = "=0.38.3"
+protobuf = "=3.4.0"
+rand = "=0.8.8"
+regex = "=1.13.1"
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+sha2 = "=0.10.9"
+sqlx = { version = "=0.8.6", default-features = false, features = ["runtime-tokio", "sqlite", "macros"] }
+thiserror = "=2.0.21"
+tokio = { version = "=1.54.1", features = ["full"] }
+tracing = "=0.1.44"
+tracing-subscriber = { version = "=0.3.23", features = ["env-filter"] }
+tower = "=0.5.3"
+tower-http = { version = "=0.6.11", features = ["cors", "compression-gzip", "trace"] }
+uuid = { version = "=1.29.0", features = ["v4", "serde"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
 
 llm-core = { path = "llm-core" }
 llm-db = { path = "llm-db" }
