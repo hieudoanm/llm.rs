@@ -173,13 +173,6 @@ impl DataFrame {
         seen
     }
 
-    pub(crate) fn inner(&self) -> &PolarsDataFrame {
-        &self.inner
-    }
-
-    pub(crate) fn into_inner(self) -> PolarsDataFrame {
-        self.inner
-    }
 }
 
 pub fn parse_number(raw: &str) -> Option<f64> {

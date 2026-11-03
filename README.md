@@ -2,9 +2,11 @@
 
 **Train supervised, semi-supervised, unsupervised, and offline reinforcement-learning models from CSV files. Export them as portable ONNX models — all on your own machine.**
 
+keywords: `machine-learning`, `ml`, `rust`, `onnx`, `csv`, `training`, `desktop`, `tauri`, `nextjs`, `supervised`, `unsupervised`, `reinforcement-learning`, `anomaly-detection`, `clustering`, `regression`, `classification`
+
 Machine Learning in Rust (llm.rs) is a local, full-stack training studio for tabular data. Upload a CSV with a header row, map feature columns to **X** and (when the task requires it) a label column to **Y**, or declare experience columns for offline reinforcement learning, choose a task — classification, regression, semi-supervised, clustering, anomaly detection, or reinforcement learning — and an algorithm from the curated catalogue. Train asynchronously and download a portable **ONNX** artefact. Everything runs locally via Docker Compose — no cloud account or infrastructure setup.
 
-[📄 Documentation](docs/README.md) · [🚀 Quick Start](#get-started) · [🔍 See It In Action](#see-it-in-action) · [🧪 Try Algorithms](packages/frontend/src/app/algorithms/page.tsx)
+[📄 Documentation](docs/README.md) · [🚀 Quick Start](#get-started) · [🔍 See It In Action](#see-it-in-action) · [🧪 Try Algorithms](packages/desktop/src/app/algorithms/page.tsx)
 
 ![llm](docs/07-ui-ux-design/og/images/og.png)
 
@@ -52,13 +54,15 @@ Every trained model — across all six task types — is exported to **ONNX**.
 - **From CSV to ONNX in minutes** — A guided wizard takes you from upload to a downloadable, portable `.onnx` artefact.
 - **Honest, task-aware training** — Choose from a curated catalogue of Rust ML algorithms with transparent metrics.
 - **Reproducible by design** — Every job records dataset fingerprint, column mapping, algorithm, hyperparameters, library versions, and task-specific metrics.
-- **Developer-friendly** — Axum backend, Next.js UI, SQLite metadata, and Docker Compose for a reproducible local topology.
+- **Developer-friendly** — Axum backend, Next.js UI (desktop via Tauri), SQLite metadata, and Docker Compose for a reproducible local topology.
 
 ## See It in Action
 
 ![llm Demo](demo/demo.gif)
 
 Or watch the full recorded walkthrough in [`demo/demo.md`](demo/demo.md) and [`demo/demo.mp4`](demo/demo.mp4).
+
+The landing page is deployed at [hieudoanm.github.io/llm.rs](https://hieudoanm.github.io/llm.rs).
 
 ## Get Started
 
@@ -119,7 +123,7 @@ The project produces release artifacts via GitHub Actions:
 - **Maturity:** Software demonstration (not intended for production AutoML or safety-critical use). All six task types are implemented, including offline reinforcement learning (Fitted Q-Iteration) added in Phase 11.
 - **Catalogue:** allow-listed algorithms — classifiers, regressors, self-training classifier, clustering models, anomaly detector, and an offline reinforcement-learning model (`fitted_q_iteration`) — every one exported to ONNX.
 - **License:** [MIT License](LICENSE) — see the `LICENSE` file for full terms.
-- **Tech stack:** Next.js (App Router), TypeScript, Tailwind CSS, DaisyUI, Axum (Rust), linfa/ndarray, ONNX, SQLite, Docker Compose.
+- **Tech stack:** Next.js (App Router), TypeScript, Tailwind CSS, DaisyUI, Axum (Rust), linfa/ndarray, ONNX, SQLite, Tauri (desktop), Docker Compose.
 - **Testing:** Vitest + React Testing Library (80% coverage gate), Playwright e2e, `cargo test --workspace` backend tests.
 
 ## Community and Contributions
@@ -128,7 +132,7 @@ Contributions, bug reports, and feature suggestions are welcome. See existing re
 
 - [README for Technical](docs/README.md) — architecture, API spec, data model, testing strategy
 - [README for Backend](docs/08-tech-stack/backend/README.md) — architecture, API spec, data model
-- [README for Frontend](packages/frontend/README.md)
+- [README for Desktop](packages/desktop/README.md)
 
 To report issues or propose changes, open an issue or pull request in this repository.
 

@@ -3,12 +3,13 @@ name: CI
 on:
   push:
     branches: [master]
+    tags: ["latest"]
   pull_request:
   release:
     types: [published]
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -96,6 +97,12 @@ jobs:
         working-directory: ${{ github.workspace }}/packages/desktop
         run: pnpm run build:tauri
 
+      - name: Zip macOS app bundle
+        if: runner.os == 'macOS'
+        run: |
+          cd ${{ github.workspace }}/packages/desktop/src-tauri/target/release/bundle/macos
+          zip -r -X LLM.app.zip LLM.app
+
       - name: Upload desktop bundle
         uses: actions/upload-artifact@v7.0.2
         with:
@@ -155,59 +162,51 @@ jobs:
   release:
     name: Publish Release Artifacts
     needs: [cli, desktop-build]
-    if: startsWith(github.ref, 'refs/tags/')
+    if: github.ref == 'refs/tags/latest'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
 
-      - name: Install Rust
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6.1.1
-        with:
-          version: 12.16.1
-
-      - name: Set up Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v7.1.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: pnpm
-
-      - name: Install system dependencies (Linux)
+      - name: Read release notes from README.md
+        id: readme
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libssl-dev
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          cat README.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Build CLI binary
-        working-directory: ${{ github.workspace }}/crates
-        run: cargo build --release -p llm-cli
-
-      - name: Install desktop dependencies
-        working-directory: ${{ github.workspace }}/packages/desktop
-        run: pnpm install --frozen-lockfile
-
-      - name: Build frontend
-        working-directory: ${{ github.workspace }}/packages/desktop
-        run: pnpm run build
-
-      - name: Build Tauri app (all platforms)
-        id: tauri
-        uses: tauri-apps/tauri-action@v0.6.2
+      - name: Download CLI artifact
+        uses: actions/download-artifact@v7.0.2
         with:
-          args: --verbose
+          name: llm-cli-linux
+          path: release-artifacts
+
+      - name: Download desktop artifacts
+        uses: actions/download-artifact@v7.0.2
+        with:
+          path: release-artifacts
+          merge-multiple: true
+
+      - name: Delete existing "latest" release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --yes --cleanup-tag || true
+          git push origin :refs/tags/latest || true
 
-      - name: Upload CLI binary to release
-        uses: softprops/action-gh-release@v2.6.2
+      - name: Create/Update "latest" Release
+        uses: softprops/action-gh-release@v3.0.3
         with:
-          files: ${{ github.workspace }}/crates/target/release/llm
-          tag_name: ${{ github.ref }}
+          tag_name: latest
+          name: "llm.rs (latest)"
+          body: ${{ steps.readme.outputs.body }}
+          files: release-artifacts/**
+          draft: false
+          prerelease: false
+          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
