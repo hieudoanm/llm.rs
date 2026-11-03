@@ -9,10 +9,10 @@ P0 (FR-110..FR-115). Planned in Phase 11.
 Offline (batch) reinforcement learning turns a logged experience CSV into a fitted Q-function:
 
 - The dataset is a **transition log**: one row per observed transition with state features (**X**), an action, a reward, and either explicit next-state columns or an episode column that orders transitions.
-- The single P0 algorithm, **`fitted_q_iteration`**, runs Fitted Q-Iteration (FQI): each sweep fits a scikit-learn regressor that maps `(state, action)` → Q-value against Bellman targets built from the previous sweep's Q-function.
+- The single P0 algorithm, **`fitted_q_iteration`**, runs Fitted Q-Iteration (FQI): each sweep fits a llm regressor that maps `(state, action)` → Q-value against Bellman targets built from the previous sweep's Q-function.
 - The fitted Q-function (preprocessor + regressor) is exported to ONNX like every other task. A consumer derives the policy by evaluating Q for each recorded action and taking the argmax.
 
-No label column is used, and no new dependency is introduced: FQI is fitted on the scikit-learn estimators already in the stack.
+No label column is used, and no new dependency is introduced: FQI is fitted on the llm estimators already in the stack.
 
 ## User-visible behaviour
 
@@ -104,7 +104,7 @@ No label column is used, and no new dependency is introduced: FQI is fitted on t
 
 - An experience CSV completes for `fitted_q_iteration` with the documented metrics and an ONNX artefact.
 - Reinforcement-learning jobs expose `labelColumn = null` and persist `rlColumns` on the job.
-- ONNX Q-values match the fitted mlrs regressor on evaluation inputs (state block + one-hot action).
+- ONNX Q-values match the fitted llm regressor on evaluation inputs (state block + one-hot action).
 - `metrics.actions` lists the action set in one-hot order, and the documented argmax rule reproduces the greedy policy.
 - Validation errors (label supplied, missing experience columns, unresolvable next state, out-of-range hyperparameters) return the documented 400 codes with no job row.
 - The UI hides the label control, exposes the experience-column pickers, validates ranges before submission, and renders the RL metrics and charts.

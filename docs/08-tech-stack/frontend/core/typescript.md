@@ -1,4 +1,4 @@
-# mlrs — TypeScript
+# llm — TypeScript
 
 - `strict: true`, `noUncheckedIndexedAccess`.
 - Discriminated union for `Job` by `taskType` / `status`.

@@ -11,12 +11,12 @@
 ## Repository structure
 
 ```text
-mlrs/
+llm/
 ├── crates/
-│   ├── mlrs-core/   # Pure-Rust core
-│   ├── mlrs-db/     # SQLite persistence
-│   ├── mlrs-api/    # Axum HTTP API and worker
-│   └── mlrs-server/ # Binary entry point
+│   ├── llm-core/   # Pure-Rust core
+│   ├── llm-db/     # SQLite persistence
+│   ├── llm-api/    # Axum HTTP API and worker
+│   └── llm-server/ # Binary entry point
 ├── packages/
 │   └── frontend/    # Next.js
 ├── docker-compose.yaml
@@ -31,13 +31,13 @@ from the **repository root** context.
 
 ### backend
 
-- Build: `crates/mlrs-server/Dockerfile`
+- Build: `crates/llm-server/Dockerfile`
 - Port: `127.0.0.1:8000`
-- Volume: `mlrs_data:/var/lib/mlrs`
-- Env: `DATABASE_URL`, `MLRS_DATA_DIR`, `MLRS_MAX_UPLOAD_MB` (upload cap in MiB, default 10), plus
-  `MLRS_LOG_LEVEL`, `MLRS_CORS_ORIGINS`, `MLRS_CORS_ALLOW_CREDENTIALS`, `MLRS_ENABLE_INTERACTIVE_DOCS`,
-  `MLRS_MAX_CONCURRENT_JOBS`, `MLRS_JOB_TIMEOUT_SECONDS`, `MLRS_JOB_MAX_ATTEMPTS`,
-  `MLRS_JOB_RETRY_BASE_SECONDS`, `MLRS_WORKER_STALE_SECONDS` (see below)
+- Volume: `llm_data:/var/lib/llm`
+- Env: `DATABASE_URL`, `LLM_DATA_DIR`, `LLM_MAX_UPLOAD_MB` (upload cap in MiB, default 10), plus
+  `LLM_LOG_LEVEL`, `LLM_CORS_ORIGINS`, `LLM_CORS_ALLOW_CREDENTIALS`, `LLM_ENABLE_INTERACTIVE_DOCS`,
+  `LLM_MAX_CONCURRENT_JOBS`, `LLM_JOB_TIMEOUT_SECONDS`, `LLM_JOB_MAX_ATTEMPTS`,
+  `LLM_JOB_RETRY_BASE_SECONDS`, `LLM_WORKER_STALE_SECONDS` (see below)
 - Healthcheck: `GET /healthz`
 
 Every variable the backend reads is listed in
@@ -65,21 +65,21 @@ Open `http://127.0.0.1:3000`. API docs: `http://127.0.0.1:8000/docs` (Swagger UI
 
 ## CLI
 
-The `mlrs` CLI is a standalone offline tool (no backend required). Install the
+The `llm` CLI is a standalone offline tool (no backend required). Install the
 latest release binary:
 
 ```bash
-curl -fsSL https://github.com/hieudoanm/scikit-learn-client/releases/download/latest/mlrs \
-  -o "$HOME/.local/bin/mlrs"
-chmod +x "$HOME/.local/bin/mlrs"
+curl -fsSL https://github.com/hieudoanm/llm-client/releases/download/latest/llm \
+  -o "$HOME/.local/bin/llm"
+chmod +x "$HOME/.local/bin/llm"
 ```
 
 Full CLI documentation lives in
-[`11-deployment/cli.md`](./cli.md); the CLI source is in `crates/mlrs-server/`.
+[`11-deployment/cli.md`](./cli.md); the CLI source is in `crates/llm-server/`.
 
 Make shortcuts (from the repository root): `make up` brings up the whole
 stack with Docker Compose and `make down` shuts it down. Host mode (optional):
-`make start` runs the API and frontend on the host — the Makefile passes all `MLRS_*`
+`make start` runs the API and frontend on the host — the Makefile passes all `LLM_*`
 variables from the environment (`.env`).
 
 ## Tests

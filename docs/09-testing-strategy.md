@@ -1,4 +1,4 @@
-# scikit-learn-client (mlrs) — Testing Strategy
+# llm-client (llm) — Testing Strategy
 
 ## 1. Purpose
 
@@ -19,14 +19,14 @@ Ensure CSV validation, task-specific label rules, job lifecycle, ONNX export, an
 - SQLite-dependent tests use a real database.
 - ONNX tests load the file with ONNX Runtime.
 - Fixtures are synthetic; never commit private data.
-- Do not mock mlrs `fit` in export tests — use tiny CSVs.
+- Do not mock llm `fit` in export tests — use tiny CSVs.
 - Every task type gets a fixture, a catalogue ONNX-parity test, and an API-level job test.
 
 ## 4. Contract testing (OpenAPI)
 
 Phase 12 adds schema drift protection:
 
-- `crates/mlrs-api/tests/api/test_openapi_contract.rs` asserts that the Axum app's generated
+- `crates/llm-api/tests/api/test_openapi_contract.rs` asserts that the Axum app's generated
   OpenAPI document equals the committed
   [`docs/06-api-specification/backend/openapi.yaml`](../06-api-specification/backend/openapi.yaml),
   that `GET /openapi.json` serves the committed document, that every route and schema is present,

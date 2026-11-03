@@ -1,4 +1,4 @@
-# mlrs — Turborepo
+# llm — Turborepo
 
 Task runner for the pnpm workspace.
 
@@ -8,7 +8,7 @@ Turborepo 2 (root `devDependency`, pinned `2.11.9`).
 
 ## Why
 
-- One entry point per task across `@mlrs/backend`, `@mlrs/notebooks`, and `@mlrs/frontend`.
+- One entry point per task across `@llm/backend`, `@llm/notebooks`, and `@llm/frontend`.
 - Dependency-aware ordering (`dependsOn: ["^build"]`) and local caching in `.turbo/` (gitignored).
 - The whole task graph is one committed `turbo.json`; the root `package.json` holds no task logic.
 
@@ -21,7 +21,7 @@ Turborepo 2 (root `devDependency`, pinned `2.11.9`).
 
 `turbo.json` declares `format`, `build`, `typecheck`, `lint`, `test`, and `dev`; each is cached and excludes `docs/**` and `images/**` from its inputs (`build` also declares outputs).
 
-| Task        | `@mlrs/frontend`              | `@mlrs/backend` / `@mlrs/notebooks` |
+| Task        | `@llm/frontend`              | `@llm/backend` / `@llm/notebooks` |
 | ----------- | ---------------------------- | ---------------------------- |
 | `lint`      | `eslint`                     | `make lint` (Ruff)           |
 | `format`    | `prettier --cache --write .` | `make format` (Ruff)         |
@@ -41,7 +41,7 @@ Root scripts wrap the tasks: `pnpm run dev | lint | build | format | typecheck |
 
 ```sh
 pnpm run lint                          # turbo run lint
-pnpm exec turbo run build --filter=@mlrs/frontend
+pnpm exec turbo run build --filter=@llm/frontend
 pnpm exec turbo run lint --dry=json    # show what would run
 pnpm exec turbo run build --force      # bypass the cache
 ```

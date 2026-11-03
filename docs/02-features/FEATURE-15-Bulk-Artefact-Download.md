@@ -41,7 +41,7 @@ per-artefact links. It downloads `{jobId}.zip` containing:
   "algorithmId": "logistic_regression",
   "status": "completed",
   "createdAt": "2026-10-21T10:00:00Z",
-  "libraryVersions": { "scikit-learn": "1.7.2" },
+  "libraryVersions": { "llm": "1.7.2" },
   "files": [
     { "path": "abc.onnx", "format": "onnx", "byteSize": 4096 },
     { "path": "metrics.json", "format": "metrics", "byteSize": 128 }
@@ -56,7 +56,7 @@ On the jobs page, the selection bar (see [`FEATURE-13`](./FEATURE-13-Job-Discove
 selected job has artefacts. The archive is organised per job:
 
 ```text
-mlrs-jobs.zip
+llm-jobs.zip
 ├── <jobId-a>/
 │   ├── <jobId-a>.onnx
 │   ├── metrics.json
@@ -104,7 +104,7 @@ the response is not chunked. The temporary file is deleted after the response is
 | Multi-job bundle where **no** job has artefacts | `404 ARTEFACT_NOT_FOUND` with `details.jobIds` listing them |
 | More than 10 ids                        | `400 VALIDATION_ERROR` (`details.field = "ids"`, `details.max = 10`) |
 | Malformed UUID in `ids`                 | `400 VALIDATION_ERROR` (`details.field = "ids"`)                     |
-| An artefact file is missing on disk     | The bundle is still produced; the missing file is omitted from `manifest.json` and the response header `X-mlrs-Missing-Files` lists the paths |
+| An artefact file is missing on disk     | The bundle is still produced; the missing file is omitted from `manifest.json` and the response header `X-llm-Missing-Files` lists the paths |
 | `metrics.json` is absent (job not completed) | The sidecar is omitted; the bundle still contains the artefacts |
 
 ## Acceptance conditions

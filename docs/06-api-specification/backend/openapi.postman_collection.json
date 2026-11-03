@@ -1,8 +1,8 @@
 {
   "info": {
-    "name": "mlrs Training API",
+    "name": "llm Training API",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Local FastAPI contract for the scikit-learn-client platform. ONNX is the required training artefact.",
+    "description": "Local FastAPI contract for the llm-client platform. ONNX is the required training artefact.",
     "version": "0.1.0"
   },
   "variable": [

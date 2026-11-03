@@ -1,6 +1,6 @@
 # Operations
 
-Local Compose operations for mlrs.
+Local Compose operations for llm.
 
 ## Sections
 

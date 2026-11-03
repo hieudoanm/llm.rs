@@ -1,4 +1,4 @@
-# mlrs — Vitest
+# llm — Vitest
 
 **Implemented.** `packages/frontend` has a unit-test layer over `src/lib/**` and
 `src/components/**`.

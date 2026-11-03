@@ -21,7 +21,7 @@ The catalogue ships 25 estimators across six task types:
 | Anomaly detection       | 1     | `isolation_forest`                                |
 | Reinforcement learning  | 1     | `fitted_q_iteration`                              |
 
-The shipped ids remain authoritative in [`01-requirements`](../01-requirements/functional-requirements.md); the backend registry lives in `crates/mlrs-api/src/training/catalogue/` (assembled in `catalogue/algorithms.py`) and the integrity tests in `crates/mlrs-api/tests/training/catalogue/` assert the two stay in sync. Families: linear models, trees and ensembles, k-NN, Gaussian Naive Bayes, SVM, MLP, self-training, centroid/probabilistic clustering, and isolation forests. Every entry must fit the pipeline, score, and convert to ONNX with predictions matching mlrs (`test_trains_and_exports_onnx`).
+The shipped ids remain authoritative in [`01-requirements`](../01-requirements/functional-requirements.md); the backend registry lives in `crates/llm-api/src/training/catalogue/` (assembled in `catalogue/algorithms.py`) and the integrity tests in `crates/llm-api/tests/training/catalogue/` assert the two stay in sync. Families: linear models, trees and ensembles, k-NN, Gaussian Naive Bayes, SVM, MLP, self-training, centroid/probabilistic clustering, and isolation forests. Every entry must fit the pipeline, score, and convert to ONNX with predictions matching llm (`test_trains_and_exports_onnx`).
 
 ## User-visible behaviour
 
@@ -44,7 +44,7 @@ The shipped ids remain authoritative in [`01-requirements`](../01-requirements/f
 
 ## Outputs
 
-Catalogue: `GET /api/v1/algorithms` → list of algorithms with `exports` (`onnx` always; `pkl`/`joblib` for mlrs).
+Catalogue: `GET /api/v1/algorithms` → list of algorithms with `exports` (`onnx` always; `pkl`/`joblib` for llm).
 
 ## Behaviour
 
@@ -63,6 +63,6 @@ Catalogue: `GET /api/v1/algorithms` → list of algorithms with `exports` (`onnx
 
 ## Acceptance conditions
 
-- P0 mlrs ids work for the matching task.
+- P0 llm ids work for the matching task.
 - Mismatched task/algorithm returns `400 TASK_ALGORITHM_MISMATCH`.
-- Every catalogue entry exports ONNX and matches mlrs predictions.
+- Every catalogue entry exports ONNX and matches llm predictions.

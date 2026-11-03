@@ -1,4 +1,4 @@
-# mlrs — Testing Definition of Done
+# llm — Testing Definition of Done
 
 A change is not done until: tests for new logic (frontend Vitest units for
 `src/lib` + `src/components`, backend pytest at the module and API boundary —

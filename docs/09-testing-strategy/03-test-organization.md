@@ -1,6 +1,6 @@
-# mlrs — Test Organisation
+# llm — Test Organisation
 
-Backend: `crates/mlrs-api/tests/`, grouped by module (`api/`, `db/`, `export/`,
+Backend: `crates/llm-api/tests/`, grouped by module (`api/`, `db/`, `export/`,
 `storage/`, `training/`) with a shared test harness and the end-to-end
 `test_e2e.rs`. Training RL tests live in `tests/training/rl/`.
 

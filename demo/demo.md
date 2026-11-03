@@ -1,22 +1,22 @@
-# mlrs Demo Script
+# llm Demo Script
 
-This document is a scene-by-scene demo script for recording an MP4 video of the mlrs
+This document is a scene-by-scene demo script for recording an MP4 video of the llm
 machine learning platform. It covers every feature of the frontend and backend so
 that AGENTS (or a human narrator) can produce a complete walkthrough video.
 
 ## Overview
 
-mlrs = scikit-learn-client. A full-stack ML training platform supporting supervised, semi-supervised, and unsupervised learning:
+llm = llm-client. A full-stack ML training platform supporting supervised, semi-supervised, and unsupervised learning:
 
-- **Frontend**: Next.js + Tailwind v4 + DaisyUI, light/dark themes (`mlrs-light` / `mlrs-dark`), TanStack Query polling, CSV upload wizard, job lifecycle status, artefact download.
-- **Backend**: FastAPI + SQLAlchemy (async) + PostgreSQL, mlrsearn training pipeline, ONNX/pickle/joblib export, file storage, health/readyz endpoints.
+- **Frontend**: Next.js + Tailwind v4 + DaisyUI, light/dark themes (`llm-light` / `llm-dark`), TanStack Query polling, CSV upload wizard, job lifecycle status, artefact download.
+- **Backend**: FastAPI + SQLAlchemy (async) + PostgreSQL, llmearn training pipeline, ONNX/pickle/joblib export, file storage, health/readyz endpoints.
 - **Database**: PostgreSQL via asyncpg, datasets/jobs/metrics/artefacts/idempotency tables.
-- **Branding**: mlrs logo mark (light/dark variants), Geist sans/mono fonts, custom design tokens.
+- **Branding**: llm logo mark (light/dark variants), Geist sans/mono fonts, custom design tokens.
 
 ## Prerequisites for Recording
 
-1. SQLite database at `.mlrs-data/mlrs.db`.
-2. Backend running: `cargo run -p mlrs-server` from `crates/` (port 8000).
+1. SQLite database at `.llm-data/llm.db`.
+2. Backend running: `cargo run -p llm-server` from `crates/` (port 8000).
 3. Frontend running: `cd packages/frontend && pnpm run dev` (port 3000).
 4. Browser at `http://localhost:3000`, screen resolution 1920×1080, dark/light OS theme set to light for the first half.
 5. Sample CSV ready at `/tmp/demo-dataset.csv` (classification) and `/tmp/demo-regression.csv` (regression).
@@ -46,13 +46,13 @@ sqft,bedrooms,age,price
 **Actions**:s
 
 1. Open browser to `http://localhost:3000`.
-2. Show the home page: hero heading "scikit-learn-client", subcopy "Upload a CSV, choose a model, download ONNX."
+2. Show the home page: hero heading "llm-client", subcopy "Upload a CSV, choose a model, download ONNX."
 3. Hover over "Train a model" and "View jobs" buttons (primary and outline variants).
 4. Scroll down to the "Everything you need to train" feature grid (CSV upload, Task-aware models, ONNX export).
 5. Scroll to "How it works" three-step section (Upload dataset → Map and configure → Train and download).
 6. Scroll to the CTA banner "Ready to train your first model?"
 
-**Narrator**: "mlrs is a focused ML training platform. Upload a CSV, pick your features and label, choose a task and algorithm, train, and download ONNX — no Python runtime needed at inference."
+**Narrator**: "llm is a focused ML training platform. Upload a CSV, pick your features and label, choose a task and algorithm, train, and download ONNX — no Python runtime needed at inference."
 
 ---
 
@@ -63,10 +63,10 @@ sqft,bedrooms,age,price
 **Actions**:
 
 1. Click the theme toggle button in the navbar (sun ↔ moon icon).
-2. Wait ~1s for the theme transition. Show the page re-render in dark mode (`mlrs-dark`).
+2. Wait ~1s for the theme transition. Show the page re-render in dark mode (`llm-dark`).
 3. Click again to return to light mode.
 
-**Narrator**: "mlrs ships with two themes — mlrs-light and mlrs-dark — driven by custom design tokens and DaisyUI. The theme persists across navigation."
+**Narrator**: "llm ships with two themes — llm-light and llm-dark — driven by custom design tokens and DaisyUI. The theme persists across navigation."
 
 ---
 
@@ -79,7 +79,7 @@ sqft,bedrooms,age,price
 1. Click "Home" → stays on `/`.
 2. Click "New job" → navigates to `/jobs/new`.
 3. Click "Jobs" → navigates to `/jobs` (empty state).
-4. Click the mlrs logo → returns to `/`.
+4. Click the llm logo → returns to `/`.
 
 **Narrator**: "The navbar gives instant access to Home, New job, and Jobs, plus the theme toggle."
 
@@ -209,7 +209,7 @@ sqft,bedrooms,age,price
 5. Show regression metrics: rmse, mae, r2.
 6. Download model.onnx.
 
-**Narrator**: "mlrs supports both classification and regression. Regression jobs validate that the label is numeric and produce RMSE, MAE, and R² metrics."
+**Narrator**: "llm supports both classification and regression. Regression jobs validate that the label is numeric and produce RMSE, MAE, and R² metrics."
 
 ---
 
@@ -224,7 +224,7 @@ sqft,bedrooms,age,price
 3. Show that all components (badges, alerts, cards, buttons, dropzone) render correctly in dark mode.
 4. Toggle back to light theme at the end.
 
-**Narrator**: "Every component adapts to mlrs-dark. The design tokens ensure consistent contrast and branding in both themes."
+**Narrator**: "Every component adapts to llm-dark. The design tokens ensure consistent contrast and branding in both themes."
 
 ---
 
@@ -238,7 +238,7 @@ sqft,bedrooms,age,price
 2. Show hero section + CTA "Start training".
 3. Fade out.
 
-**Narrator**: "From CSV to ONNX in under a minute. That's mlrs — scikit-learn-client."
+**Narrator**: "From CSV to ONNX in under a minute. That's llm — llm-client."
 
 ---
 

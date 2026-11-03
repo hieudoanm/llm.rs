@@ -1,6 +1,6 @@
-# mlrs — Test Fixtures
+# llm — Test Fixtures
 
-Store under `crates/mlrs-api/tests/fixtures/`:
+Store under `crates/llm-api/tests/fixtures/`:
 
 | File                               | Task                        | Notes                                                             |
 | ---------------------------------- | --------------------------- | ----------------------------------------------------------------- |

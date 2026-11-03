@@ -1,6 +1,6 @@
 # Phase 6: ONNX export
 
-Week 4. mlrs2onnx, artefact rows, download endpoint, UI download. Integration: ORT load.
+Week 4. llm2onnx, artefact rows, download endpoint, UI download. Integration: ORT load.
 
 ## Acceptance
 

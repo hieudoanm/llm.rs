@@ -1,8 +1,8 @@
-# scikit-learn-client (mlrs) — User Stories
+# llm-client (llm) — User Stories
 
 ## 1. Purpose
 
-This document describes user stories for mlrs, expressing user goals in terms of role, motivation, and acceptance criteria.
+This document describes user stories for llm, expressing user goals in terms of role, motivation, and acceptance criteria.
 
 It complements `00-overview.md`, `01-requirements.md`, `02-features.md`, `04-architecture.md`, `05-data-model.md`, and `06-api-specification.md`.
 
@@ -13,7 +13,7 @@ It complements `00-overview.md`, `01-requirements.md`, `02-features.md`, `04-arc
 | Practitioner       | Train a model from a CSV and export ONNX         |
 | Developer/Operator | Run Compose, inspect health, recover failed jobs |
 
-mlrs is a **local single-user** studio. There are no accounts in the initial release.
+llm is a **local single-user** studio. There are no accounts in the initial release.
 
 ## User Stories
 

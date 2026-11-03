@@ -1,12 +1,12 @@
-# mlrs — serde
+# llm — serde
 
-## Usage in mlrs
+## Usage in llm
 
 serde is the **validation and serialisation layer** for the entire API:
 
 - All request/response bodies are typed serde structs/enums
 - Axum derives the OpenAPI contract from these types via `utoipa`
-- Models live in `crates/mlrs-api/src/schemas.rs`
+- Models live in `crates/llm-api/src/schemas.rs`
 - Every endpoint handler uses typed parameters and response types
 
 ## Model catalogue

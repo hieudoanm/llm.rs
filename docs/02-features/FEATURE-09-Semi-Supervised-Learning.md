@@ -6,7 +6,7 @@ P0 (FR-080..FR-086). Planned in Phase 9.
 
 ## Description
 
-Semi-supervised learning lets a user train a classifier when only part of the label column is filled. Empty label cells mean "unlabelled": those rows contribute features during training but are never scored. The first shipped estimator is scikit-learn's `SelfTrainingClassifier` with a logistic-regression base estimator.
+Semi-supervised learning lets a user train a classifier when only part of the label column is filled. Empty label cells mean "unlabelled": those rows contribute features during training but are never scored. The first shipped estimator is llm's `SelfTrainingClassifier` with a logistic-regression base estimator.
 
 ## User-visible behaviour
 

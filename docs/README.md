@@ -1,4 +1,4 @@
-# scikit-learn-client (mlrs) — Product Specification
+# llm-client (llm) — Product Specification
 
 Product strategy · Functional requirements · Architecture · Data model · Delivery roadmap
 
@@ -26,7 +26,7 @@ Product strategy · Functional requirements · Architecture · Data model · Del
 
 ## 1. Product vision
 
-**scikit-learn-client (mlrs)** is a local, full-stack studio for training machine-learning models from a CSV.
+**llm-client (llm)** is a local, full-stack studio for training machine-learning models from a CSV.
 
 A user uploads a table with features (**X**) and, when the task requires one, a label (**Y**), or declares experience columns for offline reinforcement learning, chooses an allow-listed algorithm, and receives a trained artefact. **ONNX (`.onnx`) is the required export.** Pickle (`.pkl`) and joblib (`.joblib`) are optional extra saves.
 
@@ -37,7 +37,7 @@ The studio supports three supervision modes behind one workflow:
 - **Unsupervised** — clustering and anomaly detection with no label column.
 - **Offline reinforcement learning** — Fitted Q-Iteration from a transition log with experience columns.
 
-The product demonstrates end-to-end software engineering across a Next.js frontend (Tailwind CSS, DaisyUI), a Rust Axum backend (scikit-learn), SQLite for job and artefact metadata, and Docker Compose for local service topology.
+The product demonstrates end-to-end software engineering across a Next.js frontend (Tailwind CSS, DaisyUI), a Rust Axum backend (llm), SQLite for job and artefact metadata, and Docker Compose for local service topology.
 
 ## Product principles
 
@@ -53,7 +53,7 @@ The product demonstrates end-to-end software engineering across a Next.js fronte
 
 > Go from a CSV to a downloadable ONNX model on your own machine.
 
-mlrs is a software demonstration, not a production AutoML platform. It does not claim state-of-the-art accuracy, regulatory compliance, or suitability for safety-critical decisions.
+llm is a software demonstration, not a production AutoML platform. It does not claim state-of-the-art accuracy, regulatory compliance, or suitability for safety-critical decisions.
 
 ## 2. Target users
 
@@ -79,7 +79,7 @@ See [`01-requirements.md`](01-requirements.md) for the complete FR specification
 
 CSV upload, column mapping (X/Y where required), model selection, asynchronous training, task-specific metrics, required ONNX export, job history, health checks.
 
-The implemented P0 catalogue covers mlrs classification and regression. The following P0 extensions are planned in Phases 9–10:
+The implemented P0 catalogue covers llm classification and regression. The following P0 extensions are planned in Phases 9–10:
 
 - **Semi-supervised:** self-training classification with partially labelled CSVs.
 - **Unsupervised:** clustering (KMeans, MiniBatchKMeans, GaussianMixture) and anomaly detection (IsolationForest).
@@ -146,7 +146,7 @@ Goal: group rows without a target column.
 3. Train and review silhouette, Davies–Bouldin, Calinski–Harabasz, and inertia/BIC.
 4. Download the ONNX model.
 
-Success metric: cluster metrics are returned and ONNX predictions match mlrs.
+Success metric: cluster metrics are returned and ONNX predictions match llm.
 
 ### Journey F — Detect anomalies
 
@@ -157,7 +157,7 @@ Goal: flag unusual rows without a target column.
 3. Train and review the anomaly count, rate, and score distribution.
 4. Download the ONNX model.
 
-Success metric: ONNX labels and scores match mlrs.
+Success metric: ONNX labels and scores match llm.
 
 ## 6. Application structure
 
@@ -175,7 +175,7 @@ Success metric: ONNX labels and scores match mlrs.
 
 ### 7.1 System design
 
-mlrs is a **three-service local stack**: Next.js frontend, Axum training API, SQLite. The API accepts uploads, persists metadata, and runs training **asynchronously** so HTTP handlers do not block on fit/export. Artefact files live on a Docker volume; SQLite stores jobs, column maps, metrics, and artefact pointers. See [`04-architecture.md`](04-architecture.md).
+llm is a **three-service local stack**: Next.js frontend, Axum training API, SQLite. The API accepts uploads, persists metadata, and runs training **asynchronously** so HTTP handlers do not block on fit/export. Artefact files live on a Docker volume; SQLite stores jobs, column maps, metrics, and artefact pointers. See [`04-architecture.md`](04-architecture.md).
 
 ### 7.2 Technology stack
 
@@ -197,7 +197,7 @@ This snapshot reflects the repository state on 2026-10-19. It is intentionally s
 
 ### Implemented
 
-- **Backend** (`crates/mlrs-api`): Axum app serving health endpoints (`/healthz`, `/readyz`), plus routes under `/api/v1` for algorithms, datasets, and jobs; sqlx with SQLite schema; filesystem storage for uploads and artefacts (`MLRS_DATA_DIR`, upload cap `MLRS_MAX_UPLOAD_MB`); a background training worker with linfa estimators and ONNX export via `onnx-protobuf`; cargo test covering the algorithm catalogue and the API end to end.
+- **Backend** (`crates/llm-api`): Axum app serving health endpoints (`/healthz`, `/readyz`), plus routes under `/api/v1` for algorithms, datasets, and jobs; sqlx with SQLite schema; filesystem storage for uploads and artefacts (`LLM_DATA_DIR`, upload cap `LLM_MAX_UPLOAD_MB`); a background training worker with linfa estimators and ONNX export via `onnx-protobuf`; cargo test covering the algorithm catalogue and the API end to end.
 - **Frontend** (`packages/frontend`): Next.js App Router UI — home, job wizard (upload → map columns → configure a model), job history, and job detail with per-metric explanations; light/dark DaisyUI themes; Vitest + React Testing Library units over `src/lib` + `src/components` (80% coverage gate); Playwright e2e over the demo scenes.
 - **Notebooks**: removed — Python backend deleted; sample datasets exported directly from the Rust backend.
 - **Infrastructure**: `docker-compose.yaml` (SQLite 18, backend, frontend), one Dockerfile per app service, GitHub Actions CI (backend, frontend, e2e), and the Turborepo/Husky workspace tooling.
@@ -205,7 +205,7 @@ This snapshot reflects the repository state on 2026-10-19. It is intentionally s
 
 ### Not yet implemented
 
-- Alembic migrations — removed; schema defined in `crates/mlrs-db/src/schema.rs`.
+- Alembic migrations — removed; schema defined in `crates/llm-db/src/schema.rs`.
 - Framework neural nets — the neural-net offering is the configurable tabular linfa/ndarray MLPs.
 
 ### Roadmap
@@ -252,9 +252,9 @@ See [`11-deployment.md`](11-deployment.md) and [`12-operations.md`](12-operation
 ### Options
 
 - **Local only:** Docker Compose with `frontend`, `backend`, and `sqlite`
-- **CLI:** `mlrs` — offline train-and-export binary (see
+- **CLI:** `llm` — offline train-and-export binary (see
   [`11-deployment/cli.md`](./11-deployment/cli.md) and
-  [`crates/mlrs-server/scripts/install.sh`](../crates/mlrs-server/scripts/install.sh))
+  [`crates/llm-server/scripts/install.sh`](../crates/llm-server/scripts/install.sh))
 - CI: GitHub Actions quality gates
 - Cloud, Kubernetes, and Terraform are **out of scope** for this release
 

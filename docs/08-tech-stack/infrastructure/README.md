@@ -1,4 +1,4 @@
-# mlrs — Infrastructure Best Practices
+# llm — Infrastructure Best Practices
 
 ## Documents
 

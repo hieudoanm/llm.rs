@@ -23,7 +23,7 @@ This feature makes the worker bounded, interruptible, and retry-aware.
 
 ### Bounded concurrency
 
-- At most **N** jobs execute at the same time. `N` is `mlrs_MAX_CONCURRENT_JOBS` (default **1**,
+- At most **N** jobs execute at the same time. `N` is `llm_MAX_CONCURRENT_JOBS` (default **1**,
    preserving the current serial behaviour).
 - When the limit is reached, additional jobs stay in `queued` and the jobs page shows the queue
   position: **"Queued — 2 jobs ahead"**.
@@ -31,7 +31,7 @@ This feature makes the worker bounded, interruptible, and retry-aware.
 
 ### Per-job timeout
 
-- Every job has a wall-clock budget: `mlrs_JOB_TIMEOUT_SECONDS` (default **1800** = 30 minutes).
+- Every job has a wall-clock budget: `llm_JOB_TIMEOUT_SECONDS` (default **1800** = 30 minutes).
 - When the budget is exceeded, the worker cancels the job and records `failed` with the error code
   `JOB_TIMEOUT`.
 - The timeout message names the limit and the elapsed time:
@@ -41,7 +41,7 @@ This feature makes the worker bounded, interruptible, and retry-aware.
 
 ### Retry with backoff
 
-- A job is attempted up to `mlrs_JOB_MAX_ATTEMPTS` times (default **2** — the initial attempt plus
+- A job is attempted up to `llm_JOB_MAX_ATTEMPTS` times (default **2** — the initial attempt plus
   one retry).
 - **Only transient failures are retried.** Transient means the failure was caused by the
   environment rather than by the data: a database connection error, a disk write error, an OS-level
@@ -52,7 +52,7 @@ This feature makes the worker bounded, interruptible, and retry-aware.
 - Between attempts the job returns to `queued` with the status `retrying`, and the worker waits
   before the next attempt.
 - The wait uses **exponential backoff with full jitter**: attempt *n* waits a random duration in
-  `[0, base × 2^(n-1))` seconds, where `base` is `mlrs_JOB_RETRY_BASE_SECONDS` (default **2**).
+  `[0, base × 2^(n-1))` seconds, where `base` is `llm_JOB_RETRY_BASE_SECONDS` (default **2**).
   With the default base the first retry waits 0–2 s, the second 0–4 s, the fourth 0–16 s, capped
   at 30 s.
 - The job records `attempts` (how many attempts have started) and `nextAttemptAt` (when the next
@@ -85,10 +85,10 @@ The job payload gains:
 
 | Variable                    | Default | Meaning                                                  |
 | --------------------------- | ------- | -------------------------------------------------------- |
-| `mlrs_MAX_CONCURRENT_JOBS`   | `1`     | Maximum jobs executing concurrently.                    |
-| `mlrs_JOB_TIMEOUT_SECONDS`   | `1800`  | Wall-clock budget for a single job attempt.            |
-| `mlrs_JOB_MAX_ATTEMPTS`      | `2`     | Total attempts per job, including the first.            |
-| `mlrs_JOB_RETRY_BASE_SECONDS`| `2`     | Base delay of the exponential backoff.                  |
+| `llm_MAX_CONCURRENT_JOBS`   | `1`     | Maximum jobs executing concurrently.                    |
+| `llm_JOB_TIMEOUT_SECONDS`   | `1800`  | Wall-clock budget for a single job attempt.            |
+| `llm_JOB_MAX_ATTEMPTS`      | `2`     | Total attempts per job, including the first.            |
+| `llm_JOB_RETRY_BASE_SECONDS`| `2`     | Base delay of the exponential backoff.                  |
 
 Invalid values (non-integer, zero, negative, or above the documented maximum) fall back to the
 default and are logged once at startup as a warning.
@@ -106,17 +106,17 @@ fields and the new `retrying` status.
 | Job deleted while running                     | The task is cancelled at its next await point; no artefacts are written |
 | Timeout fires while the fit is inside `asyncio.to_thread` | The attempt is abandoned; the OS thread may finish but its result is discarded |
 | A retry is scheduled while the backend restarts | On startup, jobs in `retrying` are reset to `queued` and re-attempted |
-| The container is OOM-killed                    | On startup, jobs left in `validating`/`training`/`evaluating`/`exporting` older than `mlrs_WORKER_STALE_SECONDS` (default 3600) are recorded `failed` with `WORKER_INTERRUPTED` |
+| The container is OOM-killed                    | On startup, jobs left in `validating`/`training`/`evaluating`/`exporting` older than `llm_WORKER_STALE_SECONDS` (default 3600) are recorded `failed` with `WORKER_INTERRUPTED` |
 | Retry budget exhausted                        | `failed` with `JOB_RETRY_EXHAUSTED`; the underlying message is preserved in `error.message` |
 | A deterministic failure on the first attempt  | No retry; `failed` with the original code (`TRAINING_FAILED`)      |
-| `mlrs_MAX_CONCURRENT_JOBS` = 1 (default)       | Behaviour matches today's serial worker, including "next job starts after the previous one terminates" |
+| `llm_MAX_CONCURRENT_JOBS` = 1 (default)       | Behaviour matches today's serial worker, including "next job starts after the previous one terminates" |
 
 ## Acceptance conditions
 
-- With `mlrs_MAX_CONCURRENT_JOBS=1`, a second accepted job remains `queued` until the first reaches
+- With `llm_MAX_CONCURRENT_JOBS=1`, a second accepted job remains `queued` until the first reaches
   a terminal status.
-- With `mlrs_MAX_CONCURRENT_JOBS=2`, two jobs run simultaneously and a third waits.
-- A job whose fit exceeds `mlrs_JOB_TIMEOUT_SECONDS` is recorded `failed` with `error.code =
+- With `llm_MAX_CONCURRENT_JOBS=2`, two jobs run simultaneously and a third waits.
+- A job whose fit exceeds `llm_JOB_TIMEOUT_SECONDS` is recorded `failed` with `error.code =
   "JOB_TIMEOUT"`, and no artefact row is created for it.
 - A job whose first attempt fails with a transient error and whose second attempt succeeds ends
   `completed` with `attempts = 2` and a valid ONNX artefact.

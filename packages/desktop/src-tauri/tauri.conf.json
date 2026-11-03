@@ -1,0 +1,39 @@
+{
+  "productName": "Local Learning Machine",
+  "version": "0.1.0",
+  "identifier": "com.llm.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:3000",
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build",
+    "devPath": "http://localhost:3000",
+    "distDir": "../dist"
+  },
+  "app": {
+    "security": {
+      "csp": null
+    }
+  },
+  "windows": [
+    {
+      "title": "Local Learning Machine",
+      "width": 1200,
+      "height": 800,
+      "resizable": true,
+      "fullscreen": false
+    }
+  ],
+  "plugins": [],
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

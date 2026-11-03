@@ -1,4 +1,4 @@
-# mlrs — Frontend testing
+# llm — Frontend testing
 
 | Document                           | Covers         |
 | ---------------------------------- | -------------- |

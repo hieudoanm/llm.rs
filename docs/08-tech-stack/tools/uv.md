@@ -1,6 +1,6 @@
-# mlrs — uv
+# llm — uv
 
-Rust package manager and lockfile tool for `crates/mlrs-api`.
+Rust package manager and lockfile tool for `crates/llm-api`.
 
 ## Choice
 

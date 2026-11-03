@@ -1,4 +1,4 @@
-# scikit-learn-client (mlrs) — Data Model
+# llm-client (llm) — Data Model
 
 ## 1. Purpose
 
@@ -109,7 +109,7 @@ Insights are advisory — no insight blocks job creation.
 ### 6.8 Migration note
 
 Existing rows are compatible: every pre-Phase-9 job has a non-null label. The local schema is
-defined in `crates/mlrs-db/src/schema.rs` as a `SCHEMA` constant, applied idempotently at startup.
+defined in `crates/llm-db/src/schema.rs` as a `SCHEMA` constant, applied idempotently at startup.
 There are no separate migration files — schema changes are made by editing the `SCHEMA` constant
 and redeploying.
 
@@ -117,7 +117,7 @@ and redeploying.
 
 - Timestamps: RFC3339 `TEXT` UTC.
 - Hashes: lowercase hex SHA-256.
-- `library_versions` example: `{ "rust": "1.x", "mlrs": "...", "onnx": "...", "onnx-protobuf": "..." }`.
+- `library_versions` example: `{ "rust": "1.x", "llm": "...", "onnx": "...", "onnx-protobuf": "..." }`.
 
 ## Cross-references
 

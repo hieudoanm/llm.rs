@@ -1,4 +1,4 @@
-# scikit-learn-client (mlrs) — Technology Stack & Decisions
+# llm-client (llm) — Technology Stack & Decisions
 
 ## 1. Purpose
 
@@ -38,9 +38,9 @@ Non-negotiable:
 | Git hooks                 | Husky (+ lint-staged, declared)           | [tools/husky.md](./08-tech-stack/tools/husky.md) |
 | API                       | Axum + serde v2 + axum           | [§5.1](#51-fastapi)                              |
 | Language                  | Rust stable                               | [§5.2](#52-rust)                               |
-| Classical ML              | scikit-learn                              | [§5.3](#53-scikit-learn)                         |
-| Neural nets (P1)          | scikit-learn MLPs (configurable)          | [§5.4](#54-neural-networks-tabular-mlps)         |
-| Export                    | ONNX + mlrs2onnx; optional pickle / joblib | [§5.5](#55-onnx)                                 |
+| Classical ML              | llm                              | [§5.3](#53-llm)                         |
+| Neural nets (P1)          | llm MLPs (configurable)          | [§5.4](#54-neural-networks-tabular-mlps)         |
+| Export                    | ONNX + llm2onnx; optional pickle / joblib | [§5.5](#55-onnx)                                 |
 | Validation/serialisation  | serde v2                               | [§5.6](#56-pydantic-v2)                          |
 | ORM / migrations          | SQLx                      | [§5.7](#57-sqlx)                  |
 | Database                  | SQLite 18                             | [§6](#6-sqliteql)                              |
@@ -199,7 +199,7 @@ work found `retrying` missing from the status union and `artefacts` marked requi
 as the *transport* — it would re-implement the retry/timeout/`ApiError` behaviour `api.ts` already
 has; GraphQL/codegen — no GraphQL in the stack.
 
-Regenerate with `pnpm --filter @mlrs/frontend run openapi:types`. Used by `src/lib/apiTyped.ts`.
+Regenerate with `pnpm --filter @llm/frontend run openapi:types`. Used by `src/lib/apiTyped.ts`.
 
 ## 5. Backend
 
@@ -218,7 +218,7 @@ running application and checked for drift in CI (NFR-073, FR-191). The committed
 
 ### 5.1.1 Configuration
 
-**Choice:** A single settings module (`crates/mlrs-api/src/config.py`) that reads the
+**Choice:** A single settings module (`crates/llm-api/src/config.py`) that reads the
 environment once at start-up and exposes typed values with documented defaults. No
 `pydantic-settings` dependency.
 
@@ -255,15 +255,15 @@ list stays short enough to validate by hand.
 
 ### 5.4 Neural networks (tabular MLPs)
 
-**Choice:** scikit-learn `MLPClassifier` / `MLPRegressor`, exposed as `mlp_classifier` and `mlp_regressor` with a configurable architecture (`hidden_layer_sizes`, `activation`, `solver`, `alpha`, `learning_rate_init`, `max_iter`, `batch_size`, `early_stopping`).
+**Choice:** llm `MLPClassifier` / `MLPRegressor`, exposed as `mlp_classifier` and `mlp_regressor` with a configurable architecture (`hidden_layer_sizes`, `activation`, `solver`, `alpha`, `learning_rate_init`, `max_iter`, `batch_size`, `early_stopping`).
 
-**Why:** This is a tabular training studio; multi-layer perceptrons are the appropriate neural-net model for tabular data. Riding on the existing scikit-learn estimator keeps a single `Pipeline` + `mlrs2onnx` export path, needs no new dependency, and adds no image-size cost. The architecture is still genuinely configurable — depth, width, activation, solver, regularisation, and early stopping are all hyperparameters (FR-023, FR-026, FR-027).
+**Why:** This is a tabular training studio; multi-layer perceptrons are the appropriate neural-net model for tabular data. Riding on the existing llm estimator keeps a single `Pipeline` + `llm2onnx` export path, needs no new dependency, and adds no image-size cost. The architecture is still genuinely configurable — depth, width, activation, solver, regularisation, and early stopping are all hyperparameters (FR-023, FR-026, FR-027).
 
 **Rejected:** GPU / large-net training in Compose — non-goal.
 
 ### 5.5 ONNX
 
-**Choice:** `onnx`, `mlrs2onnx` (both required exports), and `onnxruntime` in tests. Every catalogue entry — including the MLPs and the FQI Q-function — converts through a single `mlrs2onnx` path.
+**Choice:** `onnx`, `llm2onnx` (both required exports), and `onnxruntime` in tests. Every catalogue entry — including the MLPs and the FQI Q-function — converts through a single `llm2onnx` path.
 
 **Why:** Portable contract. Pickle is Rust-only and unsafe as an interchange format.
 

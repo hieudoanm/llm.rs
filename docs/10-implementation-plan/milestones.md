@@ -1,8 +1,8 @@
-# mlrs — Milestones
+# llm — Milestones
 
 - **M1 Foundation** (end of Phase 1) — Compose SQLite + empty API health.
 - **M2 Ingest** (end of Phase 3) — Upload and mapping persist.
-- **M3 Train** (end of Phase 6) — Async mlrs job + ONNX download.
+- **M3 Train** (end of Phase 6) — Async llm job + ONNX download.
 - **M4 Studio** (end of Phase 8) — History, optional artefacts, docs, demo CSV.
 - **M5 Semi-supervised** (end of Phase 9) — Partial-label jobs train, score labelled rows, and export ONNX.
 - **M6 Unsupervised** (end of Phase 10) — Clustering and anomaly-detection jobs train label-free, score in-sample, and export ONNX.

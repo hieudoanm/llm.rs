@@ -12,20 +12,20 @@ environment-variable reference
 
 ## Scope
 
-1. **Central configuration** — add `crates/mlrs-api/src/config.py`: a single settings module
+1. **Central configuration** — add `crates/llm-api/src/config.py`: a single settings module
    that reads every environment variable once, validates it, and falls back to a documented
    default with one startup warning. Move the CORS allow-list out of `main.py` into
-   `mlrs_CORS_ORIGINS`; add `mlrs_CORS_ALLOW_CREDENTIALS`, `mlrs_ENABLE_INTERACTIVE_DOCS`, and
-   `mlrs_LOG_LEVEL`. Wire the new variables through `docker-compose.yaml` and `.env.example`.
+   `llm_CORS_ORIGINS`; add `llm_CORS_ALLOW_CREDENTIALS`, `llm_ENABLE_INTERACTIVE_DOCS`, and
+   `llm_LOG_LEVEL`. Wire the new variables through `docker-compose.yaml` and `.env.example`.
 2. **Upload hardening** — validate the declared content type, the extension, and the sniffed
    bytes; reject binary payloads renamed to `.csv` with `UNSUPPORTED_FILE_TYPE`; reject
    undecodable bytes with `MALFORMED_CSV`; reject empty or duplicate header names with
    `VALIDATION_ERROR`.
-3. **Worker reliability** — bound concurrency with `mlrs_MAX_CONCURRENT_JOBS`; bound each attempt
-   with `mlrs_JOB_TIMEOUT_SECONDS`; retry transient failures up to `mlrs_JOB_MAX_ATTEMPTS` times
-   with exponential backoff and full jitter based on `mlrs_JOB_RETRY_BASE_SECONDS`; add the
+3. **Worker reliability** — bound concurrency with `llm_MAX_CONCURRENT_JOBS`; bound each attempt
+   with `llm_JOB_TIMEOUT_SECONDS`; retry transient failures up to `llm_JOB_MAX_ATTEMPTS` times
+   with exponential backoff and full jitter based on `llm_JOB_RETRY_BASE_SECONDS`; add the
    non-terminal status `retrying`; expose `attempts`, `maxAttempts`, and `nextAttemptAt`; sweep
-   stale jobs with `mlrs_WORKER_STALE_SECONDS`.
+   stale jobs with `llm_WORKER_STALE_SECONDS`.
 4. **Job discovery** — add `name` and `tags` to `jobs`; add `PATCH /api/v1/jobs/{jobId}`;
    extend `GET /api/v1/jobs` with `status`, `taskType`, `algorithmId`, `tag`, `q`,
    `createdFrom`, `createdTo`, and `sort`.
@@ -62,11 +62,11 @@ environment-variable reference
 ## Acceptance
 
 - The backend starts with no environment variables set and serves every documented route.
-- `mlrs_CORS_ORIGINS` controls the allow-list; the hard-coded list is gone from `main.py`.
+- `llm_CORS_ORIGINS` controls the allow-list; the hard-coded list is gone from `main.py`.
 - A binary payload renamed to `.csv` is rejected with `UNSUPPORTED_FILE_TYPE`; a valid CSV is
   still accepted with `201`.
-- With `mlrs_MAX_CONCURRENT_JOBS=1` a second job waits for the first; a job that exceeds
-  `mlrs_JOB_TIMEOUT_SECONDS` fails with `JOB_TIMEOUT` and leaves no artefact; a transient failure
+- With `llm_MAX_CONCURRENT_JOBS=1` a second job waits for the first; a job that exceeds
+  `llm_JOB_TIMEOUT_SECONDS` fails with `JOB_TIMEOUT` and leaves no artefact; a transient failure
   is retried and can succeed; a deterministic failure is not retried.
 - `GET /api/v1/jobs` filters and sorts as documented; `PATCH /api/v1/jobs/{jobId}` updates only
   `name` and `tags`.

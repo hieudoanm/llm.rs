@@ -1,4 +1,4 @@
-# mlrs — Responsive Design
+# llm — Responsive Design
 
 _Part of [07-ui-ux-design.md](../../07-ui-ux-design.md)._
 

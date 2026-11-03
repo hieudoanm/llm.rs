@@ -1,8 +1,8 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "mlrs Training API",
-    "description": "Local FastAPI contract for the scikit-learn-client platform. ONNX is the required training artefact.",
+    "title": "llm Training API",
+    "description": "Local FastAPI contract for the llm-client platform. ONNX is the required training artefact.",
     "version": "0.1.0"
   },
   "servers": [
@@ -880,7 +880,7 @@
           "family": {
             "type": "string",
             "title": "Family",
-            "default": "mlrsearn"
+            "default": "llmearn"
           },
           "description": {
             "type": "string",

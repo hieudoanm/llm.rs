@@ -38,7 +38,7 @@ The filter state is reflected in the URL query string so a filtered view can be 
 shared.
 
 The URL is authoritative, but a bare `/jobs` visit restores the **last-used** filter set from
-`localStorage` (key `mlrs-jobs-filters`); clearing every filter removes the stored entry. The restore
+`localStorage` (key `llm-jobs-filters`); clearing every filter removes the stored entry. The restore
 happens once, after mount, so a shared link always wins over the local memory.
 
 The history table is **virtualised**: only the rows in view are mounted, so a history with hundreds

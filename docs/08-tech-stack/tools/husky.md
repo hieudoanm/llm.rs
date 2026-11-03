@@ -1,4 +1,4 @@
-# mlrs — Husky
+# llm — Husky
 
 Git hooks for the pnpm workspace.
 

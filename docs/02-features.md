@@ -1,8 +1,8 @@
-# scikit-learn-client (mlrs) — Features
+# llm-client (llm) — Features
 
 ## 1. Purpose
 
-This document describes how mlrs features should behave from the user's perspective and how their behaviour should be implemented.
+This document describes how llm features should behave from the user's perspective and how their behaviour should be implemented.
 
 It complements:
 
@@ -19,7 +19,7 @@ Features should be delivered in vertical slices: a user should complete CSV uplo
 
 The canonical entities are `datasets`, `dataset_insights`, `jobs`, `job_metrics`, and `artefacts`.
 
-mlrs is a software demonstration. It does not provide production AutoML or safety-critical guarantees. The reinforcement-learning extension (Phase 11) fits the same local-only constraints. The Phase 12 features (FEATURE-13..FEATURE-18) harden the platform and add discovery, comparison, and insight features on top of the same workflow.
+llm is a software demonstration. It does not provide production AutoML or safety-critical guarantees. The reinforcement-learning extension (Phase 11) fits the same local-only constraints. The Phase 12 features (FEATURE-13..FEATURE-18) harden the platform and add discovery, comparison, and insight features on top of the same workflow.
 
 Each feature section states **user-visible behaviour**, **inputs**, **outputs**, **states**, **edge cases**, and **acceptance conditions**. Priority maps to P0–P1 and to `FR-` identifiers.
 
@@ -36,7 +36,7 @@ A feature is complete when: behaviour documented, FE/BE implement the contract, 
 
 ## 4. MVP Definition of Done
 
-MVP ready when the core workflow works end-to-end: upload CSV → map X/Y → choose mlrs model → train asynchronously → view metrics → download `.onnx`. Error handling complete, UI states implemented, health checks in place.
+MVP ready when the core workflow works end-to-end: upload CSV → map X/Y → choose llm model → train asynchronously → view metrics → download `.onnx`. Error handling complete, UI states implemented, health checks in place.
 
 The semi-supervised and unsupervised extensions (FEATURE-09 and FEATURE-10) reuse the same workflow with a conditional label column and task-specific metrics. They are delivered in Phases 9–10. FEATURE-11 (reinforcement learning) reuses the same workflow with experience columns instead of a label; it is delivered in Phase 11.
 

@@ -30,7 +30,7 @@ endpoints and no new dependencies.
 6. **Export** — convert the fitted preprocessor + Q-function regressor with
    `target_opset={"": ONNX_OPSET, "ai.onnx.ml": 3}`; the graph takes the state
    features followed by the one-hot action block; ONNX Q-values must match
-   mlrs.
+   llm.
 7. **UI** — add the Reinforcement learning task, the experience-column
    pickers, the FQI hyperparameter fields, metric explanations, job-history
    badges, and the sixth algorithms-page group; update the `02-new-job`,
@@ -41,7 +41,7 @@ endpoints and no new dependencies.
 ## Acceptance
 
 - An experience CSV trains with `fitted_q_iteration` and produces ONNX whose
-  Q-values match mlrs.
+  Q-values match llm.
 - `labelColumn` on a reinforcement-learning job returns
   `400 INVALID_COLUMN_MAP`, and so does a missing `rlColumns` (or one supplied
   to another task).

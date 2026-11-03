@@ -94,7 +94,7 @@ No npm dependency; ~500 bytes gzipped. Handles DaisyUI theme colours via CSS var
 
 ### Theme handling
 
-- SVG download preserves the current DaisyUI theme (`data-theme="mlrs-light"` or `mlrs-dark`) because the SVG uses CSS variables for colours.
+- SVG download preserves the current DaisyUI theme (`data-theme="llm-light"` or `llm-dark`) because the SVG uses CSS variables for colours.
 - PNG download captures the current theme as rendered (light or dark). No theme switching is offered; the user downloads what they see.
 
 ### Accessibility

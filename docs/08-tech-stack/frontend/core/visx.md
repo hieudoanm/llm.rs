@@ -1,4 +1,4 @@
-# mlrs — visx
+# llm — visx
 
 Charting for the completed-job result charts
 ([`charts.md`](../../../07-ui-ux-design/system/charts.md)).

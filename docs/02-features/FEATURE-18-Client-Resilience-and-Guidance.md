@@ -230,7 +230,7 @@ The guard is dropped once the job is accepted.
 
 - The wizard's in-progress state (uploaded dataset id, selected columns, task, algorithm,
   hyperparameters, export flags) is written to `sessionStorage` under the key
-  `mlrs:wizard:new-job`.
+  `llm:wizard:new-job`.
 - The state is restored on mount, with a dismissible notice: **"Restored your unfinished job
   setup."**
 - The stored state is cleared when the job is accepted, when the user clicks **Start over**, or

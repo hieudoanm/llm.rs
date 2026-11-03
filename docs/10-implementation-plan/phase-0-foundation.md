@@ -4,7 +4,7 @@ _Part of [10-implementation-plan.md](../10-implementation-plan.md)._ Week 1.
 
 ## Deliverables
 
-Monorepo `packages/frontend` (Next.js + Tailwind + DaisyUI), `crates/mlrs-api` (Axum hello), `docker-compose.yaml` with sqlite + backend + frontend skeletons, GitHub Actions lint/test skeleton, README run instructions, Husky.
+Monorepo `packages/frontend` (Next.js + Tailwind + DaisyUI), `crates/llm-api` (Axum hello), `docker-compose.yaml` with sqlite + backend + frontend skeletons, GitHub Actions lint/test skeleton, README run instructions, Husky.
 
 ## Acceptance
 

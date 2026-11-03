@@ -1,4 +1,4 @@
-# mlrs — ESLint
+# llm — ESLint
 
 Lint for `packages/frontend`.
 

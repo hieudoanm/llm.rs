@@ -1,4 +1,4 @@
-# mlrs — Prettier
+# llm — Prettier
 
 Formatter for `packages/frontend`.
 

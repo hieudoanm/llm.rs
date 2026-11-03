@@ -1,4 +1,4 @@
-# mlrs — Quality Gates
+# llm — Quality Gates
 
 Pre-commit (Husky): `pnpm turbo run lint` then `pnpm turbo run format` —
 whole-workspace, writing in place; `lint-staged` (staged-file checks) is declared
@@ -15,5 +15,5 @@ The **80%** frontend coverage threshold (statements, branches, functions, lines)
 is enforced whenever coverage runs: `pnpm run test:coverage` fails the job below
 it, and CI runs that command in `frontend`. The backend carries the same 80% gate
 through `cargo-tarpaulin` (`--fail-under=80` in
-`crates/mlrs-api/Cargo.toml`), applied by the `cargo test --workspace -v`
+`crates/llm-api/Cargo.toml`), applied by the `cargo test --workspace -v`
 step in CI.

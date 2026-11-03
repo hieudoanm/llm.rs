@@ -1,4 +1,4 @@
-# mlrs — Neural networks (tabular MLPs)
+# llm — Neural networks (tabular MLPs)
 
 The neural-net offering uses linfa/ndarray MLPs, exposed as the catalogue entries `mlp_classifier` (task `classification`) and `mlp_regressor` (task `regression`). They are multi-layer perceptrons for **tabular** data — depth, width, activation, regularisation, and early stopping are all configurable.
 

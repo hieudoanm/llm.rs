@@ -1,6 +1,6 @@
-# mlrs — Rust ML
+# llm — Rust ML
 
-Build with linfa/ndarray/polars. Fit on train split only for supervised tasks. Classification metrics from `mlrs-core` with `average="macro"` and `zero_division=0`. Regression: RMSE, MAE, R². Do not leak test labels into the encoder (`handle_unknown="ignore"`). Pin linfa in `crates/Cargo.toml`.
+Build with linfa/ndarray/polars. Fit on train split only for supervised tasks. Classification metrics from `llm-core` with `average="macro"` and `zero_division=0`. Regression: RMSE, MAE, R². Do not leak test labels into the encoder (`handle_unknown="ignore"`). Pin linfa in `crates/Cargo.toml`.
 
 ## Task strategies
 

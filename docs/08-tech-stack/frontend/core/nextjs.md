@@ -1,4 +1,4 @@
-# mlrs — Next.js
+# llm — Next.js
 
 App Router. Package path: `packages/frontend`.
 

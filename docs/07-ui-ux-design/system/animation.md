@@ -1,4 +1,4 @@
-# mlrs — Animation
+# llm — Animation
 
 _Part of [07-ui-ux-design.md](../../07-ui-ux-design.md)._
 

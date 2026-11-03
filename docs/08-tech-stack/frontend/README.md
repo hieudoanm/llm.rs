@@ -1,4 +1,4 @@
-# mlrs — Frontend Best Practices
+# llm — Frontend Best Practices
 
 The **why** lives in [`08-tech-stack.md`](../../08-tech-stack.md). These documents are the **how**.
 

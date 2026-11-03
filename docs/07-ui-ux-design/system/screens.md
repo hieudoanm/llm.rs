@@ -1,10 +1,10 @@
-# mlrs — Screen Designs
+# llm — Screen Designs
 
 _Part of [07-ui-ux-design.md](../../07-ui-ux-design.md)._
 
 ## Home (`/`)
 
-- Hero: heading "scikit-learn-client", sub "Upload a CSV, choose a model, download ONNX."
+- Hero: heading "llm-client", sub "Upload a CSV, choose a model, download ONNX."
 - Primary CTA: "Train a model" → `/jobs/new`. Secondary: "View jobs" → `/jobs`.
 - Below the fold: a three-card feature grid (CSV upload, task-aware models, ONNX export) and a
   three-step "How it works" strip, then a closing CTA band.

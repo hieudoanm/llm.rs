@@ -1,4 +1,4 @@
-# mlrs — Tools
+# llm — Tools
 
 Package managers, task runner, git hooks, linters, and formatters used across the repo.
 

@@ -1,4 +1,4 @@
-# mlrs — Iconography
+# llm — Iconography
 
 _Part of [07-ui-ux-design.md](../../07-ui-ux-design.md)._
 

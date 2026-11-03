@@ -1,4 +1,4 @@
-# mlrs — Definition of Done
+# llm — Definition of Done
 
 _Part of [10-implementation-plan.md](../10-implementation-plan.md)._
 
@@ -7,7 +7,7 @@ A phase is complete when all phase tasks are done, tests pass in CI, docs match 
 MVP (end of Phase 8) additionally:
 
 - [ ] `docker compose up --build` yields healthy frontend, backend, sqlite.
-- [ ] Reviewer uploads sample CSV, maps X/Y, trains mlrs classifier, downloads ONNX.
+- [ ] Reviewer uploads sample CSV, maps X/Y, trains llm classifier, downloads ONNX.
 - [ ] Regression sample path works.
 - [ ] Invalid CSV surfaces a validation error in the UI.
 - [ ] Failed export leaves `failed` without ONNX.
@@ -27,7 +27,7 @@ Unsupervised extension (Phase 10) additionally:
 - [ ] KMeans/MiniBatchKMeans/GaussianMixture, IsolationForest, and `fitted_q_iteration` all export ONNX with `ai.onnx.ml` 3.
 ## Phase 11 reinforcement learning (additionally)
 
-- [ ] An experience CSV trains with `fitted_q_iteration` and produces ONNX whose Q-values match mlrs.
+- [ ] An experience CSV trains with `fitted_q_iteration` and produces ONNX whose Q-values match llm.
 - [ ] A label column on a reinforcement-learning job is rejected; missing or invalid `rlColumns` are rejected.
 - [ ] FQI hyperparameters outside the documented ranges are rejected before a job row is created.
 - [ ] Completed jobs return the RL metrics (including `actions`) and render the RL charts.

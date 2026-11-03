@@ -1,4 +1,4 @@
-# AGENTS.md — ml.rs (mlrs)
+# AGENTS.md — llm.rs (Local Learning Machine)
 
 Guidance for AI agents (and orientation for humans) working in this repository.
 
@@ -11,7 +11,7 @@ The product and implementation specification lives in `docs/`. Start at the inde
 | Understand vision and scope         | [`docs/00-overview.md`](docs/00-overview.md)                                                                                                                           |
 | Check requirements (`FR-`, `NFR-`)  | [`docs/01-requirements.md`](docs/01-requirements.md)                                                                                                                   |
 | Understand user-visible behaviour   | [`docs/02-features.md`](docs/02-features.md) (`FEATURE-01`…`18`)                                                                                                       |
-| Change architecture/API/data model  | [`docs/04-architecture.md`](docs/04-architecture.md), [`docs/05-data-model.md`](docs/05-data-model.md), [`docs/06-api-specification.md`](docs/06-api-specification.md) |
+| Change architecture/API/data model  | [`docs/04-architecture.md`](docs/04-architecture.md), [`docs/05-data-model.md`](docs/05-data-model.md)                                                               |
 | Style the UI (tokens, states, a11y) | [`docs/07-ui-ux-design.md`](docs/07-ui-ux-design.md)                                                                                                                   |
 | Add or decide on a dependency       | [`docs/08-tech-stack.md`](docs/08-tech-stack.md)                                                                                                                       |
 | Know how tests are organised        | [`docs/09-testing-strategy.md`](docs/09-testing-strategy.md)                                                                                                           |
@@ -22,46 +22,39 @@ The product and implementation specification lives in `docs/`. Start at the inde
 
 | Path                 | What it is                                                                                                                  |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `crates/`            | Pure-Rust backend: `mlrs-core`, `mlrs-db`, `mlrs-api`, `mlrs-server`                                                        |
-| `packages/frontend`  | Next.js App Router UI (TypeScript, Tailwind CSS, DaisyUI, Playwright). See `packages/frontend/AGENTS.md`.                   |
+| `crates/`            | Pure-Rust crates: `llm-core`, `llm-db`, `llm-cli`                                                                           |
+| `packages/desktop`   | Next.js + Tauri desktop UI. See `packages/desktop/AGENTS.md`.                                                               |
 | `docs/`              | The specification — source of truth (see above).                                                                            |
 | `demo/`              | Recorded demo video, produced by `make e2e-demo`.                                                                           |
-| `.github/workflows/` | CI: Rust (cargo check + test), frontend (eslint + tsc + build), e2e (Playwright) — SQLite only, no PostgreSQL.              |
+| `.github/workflows/` | CI: Rust (cargo check + test), desktop (Tauri builds for all platforms), release artifacts (CLI + 7 desktop bundles).       |
 
-pnpm workspace (`pnpm-workspace.yaml`) driven by turbo: `pnpm run dev | lint | build | format | typecheck | test` (`format` and `typecheck` run Prettier/`tsc` for the frontend; `test` runs the Vitest suite in `packages/frontend`). Rust: `cargo build | cargo test | cargo check` in `crates/`.
+pnpm workspace (`pnpm-workspace.yaml`) driven by turbo: `pnpm run dev | lint | build | format | typecheck | test` (`format` and `typecheck` run Prettier/`tsc` for the desktop frontend; `test` runs the Vitest suite in `packages/desktop`). Rust: `cargo build | cargo test | cargo check` in `crates/`.
 
 ## Common commands
 
 ```sh
-# Full local stack: backend :8000, frontend :3000 (SQLite, no PostgreSQL)
-docker compose up -d --build
+# CLI build and run
+cd crates && cargo build --release -p llm-cli
+./target/release/llm --help
 
-# The same stack via make
-make up        # / make down
+# Desktop app development (Next.js + Tauri)
+cd packages/desktop && pnpm dev  # runs Next.js dev + Tauri dev concurrently
 
-# Host mode instead: backend/frontend on the host
-make start   # / make stop
-
-# Backend API health check (needs the stack up)
-curl http://127.0.0.1:8000/healthz
-
-# Playwright e2e (needs backend :8000 + frontend :3000)
-make e2e
-# or: cd packages/frontend && pnpm exec playwright test
-
-# Frontend unit tests (Vitest + React Testing Library; `test:coverage` is the
-# 80% gate that CI runs)
-cd packages/frontend && pnpm test
+# Desktop app production build
+cd packages/desktop && pnpm build && pnpm build:tauri
 
 # Rust build and test
 cd crates && cargo build
 cd crates && cargo test
+
+# Full release (CLI binary + 7 desktop artifacts)
+# Handled by GitHub Actions on tag push
 ```
 
 ## Environment and conventions
 
 - **Node 26** (`.node-version`, `.nvmrc`) with pnpm.
-- **SQLite** only — no PostgreSQL. The backend persists to `.mlrs-data/mlrs.db` by default.
-- `.env` (copied from `.env.example`, gitignored) parameterises compose: `MLRS_DATA_DIR`, `MLRS_MAX_UPLOAD_MB`, `MLRS_LOG_LEVEL`, `MLRS_CORS_ORIGINS`, etc.
-- Frontend e2e selectors: use role/label locators but avoid ambiguous `aria-label` values — Playwright strict mode fails on multiple matches.
-- Keep ports and versions you touch in sync across `docker-compose.yaml`, `.env.example`, `Makefile`, `docs/`, and `README.md`.
+- **SQLite** only — no PostgreSQL, no Docker. The app persists to `.llm-data/llm.db` by default.
+- `.env` (copied from `.env.example`, gitignored) parameterises the app: `LLM_DATA_DIR`, `LLM_MAX_UPLOAD_MB`, `LLM_LOG_LEVEL`, etc.
+- Desktop e2e selectors: use role/label locators but avoid ambiguous `aria-label` values — Playwright strict mode fails on multiple matches.
+- Keep ports and versions you touch in sync across `.env.example`, `Makefile`, `docs/`, and `README.md`.

@@ -1,6 +1,6 @@
-# scikit-learn-client (mlrs) — Requirements
+# llm-client (llm) — Requirements
 
-This document defines the functional and non-functional requirements for mlrs. Each requirement category is documented in a separate file:
+This document defines the functional and non-functional requirements for llm. Each requirement category is documented in a separate file:
 
 ## Functional Requirements
 

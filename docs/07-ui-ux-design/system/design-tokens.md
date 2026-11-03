@@ -1,10 +1,10 @@
-# mlrs — Design Tokens
+# llm — Design Tokens
 
 _Part of [07-ui-ux-design.md](../../07-ui-ux-design.md)._
 
 All values below are mirrored by:
 
-- the DaisyUI themes `mlrs-light` / `mlrs-dark` in
+- the DaisyUI themes `llm-light` / `llm-dark` in
   [`packages/frontend/src/styles/globals.css`](../../../packages/frontend/src/styles/globals.css), and
 - the `@theme` / `[data-theme]` blocks in the
   [prototypes](../prototypes/README.md).
@@ -13,8 +13,25 @@ Change a token here, then change it in both places.
 
 ## Brand
 
-Product name: **scikit-learn-client** (short: **mlrs**). Wordmark in the UI navbar; no
+Product name: **llm.rs**. Wordmark in the UI navbar and marketing headers; no
 third-party AutoML marks. See [`brand/README.md`](../brand/README.md) for the marks themselves.
+
+The brand uses its own warm palette, shared by the landing page and the desktop dark theme. These
+are brand tokens rather than UI-state tokens, so the product can keep its blue primary action
+colour while the mark stays orange.
+
+| Token                | Light     | Dark      | Use                       |
+| -------------------- | --------- | --------- | ------------------------- |
+| `brand-mark`         | `#C2410C` | `#F06B4D` | Mark box                  |
+| `brand-mark-content` | `#FFF7ED` | `#0B1018` | Diagonal line in the mark |
+| `brand-wordmark`     | `#0B1018` | `#F7F1E8` | `llm.rs` wordmark         |
+| `brand-bg`           | `#FFFFFF` | `#0B1018` | Brand page background     |
+| `brand-panel`        | `#F8FAFC` | `#111923` | Brand cards and panels    |
+| `brand-ink`          | `#0B1018` | `#F7F1E8` | Primary brand text        |
+| `brand-muted`        | `#64748B` | `#9DA8B7` | Secondary brand text      |
+| `brand-accent`       | `#C2410C` | `#FFAC70` | Warm accent               |
+| `brand-mint`         | `#047857` | `#76D5A5` | Success and confirmation  |
+| `brand-line`         | `#E2E8F0` | `#24303D` | Brand borders and rules   |
 
 ## Colour
 
@@ -47,7 +64,7 @@ Tokens are exposed to Tailwind as `--color-<name>`, so `--color-text-primary` is
 | `error`             | `#EF4444` | `#F87171` | Failed / validation             |
 | `error-content`     | `#FFFFFF` | `#0B1120` | Text on error                   |
 
-### mlrs extended
+### llm extended
 
 | Token                       | Light                 | Dark                  | Use                        |
 | --------------------------- | --------------------- | --------------------- | -------------------------- |

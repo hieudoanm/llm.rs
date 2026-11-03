@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Rasterise the mlrs brand SVGs to PNG.
+# Rasterise the llm brand SVGs to PNG.
 #
 # Reads every *.svg in svg/ and writes the matching *.png in images/.
 # The SVG files are the source of truth; never edit the PNGs by hand.

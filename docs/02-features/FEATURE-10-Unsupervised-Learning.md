@@ -90,6 +90,6 @@ No hold-out split is created: unsupervised evaluation scores the same rows used 
 
 - Clustering CSV completes for KMeans, MiniBatchKMeans, and GaussianMixture with documented metrics and ONNX.
 - Anomaly CSV completes for IsolationForest with anomaly metrics and ONNX.
-- ONNX cluster labels and anomaly labels/scores match mlrs.
+- ONNX cluster labels and anomaly labels/scores match llm.
 - Unsupervised jobs expose `labelColumn = null`.
 - The UI hides the label control and validates the cluster/contamination fields before submission.

@@ -1,4 +1,4 @@
-# mlrs — Test Layers
+# llm — Test Layers
 
 ## Unit
 
@@ -12,11 +12,11 @@ button/alert variants, file-drop validation and the theme toggle; `fetch` is
 stubbed with `vi.stubGlobal`. App Router pages (`src/app/**`) are out of unit
 scope — Playwright covers them.
 
-**Backend — module + API boundary.** cargo test in `crates/mlrs-api/tests/` is
+**Backend — module + API boundary.** cargo test in `crates/llm-api/tests/` is
 grouped by module (`api/`, `db/`, `export/`, `storage/`, `training/`) plus
 `test_e2e.rs`, covering the algorithm catalogue, training pipeline, storage and
 DB helpers, ONNX export and the HTTP surface. `[lints]` in
-`crates/mlrs-api/Cargo.toml` carries the same **80%** gate: `cargo-tarpaulin`
+`crates/llm-api/Cargo.toml` carries the same **80%** gate: `cargo-tarpaulin`
 with `--fail-under=80` over `src/`, omitting `src/training/worker.rs`.
 
 ## Integration

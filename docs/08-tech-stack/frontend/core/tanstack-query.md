@@ -1,4 +1,4 @@
-# mlrs — TanStack Query
+# llm — TanStack Query
 
 - `useQuery(['algorithms'])` staleTime 5 minutes.
 - `useQuery(['job', id], { refetchInterval: (q) => terminal(q.state.data) ? false : 1000 })`.

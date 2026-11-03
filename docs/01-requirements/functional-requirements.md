@@ -1,10 +1,10 @@
 # Functional Requirements
 
-This document specifies the functional requirements for mlrs-client (mlrs), organised by capability. Each requirement carries a unique ID (`FR-###`), a description, and a priority. IDs are grouped by capability block and are intentionally sparse; gaps are reserved for future requirements within that capability.
+This document specifies the functional requirements for llm-client (llm), organised by capability. Each requirement carries a unique ID (`FR-###`), a description, and a priority. IDs are grouped by capability block and are intentionally sparse; gaps are reserved for future requirements within that capability.
 
 ## Learning Task Types
 
-mlrs supports six `taskType` values. The task type determines whether a label column is required, how the data is split, which algorithms are eligible, and which metrics are returned.
+llm supports six `taskType` values. The task type determines whether a label column is required, how the data is split, which algorithms are eligible, and which metrics are returned.
 
 | `taskType`              | Supervision     | Label column                                      | Split                                    | Default metrics                                             |
 | ----------------------- | --------------- | ------------------------------------------------- | ---------------------------------------- | ----------------------------------------------------------- |
@@ -80,8 +80,8 @@ mlrs supports six `taskType` values. The task type determines whether a label co
 | ------ | ------------------------------------------------------------------------------------------------------------------------- | -------- |
 | FR-020 | The system shall expose a catalogue of allow-listed algorithms for every supported task type.                             | Must     |
 | FR-021 | The catalogue shall distinguish `classification`, `regression`, `semi_supervised`, `clustering`, `anomaly_detection`, and `reinforcement_learning`. | Must     |
-| FR-022 | P0 algorithms shall be mlrs estimators that can export ONNX.                                                      | Must     |
-| FR-023 | P1 neural-net algorithms shall be configurable mlrs MLPs (`mlp_classifier`, `mlp_regressor`) that expose their architecture through hyperparameters and export ONNX. | Should   |
+| FR-022 | P0 algorithms shall be llm estimators that can export ONNX.                                                      | Must     |
+| FR-023 | P1 neural-net algorithms shall be configurable llm MLPs (`mlp_classifier`, `mlp_regressor`) that expose their architecture through hyperparameters and export ONNX. | Should   |
 | FR-024 | The system shall reject unknown `algorithmId` values.                                                                     | Must     |
 | FR-025 | The system shall reject an algorithm that does not match the declared `taskType`.                                         | Must     |
 | FR-026 | The system shall apply documented default hyperparameters when the client omits `hyperparameters`.                        | Must     |
@@ -94,7 +94,7 @@ mlrs supports six `taskType` values. The task type determines whether a label co
 - Unknown or mismatched algorithm returns `400` with `UNKNOWN_ALGORITHM` or `TASK_ALGORITHM_MISMATCH`.
 - Out-of-range hyperparameters return `400` with `INVALID_HYPERPARAMETERS`.
 
-**P0 mlrs catalogue (minimum):**
+**P0 llm catalogue (minimum):**
 
 | algorithmId                    | taskType       |
 | ------------------------------ | -------------- |
@@ -139,7 +139,7 @@ mlrs supports six `taskType` values. The task type determines whether a label co
 | ------------------- | ----------------------- | -------------------------------------------------------- |
 | `fitted_q_iteration` | `reinforcement_learning` | `GradientBoostingRegressor` Q-function (Fitted Q-Iteration) |
 
-**P1 neural nets (FR-023):** `mlp_classifier` and `mlp_regressor` are scikit-learn
+**P1 neural nets (FR-023):** `mlp_classifier` and `mlp_regressor` are llm
 `MLPClassifier` / `MLPRegressor` models whose architecture is configurable through
 hyperparameters (see [`models.md`](../08-tech-stack/backend/models.md#neural-networks-p1)).
 They are tabular multi-layer perceptrons.
@@ -214,7 +214,7 @@ They are tabular multi-layer perceptrons.
 | FR-092 | The system shall default the cluster count to 3 and require `2 <= k <= rows - 1` for KMeans/MiniBatchKMeans `n_clusters` and GaussianMixture `n_components`; otherwise `INVALID_HYPERPARAMETERS`. | Must     |
 | FR-093 | A clustering job shall fit preprocessing and the estimator on all rows and shall not create a hold-out split.                                                                                     | Must     |
 | FR-094 | Clustering jobs shall return silhouette, daviesBouldin, and calinskiHarabasz; KMeans/MiniBatchKMeans shall add inertia and GaussianMixture shall add BIC.                                         | Must     |
-| FR-095 | ONNX export shall be required and cluster-label predictions shall match mlrs `predict`.                                                                                                        | Must     |
+| FR-095 | ONNX export shall be required and cluster-label predictions shall match llm `predict`.                                                                                                        | Must     |
 | FR-096 | Job and poll payloads shall expose `labelColumn = null` and the clustering metrics for completed jobs.                                                                                            | Must     |
 
 **Acceptance criteria:**
@@ -223,7 +223,7 @@ They are tabular multi-layer perceptrons.
 - Supplying `labelColumn` returns `400 INVALID_COLUMN_MAP`.
 - `n_clusters`/`n_components` below 2 or greater than or equal to the row count returns `400 INVALID_HYPERPARAMETERS`.
 - Completed jobs return the documented clustering metrics and an `onnx` artefact.
-- ONNX output labels match mlrs for every clustering algorithm.
+- ONNX output labels match llm for every clustering algorithm.
 
 **Rationale:** Clustering is the natural first unsupervised workflow on tabular CSVs and all three estimators have verified ONNX support.
 
@@ -240,14 +240,14 @@ They are tabular multi-layer perceptrons.
 | FR-102 | `contamination` shall accept `"auto"` or a number in `(0, 0.5]`; other values return `INVALID_HYPERPARAMETERS`.                                                 | Must     |
 | FR-103 | An anomaly-detection job shall fit preprocessing and the estimator on all rows and shall not create a hold-out split.                                           | Must     |
 | FR-104 | Anomaly-detection jobs shall return anomalyCount, anomalyRate, scoreMean, and scoreStd; scores are `decision_function` values where lower means more anomalous. | Must     |
-| FR-105 | ONNX export shall be required; output labels (`1` inlier, `-1` outlier) and scores shall match mlrs.                                                         | Must     |
+| FR-105 | ONNX export shall be required; output labels (`1` inlier, `-1` outlier) and scores shall match llm.                                                         | Must     |
 
 **Acceptance criteria:**
 
 - `POST /api/v1/jobs` with `taskType = "anomaly_detection"` and no `labelColumn` is accepted.
 - `contamination = 0.6` or `contamination = 0` returns `400 INVALID_HYPERPARAMETERS`.
 - Completed jobs return the documented anomaly metrics and an `onnx` artefact.
-- ONNX labels match mlrs `predict` and scores match `decision_function` within tolerance.
+- ONNX labels match llm `predict` and scores match `decision_function` within tolerance.
 
 **Rationale:** IsolationForest is a standard tabular anomaly detector with a verified ONNX converter, giving the studio a complete unsupervised workflow.
 
@@ -264,7 +264,7 @@ They are tabular multi-layer perceptrons.
 | FR-112 | The reinforcement-learning catalogue shall include `fitted_q_iteration`; `n_iterations` (1..50), `gamma` (0..1), `max_depth` (1..20), and `learning_rate` ((0,1]) shall default to 10, 0.9, 3, and 0.1, and out-of-range values return `INVALID_HYPERPARAMETERS`.                    | Must     |
 | FR-113 | A reinforcement-learning job shall resolve transitions (explicit next state, or the next row within an episode), split by episode when an episode column exists and by transition otherwise, and fit the Q-function with Fitted Q-Iteration on the training side only.                | Must     |
 | FR-114 | Reinforcement-learning jobs shall return `meanReward`, `meanQ`, `tdErrorMean`, `tdErrorStd`, and `actions`, plus `episodeCount` and `meanEpisodeReturn` when an episode column was declared; `tdErrorMean` is the mean absolute Bellman residual on the evaluation side of the split. | Must     |
-| FR-115 | ONNX export shall be required and shall contain the fitted preprocessor + Q-function regressor taking the state features followed by a one-hot action block; ONNX Q-values shall match mlrs.                                                                                     | Must     |
+| FR-115 | ONNX export shall be required and shall contain the fitted preprocessor + Q-function regressor taking the state features followed by a one-hot action block; ONNX Q-values shall match llm.                                                                                     | Must     |
 
 **Acceptance criteria:**
 
@@ -272,10 +272,10 @@ They are tabular multi-layer perceptrons.
 - A supplied `labelColumn`, a missing `rlColumns`, an experience column absent from the header or shared with `featureColumns`, or neither `nextStateColumns` nor `episodeColumn` returns `400 INVALID_COLUMN_MAP`.
 - A non-numeric reward returns `400 INVALID_LABEL_TYPE`.
 - Fewer than 10 transitions, fewer than two episodes with an episode column, or a hyperparameter outside its documented range returns `400 INVALID_HYPERPARAMETERS`.
-- A completed job returns the documented RL metrics (including `actions`) and an `onnx` artefact whose Q-values match mlrs.
+- A completed job returns the documented RL metrics (including `actions`) and an `onnx` artefact whose Q-values match llm.
 - The split never places both sides of a transition pair across train/hold-out when episodes are declared: whole episodes go to one side.
 
-**Rationale:** Offline (batch) reinforcement learning from a logged experience CSV fits the CSV → train → ONNX philosophy: the Q-function is a scikit-learn regressor, so the existing preprocessor, split, allow-list, and export pipeline apply unchanged and no RL framework dependency is introduced. The policy (`argmax` over the recorded action set) is a documented consumer-side rule over the exported Q-function.
+**Rationale:** Offline (batch) reinforcement learning from a logged experience CSV fits the CSV → train → ONNX philosophy: the Q-function is a llm regressor, so the existing preprocessor, split, allow-list, and export pipeline apply unchanged and no RL framework dependency is introduced. The policy (`argmax` over the recorded action set) is a documented consumer-side rule over the exported Q-function.
 
 **See also:** [`US-016`](../03-user-stories/US-016.md), [`FEATURE-11`](../02-features/FEATURE-11-Reinforcement-Learning.md).
 
@@ -411,11 +411,11 @@ They are tabular multi-layer perceptrons.
 
 | ID     | Requirement                                                                                                   | Priority |
 | ------ | ------------------------------------------------------------------------------------------------------------- | -------- |
-| FR-160 | The worker shall execute at most `mlrs_MAX_CONCURRENT_JOBS` jobs concurrently; the default is 1.                | Must     |
+| FR-160 | The worker shall execute at most `llm_MAX_CONCURRENT_JOBS` jobs concurrently; the default is 1.                | Must     |
 | FR-161 | Jobs beyond the concurrency limit shall remain `queued` and the API shall report their queue position.        | Must     |
-| FR-162 | Each job attempt shall be bounded by `mlrs_JOB_TIMEOUT_SECONDS` (default 1800).                                 | Must     |
+| FR-162 | Each job attempt shall be bounded by `llm_JOB_TIMEOUT_SECONDS` (default 1800).                                 | Must     |
 | FR-163 | A job that exceeds its budget shall be recorded `failed` with the error code `JOB_TIMEOUT` and shall leave no artefact behind. | Must     |
-| FR-164 | A transient failure shall be retried up to `mlrs_JOB_MAX_ATTEMPTS` times (default 2).                           | Must     |
+| FR-164 | A transient failure shall be retried up to `llm_JOB_MAX_ATTEMPTS` times (default 2).                           | Must     |
 | FR-165 | A deterministic failure shall not be retried.                                                                  | Must     |
 | FR-166 | The delay between attempts shall be exponential with full jitter and shall never be negative.                   | Must     |
 | FR-167 | A job whose attempts are exhausted shall be recorded `failed` with the error code `JOB_RETRY_EXHAUSTED`.        | Must     |
@@ -464,7 +464,7 @@ They are tabular multi-layer perceptrons.
 | FR-190 | The backend shall serve an interactive API reference at `/docs` and `/redoc`, and the raw schema at `/openapi.json`. | Must     |
 | FR-191 | The committed `docs/06-api-specification/backend/openapi.yaml` shall be regenerated from the code and checked for drift in CI. | Must     |
 | FR-192 | The interactive reference and the committed schema shall be linked from the product documentation and from the application. | Must     |
-| FR-193 | Interactive documentation shall be disableable via `mlrs_ENABLE_INTERACTIVE_DOCS`.                | Should   |
+| FR-193 | Interactive documentation shall be disableable via `llm_ENABLE_INTERACTIVE_DOCS`.                | Should   |
 
 **Acceptance criteria:**
 

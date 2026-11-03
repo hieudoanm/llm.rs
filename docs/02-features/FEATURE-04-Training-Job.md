@@ -123,11 +123,11 @@ The job lifecycle above assumes a healthy, single-attempt execution. The bounded
 contract is normative in
 [`FEATURE-17`](./FEATURE-17-Reliable-Job-Execution.md):
 
-- At most `mlrs_MAX_CONCURRENT_JOBS` jobs execute at once (default 1); the rest stay `queued` and
+- At most `llm_MAX_CONCURRENT_JOBS` jobs execute at once (default 1); the rest stay `queued` and
   report their queue position.
-- Each attempt is bounded by `mlrs_JOB_TIMEOUT_SECONDS` (default 1800); on expiry the job is
+- Each attempt is bounded by `llm_JOB_TIMEOUT_SECONDS` (default 1800); on expiry the job is
   `failed` with `JOB_TIMEOUT` and no artefact is written.
-- A transient failure is retried up to `mlrs_JOB_MAX_ATTEMPTS` times (default 2) with
+- A transient failure is retried up to `llm_JOB_MAX_ATTEMPTS` times (default 2) with
   exponential backoff and full jitter; the job reports the non-terminal status `retrying` between
   attempts. A deterministic failure is never retried.
 - The poll payload exposes `attempts`, `maxAttempts`, and `nextAttemptAt`.

@@ -1,4 +1,4 @@
-# scikit-learn-client (mlrs) — API Specification
+# llm-client (llm) — API Specification
 
 ## 1. Purpose
 
@@ -80,7 +80,7 @@ Additional codes introduced by the Phase 12 documents:
 | ---------------------- | ---- | ----------------------------------------------------------- |
 | `UNSUPPORTED_FILE_TYPE`| 400  | The upload is not a CSV by extension, content type, or bytes. |
 | `MALFORMED_CSV`        | 400  | The bytes cannot be decoded as UTF-8 or parsed as delimited text. |
-| `JOB_TIMEOUT`          | job `status=failed` | The attempt exceeded `mlrs_JOB_TIMEOUT_SECONDS`.       |
+| `JOB_TIMEOUT`          | job `status=failed` | The attempt exceeded `llm_JOB_TIMEOUT_SECONDS`.       |
 | `JOB_RETRY_EXHAUSTED`  | job `status=failed` | Every attempt failed with a transient error.           |
 | `WORKER_INTERRUPTED`   | job `status=failed` | A crashed process left the job in a non-terminal status. |
 | `DATABASE_ERROR`       | 500  | An unhandled database failure; the driver text is never returned. |
@@ -158,7 +158,7 @@ Both the job list and the job detail carry the discovery and reliability fields:
 | `name`         | string \| null    | User-set label; `null` when the job was never renamed.                  |
 | `tags`         | array of string   | Lowercase slugs, at most 10.                                            |
 | `attempts`     | integer           | Attempts already made, including the running one.                       |
-| `maxAttempts`  | integer           | Total attempts allowed (`mlrs_JOB_MAX_ATTEMPTS`).                         |
+| `maxAttempts`  | integer           | Total attempts allowed (`llm_JOB_MAX_ATTEMPTS`).                         |
 | `nextAttemptAt`| datetime \| null  | When the next retry starts; `null` unless the job is `retrying`.        |
 | `queuePosition`| integer \| null   | Queued jobs ahead of this one; `0` at the front of the queue, `null` for a job that is not `queued`. |
 
@@ -182,7 +182,7 @@ or queued job is explainable without reading the process logs:
   flight.
 - `queuedJobs` counts `queued`, `retryingJobs` counts `retrying`.
 - `availableSlots` is `max(0, maxConcurrentJobs - runningJobs)` and comes from
-  `mlrs_MAX_CONCURRENT_JOBS`.
+  `llm_MAX_CONCURRENT_JOBS`.
 
 The endpoint is tagged `health` and lives outside `/api/v1`. It is a
 diagnostic aid, not part of the training contract.
@@ -338,7 +338,7 @@ The `charts` field contains bounded evaluation data for the Model report visuali
 
 ## 11. serde Models (Request/Response Schemas)
 
-The following models define the type-safe contracts used by the Axum backend. They are implemented in `crates/mlrs-api/src/api/schemas/` (grouped by domain — `shared.py`, `health.py`, `datasets.py`, `algorithms.py`, `jobs.py`, and re-exported from `schemas/__init__.py`) and must be kept in sync with this specification and the OpenAPI YAML.
+The following models define the type-safe contracts used by the Axum backend. They are implemented in `crates/llm-api/src/api/schemas/` (grouped by domain — `shared.py`, `health.py`, `datasets.py`, `algorithms.py`, `jobs.py`, and re-exported from `schemas/__init__.py`) and must be kept in sync with this specification and the OpenAPI YAML.
 
 ### 11.1 Health & Readiness
 
@@ -388,7 +388,7 @@ class AlgorithmResponse(BaseModel):
     algorithmId: str
     name: str
     taskType: TaskType
-    family: Literal["mlrs"]
+    family: Literal["llm"]
     description: str
     defaultHyperparameters: dict[str, Any]
     exports: list[ArtefactFormat]
@@ -649,12 +649,12 @@ Both bundle endpoints respond with a binary ZIP, not with the JSON envelope:
 | `Content-Type`          | `application/zip`                                          |
 | `Content-Disposition`   | `attachment; filename="<name>.zip"`                       |
 | `Content-Length`        | The archive size (the archive is buffered before streaming) |
-| `X-mlrs-Missing-Files`   | Comma-separated paths omitted because the file was absent  |
+| `X-llm-Missing-Files`   | Comma-separated paths omitted because the file was absent  |
 
 `GET /api/v1/jobs/{jobId}/artefacts.zip` → `<jobId>.zip`, containing `<jobId>/` with the job's
 artefacts, `metrics.json` (when metrics exist), and `manifest.json`.
 
-`GET /api/v1/jobs/artefacts.zip?ids=` → `mlrs-jobs.zip`, containing one `<jobId>/` directory per
+`GET /api/v1/jobs/artefacts.zip?ids=` → `llm-jobs.zip`, containing one `<jobId>/` directory per
 job that has artefacts, plus a top-level `skipped.json` listing the omitted jobs and the reason
 (`NO_ARTEFACTS` or `NOT_COMPLETED`).
 
@@ -673,7 +673,7 @@ The backend serves its own generated documentation:
 Rules:
 
 - These paths are **outside** the `/api/v1` base path and are not part of the training contract.
-- They are enabled by default and can be disabled with `mlrs_ENABLE_INTERACTIVE_DOCS=false`.
+- They are enabled by default and can be disabled with `llm_ENABLE_INTERACTIVE_DOCS=false`.
 - The committed copy of the schema is
   [`06-api-specification/backend/openapi.yaml`](./06-api-specification/backend/openapi.yaml). It is
   regenerated from the Axum application with `utoipa`. CI fails when the
@@ -687,19 +687,19 @@ Rules:
 
 ```bash
 # Regenerate the backend OpenAPI YAML from the Axum app (utoipa)
-cargo run --bin export-openapi --manifest-path crates/mlrs-api/Cargo.toml
+cargo run --bin export-openapi --manifest-path crates/llm-api/Cargo.toml
 
 # Verify no drift (CI uses this)
-cargo run --bin export-openapi --manifest-path crates/mlrs-api/Cargo.toml -- --check
+cargo run --bin export-openapi --manifest-path crates/llm-api/Cargo.toml -- --check
 ```
 
 ### 13.2 Troubleshooting
 
 | Symptom | Fix |
 | ------- | --- |
-| CI fails at "Check the committed OpenAPI document" (`--check` reports drift) | Regenerate the YAML from the app (`crates/mlrs-api/.../export_openapi.py`), regenerate the derivatives (`docs/06-api-specification/openapi.py` if needed), and commit all updated OpenAPI files. |
+| CI fails at "Check the committed OpenAPI document" (`--check` reports drift) | Regenerate the YAML from the app (`crates/llm-api/.../export_openapi.py`), regenerate the derivatives (`docs/06-api-specification/openapi.py` if needed), and commit all updated OpenAPI files. |
 | `openapi.yaml` is out of sync after changing routes/schemas | Update `src/api/schemas.py` / routers / `main.py`, regenerate the schema, and update this document and the frontend client in the same change (per AGENTS.md). |
-| `GET /openapi.json` 404s locally | Ensure `mlrs_ENABLE_INTERACTIVE_DOCS` is not `false`. The setting comes from `src/config.py` and is controlled via the environment. |
+| `GET /openapi.json` 404s locally | Ensure `llm_ENABLE_INTERACTIVE_DOCS` is not `false`. The setting comes from `src/config.py` and is controlled via the environment. |
 
 ---
 

@@ -1,4 +1,4 @@
-# mlrs — Components
+# llm — Components
 
 _Part of [07-ui-ux-design.md](../../07-ui-ux-design.md)._
 

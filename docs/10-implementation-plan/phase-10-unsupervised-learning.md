@@ -17,7 +17,7 @@ nullable-label plumbing. No new endpoints.
    IsolationForest.
 4. **Export** — convert the fitted preprocessor + estimator with
    `target_opset={"": ONNX_OPSET, "ai.onnx.ml": 3}`; compare ONNX outputs with
-   mlrs.
+   llm.
 5. **API** — accept the two new `taskType` values; allow `labelColumn: null`;
    document the metrics and errors; update OpenAPI.
 6. **UI** — add Clustering and Anomaly detection to the task select; hide the
@@ -33,7 +33,7 @@ nullable-label plumbing. No new endpoints.
 ## Acceptance
 
 - A label-free CSV trains with every Phase 10 estimator and produces ONNX.
-- Cluster labels and anomaly labels/scores match mlrs.
+- Cluster labels and anomaly labels/scores match llm.
 - `labelColumn` supplied to an unsupervised task returns
   `400 INVALID_COLUMN_MAP`.
 - Invalid cluster counts and contamination return

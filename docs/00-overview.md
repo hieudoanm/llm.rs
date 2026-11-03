@@ -1,12 +1,12 @@
-# scikit-learn-client (mlrs) — Project Overview
+# llm-client (llm) — Project Overview
 
 ## 1. Project Summary
 
 Support supervised, semi-supervised, unsupervised, and offline reinforcement-learning tasks on tabular CSVs. A user uploads features (**X**) and, when the task needs one, a label (**Y**), or declares experience columns for offline reinforcement learning, chooses an allow-listed algorithm, and downloads a trained model. The **canonical artefact is ONNX (`.onnx`)**. Pickle (`.pkl`) and joblib (`.joblib`) are optional.
 
-The project showcases end-to-end engineering: Next.js with Tailwind CSS and DaisyUI, Axum with scikit-learn, SQLite, and Docker Compose on a single machine.
+The project showcases end-to-end engineering: Next.js with Tailwind CSS and DaisyUI, Axum with llm, SQLite, and Docker Compose on a single machine.
 
-mlrs is an independent portfolio project. It must not copy proprietary AutoML products, branding, source code, or confidential workflows.
+llm is an independent portfolio project. It must not copy proprietary AutoML products, branding, source code, or confidential workflows.
 
 ## 2. Problem Statement
 
@@ -19,11 +19,11 @@ A useful local studio needs to make it possible to:
 - Choose a task — classification, regression, semi-supervised (self-training), clustering, anomaly detection, or reinforcement learning (offline FQI) — and an algorithm.
 - Train asynchronously with visible job status.
 - Evaluate with task-appropriate metrics: a hold-out for supervised, semi-supervised, and offline RL jobs (episodes or transitions); in-sample cluster or anomaly scores for unsupervised jobs.
-- Export **ONNX** every time, with optional mlrs pickle or joblib saves.
+- Export **ONNX** every time, with optional llm pickle or joblib saves.
 - Keep a local history of datasets, jobs, metrics, and artefact paths.
 - Run the whole system with Docker Compose: frontend, backend, SQLite.
 
-mlrs brings these workflows together in one coherent application.
+llm brings these workflows together in one coherent application.
 
 ## 3. Product Vision
 
@@ -49,7 +49,7 @@ Primary needs:
 
 ### 4.2 Developer or Operator
 
-A person responsible for running mlrs locally.
+A person responsible for running llm locally.
 
 Primary needs:
 
@@ -128,7 +128,7 @@ The application must preserve, for every job:
 
 1. A user opens the local web application.
 2. The user uploads a CSV (header required).
-3. mlrs stores the file, computes a hash, and returns inferred columns.
+3. llm stores the file, computes a hash, and returns inferred columns.
 4. The user maps feature columns to **X** and, when the task requires one, exactly one column to **Y**. For `reinforcement_learning`, the user maps state features to **X** and declares `rlColumns` (action, reward, and either next-state columns or an episode column).
 5. The user selects a task — classification, regression, semi-supervised, clustering, anomaly detection, or reinforcement learning — and an algorithm from the catalogue.
 6. The user starts a training job (optional hyperparameter overrides).
@@ -166,7 +166,7 @@ The application must:
 - Validate algorithm ids against an allow-list (no arbitrary pickle load of user models).
 - Treat `.pkl` as an optional export only; never unpickle untrusted user files.
 
-mlrs must not claim GDPR certification, SOC 2, or production MLOps compliance.
+llm must not claim GDPR certification, SOC 2, or production MLOps compliance.
 
 ## 11. MVP Definition of Done
 
@@ -176,7 +176,7 @@ The minimum viable product is complete when:
 
 - A developer can run the stack with documented Docker Compose instructions.
 - A user can upload a valid CSV and see inferred columns.
-- A user can map X and, when required, Y, then start a mlrs job.
+- A user can map X and, when required, Y, then start a llm job.
 - Training runs asynchronously and status is pollable.
 - A successful job always produces `.onnx`.
 - Metrics for the declared task type are returned.
@@ -211,4 +211,4 @@ The semi-supervised and unsupervised tasks planned in Phases 9–10 extend the s
 7. **Reproducibility:** hash, mapping, params, versions, seed.
 8. **Evidence over claims:** document only implemented behaviour.
 9. **Incremental delivery:** every milestone is runnable with Compose.
-10. **No production ML claims:** mlrs is a software demonstration.
+10. **No production ML claims:** llm is a software demonstration.

@@ -1,4 +1,4 @@
-# mlrs — Result Charts
+# llm — Result Charts
 
 _Part of [07-ui-ux-design.md](../../07-ui-ux-design.md)._
 
@@ -175,7 +175,7 @@ MLP1 is **conditional on the solver**: `loss_curve_` is populated for `adam` and
 
 ## 4. Data contract (implemented)
 
-The worker generates chart data in `crates/mlrs-api/src/training/charts/` (one module per task family, dispatched from `crates/mlrs-api/src/training/core/pipeline.py`) with feature importance collected by `_collect_feature_importance`, stores it in `job_metrics.charts` (migration `0002_add_charts_column.py`), and returns it in the poll payload. All values are JSON-serialisable and capped so the terminal poll payload stays in the low tens of KB. Reinforcement-learning charts follow §3.7; MLP jobs add `mlpProgress` (§3.8) on top of their task family's charts.
+The worker generates chart data in `crates/llm-api/src/training/charts/` (one module per task family, dispatched from `crates/llm-api/src/training/core/pipeline.py`) with feature importance collected by `_collect_feature_importance`, stores it in `job_metrics.charts` (migration `0002_add_charts_column.py`), and returns it in the poll payload. All values are JSON-serialisable and capped so the terminal poll payload stays in the low tens of KB. Reinforcement-learning charts follow §3.7; MLP jobs add `mlpProgress` (§3.8) on top of their task family's charts.
 
 ### 4.1 Data contract table
 

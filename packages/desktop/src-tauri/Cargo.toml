@@ -1,0 +1,17 @@
+[package]
+name = "llm-desktop"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tauri = { version = "1.8", features = ["dialog-all", "fs-all", "sqlite-all"] }
+llm-core = { path = "../../../crates/llm-core" }
+llm-db = { path = "../../../crates/llm-db" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[build-dependencies]
+tauri-build = { version = "1.8", features = [] }

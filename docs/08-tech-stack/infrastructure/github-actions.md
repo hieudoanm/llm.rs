@@ -1,4 +1,4 @@
-# mlrs — GitHub Actions
+# llm — GitHub Actions
 
 Workflow: [`.github/workflows/ci.yaml`](../../../.github/workflows/ci.yaml) on `push` and `pull_request` to `master`.
 

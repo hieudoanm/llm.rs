@@ -1,4 +1,4 @@
-# mlrs — pnpm
+# llm — pnpm
 
 Package manager for the workspace (`packages/*`).
 

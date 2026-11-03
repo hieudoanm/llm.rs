@@ -1,6 +1,6 @@
 # Non-Functional Requirements
 
-This document specifies the non-functional requirements (NFRs) for mlrs-client (mlrs). Each requirement carries a unique ID (`NFR-###`), a description, and a target.
+This document specifies the non-functional requirements (NFRs) for llm-client (llm). Each requirement carries a unique ID (`NFR-###`), a description, and a target.
 
 ## Performance
 
@@ -9,8 +9,8 @@ This document specifies the non-functional requirements (NFRs) for mlrs-client (
 | NFR-001 | Dataset upload validation and persist shall complete within 2 s (p95) for files ≤ 10 MiB. | 2 s     |
 | NFR-002 | `POST /api/v1/jobs` shall return within 300 ms (p95) after validation.         | 300 ms  |
 | NFR-003 | `GET /api/v1/jobs/{jobId}` shall complete within 100 ms (p95).                 | 100 ms  |
-| NFR-004 | mlrs P0 fits on the bundled sample CSV (≤ 5k rows, ≤ 20 features) shall complete within 60 s (p95) on a developer laptop. | 60 s    |
-| NFR-005 | ONNX export for P0 mlrs models on the sample CSV shall complete within 15 s (p95). | 15 s    |
+| NFR-004 | llm P0 fits on the bundled sample CSV (≤ 5k rows, ≤ 20 features) shall complete within 60 s (p95) on a developer laptop. | 60 s    |
+| NFR-005 | ONNX export for P0 llm models on the sample CSV shall complete within 15 s (p95). | 15 s    |
 | NFR-006 | `GET /api/v1/jobs` shall complete within 200 ms (p95) with filters, sorting, and cursor pagination applied over 10 000 jobs. | 200 ms |
 | NFR-007 | `GET /api/v1/datasets/{datasetId}/insights` shall complete within 1 s (p95) for a CSV within the upload size limit. | 1 s     |
 | NFR-008 | A ZIP artefact bundle shall begin streaming within 2 s (p95) of the request, even when the archive is not yet complete. | 2 s     |
@@ -28,8 +28,8 @@ This document specifies the non-functional requirements (NFRs) for mlrs-client (
 | NFR-010 | Local Compose shall start all three services to healthy within 90 s on a typical developer machine. | 90 s   |
 | NFR-011 | Backend `/readyz` shall fail when SQLite is unreachable.                | Must   |
 | NFR-012 | A single-node SQLite is sufficient; multi-AZ is out of scope.             | Local  |
-| NFR-013 | A queued job shall never wait indefinitely: every job attempt shall terminate within `mlrs_JOB_TIMEOUT_SECONDS`. | 1800 s |
-| NFR-014 | A transient backend failure shall not permanently lose an accepted job; the job shall be retried up to `mlrs_JOB_MAX_ATTEMPTS` times. | Must   |
+| NFR-013 | A queued job shall never wait indefinitely: every job attempt shall terminate within `llm_JOB_TIMEOUT_SECONDS`. | 1800 s |
+| NFR-014 | A transient backend failure shall not permanently lose an accepted job; the job shall be retried up to `llm_JOB_MAX_ATTEMPTS` times. | Must   |
 
 **Environment scoping:** All availability NFRs describe the **local Docker Compose** profile. There is no production cloud profile in this release.
 
@@ -66,7 +66,7 @@ This document specifies the non-functional requirements (NFRs) for mlrs-client (
 | NFR-034 | CORS shall be restricted to the known frontend origin.                      | Must   |
 | NFR-035 | The API shall not deserialize untrusted binary model files.                       | Must   |
 | NFR-036 | Algorithm ids shall be allow-listed; no dynamic loading of user code.      | Must   |
-| NFR-037 | The CORS allow-list shall be configurable through `MLRS_CORS_ORIGINS` and shall default to the local frontend origins. | Must   |
+| NFR-037 | The CORS allow-list shall be configurable through `LLM_CORS_ORIGINS` and shall default to the local frontend origins. | Must   |
 | NFR-038 | The API shall reject `*` as a CORS origin while credentialed requests are enabled. | Must   |
 | NFR-039 | Uploads shall be validated by content sniffing in addition to extension and size. | Must   |
 
@@ -82,7 +82,7 @@ This document specifies the non-functional requirements (NFRs) for mlrs-client (
 | ------- | --------------------------------------------------------------------------- | ------ |
 | NFR-040 | The local stack shall support one training worker (serial jobs) for MVP.    | 1      |
 | NFR-041 | Concurrent job creates may queue; the worker processes one fit at a time.   | Must   |
-| NFR-042 | The number of jobs executing concurrently shall be bounded by `mlrs_MAX_CONCURRENT_JOBS`. | Must   |
+| NFR-042 | The number of jobs executing concurrently shall be bounded by `llm_MAX_CONCURRENT_JOBS`. | Must   |
 | NFR-043 | The stack shall hold at least 100 queued jobs without degrading the API.     | 100    |
 
 **Rationale:** Serial training keeps CPU/RAM predictable on a laptop. Horizontal scale is a non-goal.

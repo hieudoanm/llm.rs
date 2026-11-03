@@ -1,4 +1,4 @@
-# SQLite schema (mlrs)
+# SQLite schema (llm)
 
 Authoritative DDL: [`schema.sql`](./schema.sql).
 

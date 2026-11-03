@@ -1,4 +1,4 @@
-# mlrs — Backend Best Practices
+# llm — Backend Best Practices
 
 ## Documents
 
@@ -6,7 +6,7 @@
 | -------------------------------------- | -------------------------------- |
 | [`rust.md`](./rust.md)             | Layout, typing, clippy           |
 | [`fastapi.md`](./fastapi.md)           | Routers, errors, uploads         |
-| [`scikit-learn.md`](./scikit-learn.md) | Pipelines, metrics               |
+| [`llm.md`](./llm.md) | Pipelines, metrics               |
 | [`models.md`](./models.md)             | The estimator model catalogue    |
 | [`neural-networks.md`](./neural-networks.md) | Tabular MLPs (P1)         |
 | [`onnx.md`](./onnx.md)                 | Required export                  |

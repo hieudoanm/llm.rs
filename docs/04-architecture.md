@@ -1,10 +1,10 @@
-# scikit-learn-client (mlrs) — System Architecture
+# llm-client (llm) — System Architecture
 
 ## 1. Purpose
 
-This document describes the system architecture, component responsibilities, data flows, trust boundaries, and failure-recovery strategies for mlrs.
+This document describes the system architecture, component responsibilities, data flows, trust boundaries, and failure-recovery strategies for llm.
 
-mlrs is a **local two-service system**: a Next.js frontend and a pure-Rust Axum training API with an in-process worker, backed by SQLite. Files live on a Docker volume. There is no message broker and no SQLite in the MVP.
+llm is a **local two-service system**: a Next.js frontend and a pure-Rust Axum training API with an in-process worker, backed by SQLite. Files live on a Docker volume. There is no message broker and no SQLite in the MVP.
 
 The primary architectural goals are:
 
@@ -61,10 +61,10 @@ A single Axum application contains HTTP, the algorithm catalogue, and the worker
 
 Logical modules (crates), not extra processes:
 
-- `mlrs-api` — routers, serde, error envelope
-- `mlrs-core` — datasets, upload, hash, preview, training, preprocess, fit, metrics, export, ONNX
-- `mlrs-db` — SQLite persistence, jobs, idempotency keys, storage paths
-- `mlrs-server` — binary entry point
+- `llm-api` — routers, serde, error envelope
+- `llm-core` — datasets, upload, hash, preview, training, preprocess, fit, metrics, export, ONNX
+- `llm-db` — SQLite persistence, jobs, idempotency keys, storage paths
+- `llm-server` — binary entry point
 
 A **second container** that runs the same image with a worker command is allowed if process isolation is desired; it must share the SQLite database file and the volume. Compose still has exactly two _named_ services if worker is a replica of backend; alternatively `backend` runs both. **Decision:** MVP runs the worker inside the backend process (tokio `spawn_blocking` for linfa `fit`). P1 may split `worker` as its own Compose service using the same image.
 
@@ -107,11 +107,11 @@ The worker is **bounded, interruptible, and retry-aware** (see
 
 | Property        | Control                    | Default   |
 | --------------- | -------------------------- | --------- |
-| Concurrency     | `MLRS_MAX_CONCURRENT_JOBS` | `1`       |
-| Per-attempt wall clock | `MLRS_JOB_TIMEOUT_SECONDS` | `1800` |
-| Attempts        | `MLRS_JOB_MAX_ATTEMPTS`    | `2`       |
-| Backoff         | `MLRS_JOB_RETRY_BASE_SECONDS`, full jitter | `2` |
-| Stale-job sweep | `MLRS_WORKER_STALE_SECONDS`| `3600`    |
+| Concurrency     | `LLM_MAX_CONCURRENT_JOBS` | `1`       |
+| Per-attempt wall clock | `LLM_JOB_TIMEOUT_SECONDS` | `1800` |
+| Attempts        | `LLM_JOB_MAX_ATTEMPTS`    | `2`       |
+| Backoff         | `LLM_JOB_RETRY_BASE_SECONDS`, full jitter | `2` |
+| Stale-job sweep | `LLM_WORKER_STALE_SECONDS`| `3600`    |
 
 Jobs beyond the concurrency limit stay `queued`. A transient failure moves the job to `retrying`
 and schedules the next attempt; a deterministic failure (invalid mapping, invalid label type,
@@ -135,17 +135,17 @@ SQLite via `sqlx`. JSON stored as `serde_json::Value` for hyperparameters, metri
 
 ### 4.5 Volume
 
-Mount `mlrs_data:/var/lib/mlrs`. Layout:
+Mount `llm_data:/var/lib/llm`. Layout:
 
 ```
-/var/lib/mlrs/datasets/{datasetId}.csv
-/var/lib/mlrs/artefacts/{jobId}/{jobId}.onnx
+/var/lib/llm/datasets/{datasetId}.csv
+/var/lib/llm/artefacts/{jobId}/{jobId}.onnx
 ```
 
 ### 4.6 Configuration
 
 All environment variables are read **once**, at process start, by a single settings module
-(`crates/mlrs-core/src/config.rs`). No module calls `std::env::var` directly outside the settings module, and no module parses
+(`crates/llm-core/src/config.rs`). No module calls `std::env::var` directly outside the settings module, and no module parses
 an environment variable on a hot path.
 
 The module exposes typed, validated settings with documented defaults:
@@ -153,18 +153,18 @@ The module exposes typed, validated settings with documented defaults:
 | Group      | Settings                                                                       |
 | ---------- | ------------------------------------------------------------------------------ |
 | Database   | `DATABASE_URL`                                                                 |
-| Storage    | `MLRS_DATA_DIR`, `MLRS_MAX_UPLOAD_MB`                                            |
-| HTTP       | `MLRS_CORS_ORIGINS`, `MLRS_CORS_ALLOW_CREDENTIALS`, `MLRS_ENABLE_INTERACTIVE_DOCS` |
-| Worker     | `MLRS_MAX_CONCURRENT_JOBS`, `MLRS_JOB_TIMEOUT_SECONDS`, `MLRS_JOB_MAX_ATTEMPTS`, `MLRS_JOB_RETRY_BASE_SECONDS`, `MLRS_WORKER_STALE_SECONDS` |
-| Logging    | `MLRS_LOG_LEVEL`                                                                |
+| Storage    | `LLM_DATA_DIR`, `LLM_MAX_UPLOAD_MB`                                            |
+| HTTP       | `LLM_CORS_ORIGINS`, `LLM_CORS_ALLOW_CREDENTIALS`, `LLM_ENABLE_INTERACTIVE_DOCS` |
+| Worker     | `LLM_MAX_CONCURRENT_JOBS`, `LLM_JOB_TIMEOUT_SECONDS`, `LLM_JOB_MAX_ATTEMPTS`, `LLM_JOB_RETRY_BASE_SECONDS`, `LLM_WORKER_STALE_SECONDS` |
+| Logging    | `LLM_LOG_LEVEL`                                                                |
 
 An invalid value falls back to the documented default and logs one warning at startup naming the
 variable and the value used (NFR-054). The authoritative list of variables, defaults, and
 statuses is [`11-deployment/environment-variables.md`](./11-deployment/environment-variables.md).
 
-**CORS.** The allow-list comes from `MLRS_CORS_ORIGINS` (comma-separated), defaulting to
+**CORS.** The allow-list comes from `LLM_CORS_ORIGINS` (comma-separated), defaulting to
 `http://localhost:3000,http://127.0.0.1:3000`. `*` is rejected while
-`MLRS_CORS_ALLOW_CREDENTIALS` is enabled. This replaces the hard-coded list, so the origin policy
+`LLM_CORS_ALLOW_CREDENTIALS` is enabled. This replaces the hard-coded list, so the origin policy
 is configurable without touching code and is testable from a single module.
 
 ## 5. Request Lifecycle
@@ -215,7 +215,7 @@ A linfa/ndarray pipeline is the unit of export:
 - **Clustering / anomaly detection:** the fitted preprocessor plus estimator is exported directly.
 - **Reinforcement learning:** the fitted preprocessor plus Q-function regressor (built from Bellman targets during FQI sweeps) is exported directly. The graph takes the state features in `featureColumns` order followed by the one-hot action block in the recorded `actions` order; the policy `π(s)=argmax_a Q(s,a)` is a documented consumer-side rule, not in the graph.
 - **Opset:** the exporter pins the default domain to 15 and `ai.onnx.ml` to **3**. IsolationForest otherwise emits ML-domain v4 operators that the pinned ONNX Runtime rejects.
-- **Allow-list gate:** an estimator without a verified converter must not enter the catalogue. CI converts every entry and compares predictions with scikit-learn.
+- **Allow-list gate:** an estimator without a verified converter must not enter the catalogue. CI converts every entry and compares predictions with llm.
 
 Every shipped model uses a single `onnx-protobuf` export path, so there is no framework-specific exporter, no combined-graph stitching, and no two-file exception.
 
@@ -224,14 +224,14 @@ Every shipped model uses a single `onnx-protobuf` export path, so there is no fr
 - One worker claims one job.
 - Additional `queued` jobs wait.
 - Job status updates use `UPDATE jobs SET status=$new WHERE id=$id AND status=$from`.
-- The number of jobs executing at the same time is bounded by `MLRS_MAX_CONCURRENT_JOBS`
+- The number of jobs executing at the same time is bounded by `LLM_MAX_CONCURRENT_JOBS`
   (default **1**, preserving the serial MVP behaviour). Jobs beyond the limit stay `queued`, and
   the API reports their queue position.
-- A job attempt is bounded by `MLRS_JOB_TIMEOUT_SECONDS` (default **1800**). On expiry the
+- A job attempt is bounded by `LLM_JOB_TIMEOUT_SECONDS` (default **1800**). On expiry the
   attempt is cancelled, any partially written artefact is removed, and the job is recorded
   `failed` with `JOB_TIMEOUT`.
-- A transient failure is retried up to `MLRS_JOB_MAX_ATTEMPTS` times (default **2**) with
-  exponential backoff and full jitter based on `MLRS_JOB_RETRY_BASE_SECONDS` (default **2**).
+- A transient failure is retried up to `LLM_JOB_MAX_ATTEMPTS` times (default **2**) with
+  exponential backoff and full jitter based on `LLM_JOB_RETRY_BASE_SECONDS` (default **2**).
   Between attempts the job reports the non-terminal status `retrying` and an `nextAttemptAt`
   timestamp. Deterministic failures are never retried.
 
@@ -241,7 +241,7 @@ Every shipped model uses a single `onnx-protobuf` export path, so there is no fr
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | SQLite locked                         | `/readyz` 503; UI network-error                                                                                                                                                     |
 | Disk full                             | job `failed` `EXPORT_FAILED`                                                                                                                                                        |
-| Process kill during fit               | on startup, jobs in `validating`/`training`/`evaluating`/`exporting` older than `MLRS_WORKER_STALE_SECONDS` (default 3600) → `failed` `WORKER_INTERRUPTED`                               |
+| Process kill during fit               | on startup, jobs in `validating`/`training`/`evaluating`/`exporting` older than `LLM_WORKER_STALE_SECONDS` (default 3600) → `failed` `WORKER_INTERRUPTED`                               |
 | ONNX export exception                 | `failed` `EXPORT_FAILED`; no completed status                                                                                                                                       |
 | Attempt exceeds the wall-clock budget | `failed` `JOB_TIMEOUT`; no artefact row, no artefact file                                                                                                                            |
 | Transient environment failure         | job `retrying` → backoff → `queued` → next attempt; exhausted budget → `failed` `JOB_RETRY_EXHAUSTED`                                                                                   |
@@ -260,7 +260,7 @@ Every shipped model uses a single `onnx-protobuf` export path, so there is no fr
 - Volume is not served by nginx/Next static files.
 - Downloads go through the Axum backend after a DB lookup.
 - No pickle load of user uploads.
-- CORS allow-list: the frontend origin, read from `MLRS_CORS_ORIGINS` by the central settings
+- CORS allow-list: the frontend origin, read from `LLM_CORS_ORIGINS` by the central settings
   module (§4.6). `*` is rejected while credentialed requests are enabled.
 - Uploads are validated by extension, content type, **and** sniffed bytes, so a mislabelled
   binary never reaches the CSV parser.
@@ -271,7 +271,7 @@ Local single-user: no JWT in MVP. Binding Compose ports to `127.0.0.1` is requir
 
 The backend serves `/docs` (Swagger UI), `/redoc`, and `/openapi.json`. These paths are outside
 the `/api/v1` base path and are not part of the training contract. They are enabled by default
-and can be turned off with `MLRS_ENABLE_INTERACTIVE_DOCS=false`. The committed schema
+and can be turned off with `LLM_ENABLE_INTERACTIVE_DOCS=false`. The committed schema
 (`docs/06-api-specification/backend/openapi.yaml`) is regenerated from the code and checked for
 drift in CI.
 

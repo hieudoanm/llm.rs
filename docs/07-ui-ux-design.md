@@ -1,10 +1,10 @@
-# scikit-learn-client (mlrs) — UI/UX Design
+# llm.rs — UI/UX Design
 
 ## 1. Purpose
 
-This document defines the UI/UX design for mlrs: tokens, components, layout, screens, states,
+This document defines the UI/UX design for llm.rs: tokens, components, layout, screens, states,
 accessibility, responsive behaviour, motion, iconography, brand, and the static prototypes. It is
-the source of truth for the frontend in `packages/frontend`.
+the source of truth for the desktop frontend in `packages/desktop`.
 
 The design must be:
 
@@ -13,7 +13,7 @@ The design must be:
 - Responsive (mobile, tablet, desktop).
 - Consistent across screens.
 - Explicit about loading, empty, validation-error, network-error, unexpected-error, and success.
-- Themeable in light and dark via DaisyUI, using the `mlrs-light` and `mlrs-dark` themes.
+- Themeable in light and dark via DaisyUI, using the `llm-light` and `llm-dark` themes.
 
 Every subsystem document below is normative. Where a subsystem document and this index disagree,
 the subsystem document governs.
@@ -80,6 +80,13 @@ rendering rules are in [`charts.md`](./07-ui-ux-design/system/charts.md).
 | Document                                               | Covers                                            |
 | ------------------------------------------------------ | ------------------------------------------------- |
 | [`brand/README.md`](./07-ui-ux-design/brand/README.md) | Logo marks, wordmark, colours, clear space, usage |
+| [`og/svg/og.svg`](./07-ui-ux-design/og/svg/og.svg)     | Social card artwork                               |
+
+The brand and the landing page share the warm, dark-first palette: `#0B1018` night surface,
+`#111923` panels, `#F7F1E8` cream text, `#9DA8B7` muted text, `#F06B4D` signal orange,
+`#FFAC70` warm accent, `#76D5A5` success mint, and `#24303D` borders. The marks use the orange
+for the box and the surface colour for the diagonal line; see the brand document for the light
+and dark variants.
 
 ## 12. Prototypes
 

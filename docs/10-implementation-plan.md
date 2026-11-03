@@ -1,4 +1,4 @@
-# scikit-learn-client (mlrs) — Implementation Plan
+# llm-client (llm) — Implementation Plan
 
 ## 1. Purpose
 

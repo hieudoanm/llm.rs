@@ -1,7 +1,7 @@
 {
-  "name": "@mlrs/workspace",
+  "name": "@llm/workspace",
   "version": "0.0.1",
-  "description": "mlrs - ml.rs training studio",
+  "description": "llm - Local Learning Machine",
   "packageManager": "pnpm@12.16.1",
   "scripts": {
     "dev": "turbo run dev",

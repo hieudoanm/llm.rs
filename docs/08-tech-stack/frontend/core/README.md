@@ -1,4 +1,4 @@
-# mlrs — Frontend core
+# llm — Frontend core
 
 | Document | Covers |
 | -------- | ------ |

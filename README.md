@@ -1,12 +1,12 @@
-# Machine Learning in Rust (ml.rs)
+# Machine Learning in Rust (llm.rs)
 
 **Train supervised, semi-supervised, unsupervised, and offline reinforcement-learning models from CSV files. Export them as portable ONNX models — all on your own machine.**
 
-Machine Learning in Rust (ml.rs) is a local, full-stack training studio for tabular data. Upload a CSV with a header row, map feature columns to **X** and (when the task requires it) a label column to **Y**, or declare experience columns for offline reinforcement learning, choose a task — classification, regression, semi-supervised, clustering, anomaly detection, or reinforcement learning — and an algorithm from the curated catalogue. Train asynchronously and download a portable **ONNX** artefact. Everything runs locally via Docker Compose — no cloud account or infrastructure setup.
+Machine Learning in Rust (llm.rs) is a local, full-stack training studio for tabular data. Upload a CSV with a header row, map feature columns to **X** and (when the task requires it) a label column to **Y**, or declare experience columns for offline reinforcement learning, choose a task — classification, regression, semi-supervised, clustering, anomaly detection, or reinforcement learning — and an algorithm from the curated catalogue. Train asynchronously and download a portable **ONNX** artefact. Everything runs locally via Docker Compose — no cloud account or infrastructure setup.
 
 [📄 Documentation](docs/README.md) · [🚀 Quick Start](#get-started) · [🔍 See It In Action](#see-it-in-action) · [🧪 Try Algorithms](packages/frontend/src/app/algorithms/page.tsx)
 
-![mlrs](docs/07-ui-ux-design/og/images/og.png)
+![llm](docs/07-ui-ux-design/og/images/og.png)
 
 ## The Problem
 
@@ -23,11 +23,11 @@ A useful local studio needs to make it possible to:
 - Keep a local history of datasets, jobs, metrics, and artefact paths.
 - Run the whole system with Docker Compose: frontend, backend, SQLite.
 
-mlrs brings these workflows together in one coherent application.
+llm brings these workflows together in one coherent application.
 
 ## The Solution
 
-mlrs provides a focused, local-first workflow: upload a CSV, configure the mapping and algorithm, train, review metrics, and download ONNX. It supports the full learning spectrum — supervised, semi-supervised, unsupervised, and offline reinforcement learning — behind one upload → configure → train → export workflow, with ONNX as the single export contract. Everything runs locally via Docker Compose — no third-party services, no account creation.
+llm provides a focused, local-first workflow: upload a CSV, configure the mapping and algorithm, train, review metrics, and download ONNX. It supports the full learning spectrum — supervised, semi-supervised, unsupervised, and offline reinforcement learning — behind one upload → configure → train → export workflow, with ONNX as the single export contract. Everything runs locally via Docker Compose — no third-party services, no account creation.
 
 ## Features
 
@@ -56,40 +56,49 @@ Every trained model — across all six task types — is exported to **ONNX**.
 
 ## See It in Action
 
-![mlrs Demo](demo/demo.gif)
+![llm Demo](demo/demo.gif)
 
 Or watch the full recorded walkthrough in [`demo/demo.md`](demo/demo.md) and [`demo/demo.mp4`](demo/demo.mp4).
 
 ## Get Started
 
-The fastest way to run mlrs locally:
+The fastest way to run llm locally:
 
 ### Prerequisites
 
-- [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/) v2
+- [Rust](https://www.rust-lang.org/) (stable toolchain)
+- [Node.js 26+](https://nodejs.org/) and [pnpm](https://pnpm.io/) (for the desktop app)
 
-### Run the stack
-
-```sh
-cp .env.example .env
-docker compose up --build
-```
-
-### Open the app
-
-| Service  | URL                             |
-| -------- | ------------------------------- |
-| App      | <http://127.0.0.1:3000>         |
-| API docs | <http://127.0.0.1:8000/docs>    |
-| Health   | <http://127.0.0.1:8000/healthz> |
-
-Stop and clean up:
+### Option 1: CLI (standalone binary)
 
 ```sh
-docker compose down -v
+# Build and run the CLI
+cd crates && cargo build --release -p llm-cli
+./target/release/llm --help
 ```
 
-For advanced local development (running backend/frontend on host), see [Technical Documentation](docs/README.md).
+### Option 2: Desktop App (Next.js + Tauri)
+
+```sh
+# Install desktop dependencies
+cd packages/desktop && pnpm install
+
+# Run in development (Next.js + Tauri concurrently)
+pnpm dev
+
+# Build for production
+pnpm build && pnpm build:tauri
+```
+
+### Release artifacts
+
+The project produces release artifacts via GitHub Actions:
+- **CLI binary** — `llm` (Linux x64)
+- **Desktop app** — 7 artifacts:
+  - macOS: `.dmg` and `.app.zip`
+  - Linux: `.rpm`, `.deb`, `.AppImage`
+  - Windows: `.msi` and `.exe`
+
 
 ## Use Cases
 
@@ -125,7 +134,7 @@ To report issues or propose changes, open an issue or pull request in this repos
 
 ## Call to Action
 
-**[Get Started](#get-started)** — Run mlrs locally in minutes and train your first model.
+**[Get Started](#get-started)** — Run llm locally in minutes and train your first model.
 
 ## License
 

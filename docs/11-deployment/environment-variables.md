@@ -15,7 +15,7 @@ bug.
 - Unknown variables in `.env` are ignored (Compose behaviour) — they are not an error.
 - Boolean variables accept `1/0`, `true/false`, `yes/no`, `on/off`, case-insensitively.
 - List variables are comma-separated with optional surrounding whitespace; empty items are
-  dropped. Example: `MLRS_CORS_ORIGINS=http://localhost:3000, http://127.0.0.1:3000`.
+  dropped. Example: `LLM_CORS_ORIGINS=http://localhost:3000, http://127.0.0.1:3000`.
 
 ## Status column
 
@@ -28,36 +28,36 @@ bug.
 
 ## Backend
 
-Every backend variable is read exactly once by `crates/mlrs-core/src/config.rs`, which resolves the
+Every backend variable is read exactly once by `crates/llm-core/src/config.rs`, which resolves the
 value at process start, falls back to the documented default when the value is unusable, and logs
 one warning. The backend container receives these from `docker-compose.yaml`.
 
 | Variable              | Default                                              | Status       | Purpose                                                                       |
 | --------------------- | ---------------------------------------------------- | ------------ | ----------------------------------------------------------------------------- |
-| `DATABASE_URL`        | `sqlite://.mlrs-data/mlrs.db`                        | Implemented  | SQLite connection string. In Compose this is built from `MLRS_DATA_DIR`.      |
-| `MLRS_DATA_DIR`       | `/var/lib/mlrs`                                      | Implemented  | Root of the artefact volume: `datasets/{datasetId}.csv` and `artefacts/{jobId}/{jobId}.{ext}`. |
-| `MLRS_MAX_UPLOAD_MB`  | `10`                                                 | Implemented  | Maximum accepted upload size in MiB for `POST /api/v1/datasets`. Over the cap → `413 UPLOAD_TOO_LARGE`. |
-| `MLRS_LOG_LEVEL`      | `INFO`                                               | Implemented  | Root log level for the structured JSON logger (`DEBUG`, `INFO`, `WARNING`, `ERROR`). |
-| `MLRS_CORS_ORIGINS`   | `http://localhost:3000,http://127.0.0.1:3000`        | Implemented  | Comma-separated allow-list of browser origins permitted to call the API. `*` is rejected while credentials are enabled. |
-| `MLRS_CORS_ALLOW_CREDENTIALS` | `true`                                         | Implemented  | Whether CORS responses may carry `Access-Control-Allow-Credentials`. Must be `false` when `MLRS_CORS_ORIGINS` contains `*`. |
-| `MLRS_ENABLE_INTERACTIVE_DOCS` | `true`                                         | Implemented  | Whether the interactive API reference (`/docs`, `/redoc`) and the raw schema (`/openapi.json`) are served. |
-| `MLRS_MAX_CONCURRENT_JOBS` | `1`                                              | Implemented  | Maximum number of jobs executing concurrently in the worker. See [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md). |
-| `MLRS_JOB_TIMEOUT_SECONDS` | `1800`                                            | Implemented  | Wall-clock budget for a single job attempt. On expiry the job fails with `JOB_TIMEOUT`. |
-| `MLRS_JOB_MAX_ATTEMPTS` | `2`                                                | Implemented  | Total attempts per job, including the first. Only transient failures are retried. |
-| `MLRS_JOB_RETRY_BASE_SECONDS` | `2`                                            | Implemented  | Base delay of the exponential backoff with full jitter between attempts. |
-| `MLRS_WORKER_STALE_SECONDS` | `3600`                                           | Implemented  | Age after which a job left in a non-terminal status by a crashed process is marked `failed` with `WORKER_INTERRUPTED`. |
+| `DATABASE_URL`        | `sqlite://.llm-data/llm.db`                        | Implemented  | SQLite connection string. In Compose this is built from `LLM_DATA_DIR`.      |
+| `LLM_DATA_DIR`       | `/var/lib/llm`                                      | Implemented  | Root of the artefact volume: `datasets/{datasetId}.csv` and `artefacts/{jobId}/{jobId}.{ext}`. |
+| `LLM_MAX_UPLOAD_MB`  | `10`                                                 | Implemented  | Maximum accepted upload size in MiB for `POST /api/v1/datasets`. Over the cap → `413 UPLOAD_TOO_LARGE`. |
+| `LLM_LOG_LEVEL`      | `INFO`                                               | Implemented  | Root log level for the structured JSON logger (`DEBUG`, `INFO`, `WARNING`, `ERROR`). |
+| `LLM_CORS_ORIGINS`   | `http://localhost:3000,http://127.0.0.1:3000`        | Implemented  | Comma-separated allow-list of browser origins permitted to call the API. `*` is rejected while credentials are enabled. |
+| `LLM_CORS_ALLOW_CREDENTIALS` | `true`                                         | Implemented  | Whether CORS responses may carry `Access-Control-Allow-Credentials`. Must be `false` when `LLM_CORS_ORIGINS` contains `*`. |
+| `LLM_ENABLE_INTERACTIVE_DOCS` | `true`                                         | Implemented  | Whether the interactive API reference (`/docs`, `/redoc`) and the raw schema (`/openapi.json`) are served. |
+| `LLM_MAX_CONCURRENT_JOBS` | `1`                                              | Implemented  | Maximum number of jobs executing concurrently in the worker. See [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md). |
+| `LLM_JOB_TIMEOUT_SECONDS` | `1800`                                            | Implemented  | Wall-clock budget for a single job attempt. On expiry the job fails with `JOB_TIMEOUT`. |
+| `LLM_JOB_MAX_ATTEMPTS` | `2`                                                | Implemented  | Total attempts per job, including the first. Only transient failures are retried. |
+| `LLM_JOB_RETRY_BASE_SECONDS` | `2`                                            | Implemented  | Base delay of the exponential backoff with full jitter between attempts. |
+| `LLM_WORKER_STALE_SECONDS` | `3600`                                           | Implemented  | Age after which a job left in a non-terminal status by a crashed process is marked `failed` with `WORKER_INTERRUPTED`. |
 
 ### Notes
 
-- `MLRS_DATA_DIR` must be an absolute path. A relative path is rejected at startup.
-- `MLRS_CORS_ORIGINS` entries must be scheme + host (+ optional port), with **no** trailing
+- `LLM_DATA_DIR` must be an absolute path. A relative path is rejected at startup.
+- `LLM_CORS_ORIGINS` entries must be scheme + host (+ optional port), with **no** trailing
   slash: `http://127.0.0.1:3000` is valid, `http://127.0.0.1:3000/` is not.
 - A CORS origin that does not parse is dropped with a startup warning; if **every** entry is
   dropped, the API starts with an empty allow-list (no cross-origin browser access).
 - Values above the documented maxima fall back to the default and log a warning once:
-  `MLRS_MAX_UPLOAD_MB` ≤ 1024, `MLRS_MAX_CONCURRENT_JOBS` ≤ 16,
-  `MLRS_JOB_TIMEOUT_SECONDS` ≤ 86400, `MLRS_JOB_MAX_ATTEMPTS` ≤ 5,
-  `MLRS_JOB_RETRY_BASE_SECONDS` ≤ 60, `MLRS_WORKER_STALE_SECONDS` ≤ 86400.
+  `LLM_MAX_UPLOAD_MB` ≤ 1024, `LLM_MAX_CONCURRENT_JOBS` ≤ 16,
+  `LLM_JOB_TIMEOUT_SECONDS` ≤ 86400, `LLM_JOB_MAX_ATTEMPTS` ≤ 5,
+  `LLM_JOB_RETRY_BASE_SECONDS` ≤ 60, `LLM_WORKER_STALE_SECONDS` ≤ 86400.
 
 ---
 
@@ -70,7 +70,7 @@ bundle at build time and are therefore **public**.
 | ------------------------- | ----------------------- | ----------- | ----------------------------------------------------------------------- |
 | `NEXT_PUBLIC_API_URL`     | `http://127.0.0.1:8000` | Implemented | Base URL of the backend API, used by the browser. Must be reachable **from the browser**, not from inside the container. |
 | `NEXT_PUBLIC_API_DOCS_URL`| `${NEXT_PUBLIC_API_URL}/docs` | Implemented | Link to the interactive API reference shown in the app footer. Falls back to `${NEXT_PUBLIC_API_URL}/docs`. |
-| `NEXT_PUBLIC_APP_NAME`    | `mlrs`                  | Planned     | Product name shown in the header and the document title.            |
+| `NEXT_PUBLIC_APP_NAME`    | `llm`                  | Planned     | Product name shown in the header and the document title.            |
 
 ### Notes
 
@@ -87,9 +87,9 @@ bundle at build time and are therefore **public**.
 
 | Variable          | Default                                            | Status      | Purpose                                                    |
 | ----------------- | -------------------------------------------------- | ----------- | ---------------------------------------------------------- |
-| `DATABASE_URL`    | `sqlite://.mlrs-data/mlrs.db`                      | Implemented | SQLite database used by the Rust test suite. Identical to CI. |
-| `MLRS_DATA_DIR`    | a per-run temporary directory                      | Implemented | Artefact root for tests; each test uses a fresh directory. |
-| `MLRS_MAX_UPLOAD_MB` | `10`                                             | Implemented | Upload cap asserted by the upload-limit tests.            |
+| `DATABASE_URL`    | `sqlite://.llm-data/llm.db`                      | Implemented | SQLite database used by the Rust test suite. Identical to CI. |
+| `LLM_DATA_DIR`    | a per-run temporary directory                      | Implemented | Artefact root for tests; each test uses a fresh directory. |
+| `LLM_MAX_UPLOAD_MB` | `10`                                             | Implemented | Upload cap asserted by the upload-limit tests.            |
 
 Tests that need a non-default value set it explicitly in the test itself (or through a fixture),
 not through the developer's shell.
@@ -100,18 +100,18 @@ not through the developer's shell.
 
 | Variable                      | Read by                                        | Documented in                                 |
 | ----------------------------- | ---------------------------------------------- | --------------------------------------------- |
-| `DATABASE_URL`                | `crates/mlrs-core/src/config.rs` → `crates/mlrs-db/src/lib.rs` | [`04-architecture.md`](../04-architecture.md) §4.4 |
-| `MLRS_DATA_DIR`               | `crates/mlrs-core/src/config.rs` → `crates/mlrs-core/src/storage/filesystem.rs` | [`05-data-model.md`](../05-data-model.md) §5   |
-| `MLRS_MAX_UPLOAD_MB`           | `crates/mlrs-core/src/config.rs` → `crates/mlrs-api/src/routes/datasets.rs` | [`FEATURE-01`](../02-features/FEATURE-01-Dataset-Upload.md) |
-| `MLRS_LOG_LEVEL`               | `crates/mlrs-core/src/config.rs` → `crates/mlrs-server/src/main.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `MLRS_CORS_ORIGINS`            | `crates/mlrs-core/src/config.rs` → `crates/mlrs-api/src/middleware.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md), [`09-testing-strategy.md`](../09-testing-strategy.md) |
-| `MLRS_CORS_ALLOW_CREDENTIALS`  | `crates/mlrs-core/src/config.rs` → `crates/mlrs-api/src/middleware.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `MLRS_ENABLE_INTERACTIVE_DOCS` | `crates/mlrs-core/src/config.rs` → `crates/mlrs-api/src/lib.rs` | [`FEATURE-18`](../02-features/FEATURE-18-Client-Resilience-and-Guidance.md) |
-| `MLRS_MAX_CONCURRENT_JOBS`     | `crates/mlrs-core/src/config.rs` → `crates/mlrs-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `MLRS_JOB_TIMEOUT_SECONDS`     | `crates/mlrs-core/src/config.rs` → `crates/mlrs-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `MLRS_JOB_MAX_ATTEMPTS`        | `crates/mlrs-core/src/config.rs` → `crates/mlrs-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `MLRS_JOB_RETRY_BASE_SECONDS`  | `crates/mlrs-core/src/config.rs` → `crates/mlrs-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `MLRS_WORKER_STALE_SECONDS`    | `crates/mlrs-core/src/config.rs` → `crates/mlrs-api/src/worker.rs` | [`04-architecture.md`](../04-architecture.md) §8 |
+| `DATABASE_URL`                | `crates/llm-core/src/config.rs` → `crates/llm-db/src/lib.rs` | [`04-architecture.md`](../04-architecture.md) §4.4 |
+| `LLM_DATA_DIR`               | `crates/llm-core/src/config.rs` → `crates/llm-core/src/storage/filesystem.rs` | [`05-data-model.md`](../05-data-model.md) §5   |
+| `LLM_MAX_UPLOAD_MB`           | `crates/llm-core/src/config.rs` → `crates/llm-api/src/routes/datasets.rs` | [`FEATURE-01`](../02-features/FEATURE-01-Dataset-Upload.md) |
+| `LLM_LOG_LEVEL`               | `crates/llm-core/src/config.rs` → `crates/llm-server/src/main.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_CORS_ORIGINS`            | `crates/llm-core/src/config.rs` → `crates/llm-api/src/middleware.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md), [`09-testing-strategy.md`](../09-testing-strategy.md) |
+| `LLM_CORS_ALLOW_CREDENTIALS`  | `crates/llm-core/src/config.rs` → `crates/llm-api/src/middleware.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_ENABLE_INTERACTIVE_DOCS` | `crates/llm-core/src/config.rs` → `crates/llm-api/src/lib.rs` | [`FEATURE-18`](../02-features/FEATURE-18-Client-Resilience-and-Guidance.md) |
+| `LLM_MAX_CONCURRENT_JOBS`     | `crates/llm-core/src/config.rs` → `crates/llm-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_JOB_TIMEOUT_SECONDS`     | `crates/llm-core/src/config.rs` → `crates/llm-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_JOB_MAX_ATTEMPTS`        | `crates/llm-core/src/config.rs` → `crates/llm-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_JOB_RETRY_BASE_SECONDS`  | `crates/llm-core/src/config.rs` → `crates/llm-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_WORKER_STALE_SECONDS`    | `crates/llm-core/src/config.rs` → `crates/llm-api/src/worker.rs` | [`04-architecture.md`](../04-architecture.md) §8 |
 | `NEXT_PUBLIC_API_URL`         | `packages/frontend/src/lib/api.ts`             | [`06-api-specification.md`](../06-api-specification.md) §3 |
 | `NEXT_PUBLIC_API_DOCS_URL`    | `packages/frontend/src/components/layout/Footer.tsx` | [`FEATURE-18`](../02-features/FEATURE-18-Client-Resilience-and-Guidance.md) |
 

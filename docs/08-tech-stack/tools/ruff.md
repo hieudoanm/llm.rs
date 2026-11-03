@@ -1,6 +1,6 @@
-# mlrs — Ruff
+# llm — Ruff
 
-Lint and formatter for Rust (`crates/mlrs-api` and repo scripts).
+Lint and formatter for Rust (`crates/llm-api` and repo scripts).
 
 ## Choice
 

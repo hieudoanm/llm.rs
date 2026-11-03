@@ -6,7 +6,7 @@ P0 ONNX (FR-050, FR-051, FR-055..057, FR-085, FR-095, FR-105); P1 optional pickl
 
 ## Description
 
-Export is part of a successful job. **ONNX is required.** Every shipped model — scikit-learn estimators, the configurable MLPs, and the FQI Q-function — exports through a single `mlrs2onnx` path. Sklearn jobs (including MLP jobs) may also write `.pkl` or `.joblib`. Downloads use artefact ids, never filesystem paths.
+Export is part of a successful job. **ONNX is required.** Every shipped model — llm estimators, the configurable MLPs, and the FQI Q-function — exports through a single `llm2onnx` path. Sklearn jobs (including MLP jobs) may also write `.pkl` or `.joblib`. Downloads use artefact ids, never filesystem paths.
 
 ## User-visible behaviour
 
@@ -44,7 +44,7 @@ If ONNX export fails, the job is `failed` even if fit succeeded. Optional format
 | clustering        | Fitted preprocessor + fitted clusterer                    | `label` (cluster index) and scores/probabilities  |
 | anomaly_detection | Fitted preprocessor + fitted IsolationForest              | `label` (`1` inlier, `-1` outlier) and scores     |
 
-For semi-supervised jobs, `pkl`/`joblib` contain the fitted `SelfTrainingClassifier` wrapper for reproducibility; ONNX contains the fitted base estimator because `mlrs2onnx` has no converter for the wrapper. Self-training only changes training labels, so the two produce identical predictions.
+For semi-supervised jobs, `pkl`/`joblib` contain the fitted `SelfTrainingClassifier` wrapper for reproducibility; ONNX contains the fitted base estimator because `llm2onnx` has no converter for the wrapper. Self-training only changes training labels, so the two produce identical predictions.
 
 ## Edge cases
 
@@ -54,7 +54,7 @@ For semi-supervised jobs, `pkl`/`joblib` contain the fitted `SelfTrainingClassif
 
 ## Acceptance conditions
 
-- CI loads every P0 ONNX with ONNX Runtime and runs one dummy inference matching mlrs predict shape and labels.
+- CI loads every P0 ONNX with ONNX Runtime and runs one dummy inference matching llm predict shape and labels.
 - Semi-supervised ONNX predictions match the fitted wrapper.
-- Clustering and anomaly ONNX outputs match mlrs.
+- Clustering and anomaly ONNX outputs match llm.
 - API responses never include absolute paths.

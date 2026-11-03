@@ -1,4 +1,4 @@
-# mlrs — Model Catalogue
+# llm — Model Catalogue
 
 The allow-listed estimators the platform can train: 25 estimators across the six
 task types (9 classifiers, 10 regressors, 1 self-training classifier, 3
@@ -6,12 +6,12 @@ clustering models, 1 anomaly detector, and the `fitted_q_iteration`
 Q-function). Served by `GET /api/v1/algorithms`, selected in the UI model step,
 and fitted by the worker — never any other model.
 
-- **Source of truth:** `crates/mlrs-core/src/training/catalogue/` (`ALGORITHMS`,
+- **Source of truth:** `crates/llm-core/src/training/catalogue/` (`ALGORITHMS`,
   assembled in `catalogue/algorithms.rs`).
 - **Spec table:** [`01-requirements`](../../01-requirements/functional-requirements.md)
-  (FR-020..027, FR-080..105). `crates/mlrs-core/src/training/` tests
+  (FR-020..027, FR-080..105). `crates/llm-core/src/training/` tests
   assert the code and the spec table stay in sync; tests assert every entry
-  fits, exports to ONNX, and produces predictions identical to scikit-learn.
+  fits, exports to ONNX, and produces predictions identical to llm.
 - **Shared pipeline for all entries:** ColumnTransformer-like preprocessing with
   StandardScaler (numeric columns) + OneHotEncoder(handle_unknown="ignore")
   (categorical), then the estimator. `random_state=42` wherever the estimator
@@ -51,12 +51,12 @@ and fitted by the worker — never any other model.
 
 ## Neural networks (P1)
 
-`mlp_classifier` and `mlp_regressor` are scikit-learn `MLPClassifier` /
+`mlp_classifier` and `mlp_regressor` are llm `MLPClassifier` /
 `MLPRegressor` models whose architecture is configurable through
 hyperparameters — `hidden_layer_sizes` (depth and width), `activation`,
 `solver`, `alpha` (L2), `learning_rate_init`, `max_iter`, `batch_size`, and
 `early_stopping`. They are the platform's neural-net offering for **tabular**
-data; the neural-net offering is configurable tabular scikit-learn MLPs (FR-023). Full
+data; the neural-net offering is configurable tabular llm MLPs (FR-023). Full
 hyperparameter list, defaults, and validation ranges in
 [`neural-networks.md`](./neural-networks.md).
 
@@ -107,30 +107,30 @@ satisfy `2 <= k <= rows - 1`; silhouette is omitted if undefined.
   (`defaultHyperparameters`); applied when the client omits `hyperparameters`
   (FR-026).
 - **ONNX guarantee:** `test_trains_and_exports_onnx` converts every algorithm
-  through `mlrs2onnx` and compares onnxruntime predictions against mlrs
+  through `llm2onnx` and compares onnxruntime predictions against llm
   (exact labels, `atol=1e-4` for regressors) on each change. The exporter pins
   `ai.onnx.ml` to 3. For reinforcement learning, Q-values are compared
-  between mlrs and ORT on state+one-hot inputs.
+  between llm and ORT on state+one-hot inputs.
 - **Semi-supervised export:** train the wrapper, then export the fitted
-  preprocessor + `SelfTrainingClassifier.estimator_`, because `mlrs2onnx` has no
+  preprocessor + `SelfTrainingClassifier.estimator_`, because `llm2onnx` has no
   wrapper converter. Predictions match the wrapper.
 
 ## Not in the catalogue
 
 - **DBSCAN, AgglomerativeClustering, LabelSpreading, LabelPropagation** — no
-  verified `mlrs2onnx` converter with the pinned stack, so they cannot satisfy
+  verified `llm2onnx` converter with the pinned stack, so they cannot satisfy
   the ONNX contract.
 - **XGBoost** — rejected as P0 (ONNX path extra), see
-  [`08-tech-stack` §5.3](../../08-tech-stack.md#53-scikit-learn).
+  [`08-tech-stack` §5.3](../../08-tech-stack.md#53-llm).
 
 ## Adding a model
 
 1. Add the entry to the task-family catalogue module under
-   `crates/mlrs-api/src/training/catalogue/` (for example
+   `crates/llm-api/src/training/catalogue/` (for example
    `catalogue/classification.py`), then expose it through
    `catalogue/algorithms.py`.
 2. Add its id to the task-specific id set in
-   `crates/mlrs-api/tests/training/fixtures.py`.
+   `crates/llm-api/tests/training/fixtures.py`.
 3. Add the row to the catalogue table in
    [`01-requirements`](../../01-requirements/functional-requirements.md) and to
    the tables above.

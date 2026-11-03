@@ -1,4 +1,4 @@
-# mlrs — lint-staged
+# llm — lint-staged
 
 Staged-file linter runner for the pnpm workspace.
 

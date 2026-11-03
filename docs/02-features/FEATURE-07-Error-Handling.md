@@ -41,7 +41,7 @@ All API errors use a single envelope. The UI maps codes to alerts. Stack traces 
 | `ARTEFACT_NOT_FOUND`      | 404                              | Unknown artefact                             |
 | `TRAINING_FAILED`         | 200 on GET job (`status=failed`) | Fit/validation error recorded on job          |
 | `EXPORT_FAILED`           | 200 on GET job (`status=failed`) | ONNX/pkl/joblib export error recorded on job  |
-| `JOB_TIMEOUT`             | 200 on GET job (`status=failed`) | The attempt exceeded `mlrs_JOB_TIMEOUT_SECONDS` |
+| `JOB_TIMEOUT`             | 200 on GET job (`status=failed`) | The attempt exceeded `llm_JOB_TIMEOUT_SECONDS` |
 | `JOB_RETRY_EXHAUSTED`     | 200 on GET job (`status=failed`) | Every attempt failed with a transient error  |
 | `WORKER_INTERRUPTED`      | 200 on GET job (`status=failed`) | A crashed process left the job non-terminal   |
 | `INTERNAL_ERROR`          | 500                              | Unexpected server error                       |
