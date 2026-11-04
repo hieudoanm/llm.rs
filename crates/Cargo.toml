@@ -26,7 +26,7 @@ ndarray = "=0.17.2"
 ndarray-linalg = "=0.18.1"
 ndarray-rand = "=0.16.0"
 onnx-protobuf = "=0.2.3"
-polars = { version = "=0.38.3", features = ["lazy", "serde", "csv"] }
+polars = { version = "=0.55.2", features = ["lazy", "serde", "csv"] }
 polars-lazy = "=0.55.2"
 protobuf = "=3.4.0"
 rand = "=0.8.8"
