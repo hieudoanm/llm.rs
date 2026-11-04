@@ -21,19 +21,19 @@ flate2 = "=1.1.10"
 linfa = "=0.7.1"
 linfa-trees = "=0.8.1"
 linfa-preprocessing = "=0.8.1"
-linfa-clustering = "=0.7.1"
+linfa-clustering = "=0.8.1"
 ndarray = "=0.17.2"
-ndarray-linalg = "=0.15.0"
-ndarray-rand = "=0.1.1"
+ndarray-linalg = "=0.18.1"
+ndarray-rand = "=0.16.0"
 onnx-protobuf = "=0.2.3"
-polars = { version = "=0.38.3", features = ["lazy", "serde", "csv"] }
+polars = { version = "=0.55.2", features = ["lazy", "serde", "csv"] }
 polars-lazy = "=0.55.2"
 protobuf = "=3.4.0"
 rand = "=0.8.8"
 regex = "=1.13.1"
 serde = { version = "=1.0.229", features = ["derive"] }
 serde_json = "=1.0.154"
-sha2 = "=0.10.9"
+sha2 = "=0.11.1"
 sqlx = { version = "=0.8.6", default-features = false, features = ["runtime-tokio", "sqlite", "macros"] }
 thiserror = "=2.0.21"
 tokio = { version = "=1.54.1", features = ["full"] }
