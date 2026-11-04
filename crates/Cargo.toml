@@ -24,7 +24,7 @@ linfa-preprocessing = "=0.7.1"
 linfa-clustering = "=0.7.1"
 ndarray = "=0.17.2"
 ndarray-linalg = "=0.18.1"
-ndarray-rand = "=0.1.1"
+ndarray-rand = "=0.16.0"
 onnx-protobuf = "=0.2.3"
 polars = { version = "=0.38.3", features = ["lazy", "serde", "csv"] }
 polars-lazy = "=0.55.2"
