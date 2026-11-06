@@ -86,7 +86,7 @@ impl Database {
     /// Create the schema. Every statement is idempotent.
     pub async fn migrate(&self) -> LlmResult<()> {
         for statement in schema::SCHEMA {
-            sqlx::query(statement)
+            sqlx::query(sqlx::AssertSqlSafe(*statement))
                 .execute(&self.pool)
                 .await
                 .map_err(|err| convert::database_error("applying the schema", err))?;
