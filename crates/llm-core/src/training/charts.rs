@@ -7,7 +7,7 @@
 use ndarray::Array2;
 use rand::rngs::StdRng;
 use rand::seq::SliceRandom;
-use rand::{Rng, SeedableRng};
+use rand::{RngExt, SeedableRng};
 use serde_json::{json, Value};
 
 use super::metrics::{confusion_matrix, per_class_metrics, silhouette_samples};
@@ -382,7 +382,7 @@ fn random_index(n: usize, rng: &mut StdRng) -> usize {
     if n == 0 {
         0
     } else {
-        rng.gen_range(0..n)
+        rng.random_range(0..n)
     }
 }
 

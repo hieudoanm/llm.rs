@@ -8,7 +8,7 @@ use linfa::prelude::*;
 use linfa_clustering::KMeans;
 use ndarray::Array2;
 use rand::rngs::StdRng;
-use rand::{Rng, SeedableRng};
+use rand::{RngExt, SeedableRng};
 
 pub use super::model::ClusterModel;
 
@@ -47,7 +47,7 @@ fn fit_kmeans_hand_rolled(
     if !x.is_empty() {
         // k-means++ initialisation.
         let mut chosen = Vec::with_capacity(k);
-        chosen.push(rng.gen_range(0..x.len()));
+        chosen.push(rng.random_range(0..x.len()));
         while chosen.len() < k {
             let mut best = 0usize;
             let mut best_distance = -1.0;
@@ -152,7 +152,7 @@ pub fn fit_kmeans(
     let dataset: linfa::DatasetBase<ndarray::Array2<f64>, ndarray::Array1<()>> =
         DatasetBase::from(data);
 
-    match KMeans::params_with_rng(k, StdRng::seed_from_u64(seed))
+    match KMeans::params_with_rng(k, <rand08::rngs::StdRng as rand08::SeedableRng>::seed_from_u64(seed))
         .max_n_iterations(max_iter.max(1) as u64)
         .fit(&dataset)
     {
