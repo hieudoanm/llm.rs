@@ -126,7 +126,7 @@ pub fn sort_expression(filters: &crate::jobs::filters::JobFilters) -> String {
 }
 
 pub fn push_bound(
-    builder: &mut sqlx::QueryBuilder<'_, sqlx::Sqlite>,
+    builder: &mut sqlx::QueryBuilder<sqlx::Sqlite>,
     value: &Comparable,
 ) {
     match value {
@@ -143,7 +143,7 @@ pub fn push_bound(
 }
 
 pub fn push_in(
-    builder: &mut sqlx::QueryBuilder<'_, sqlx::Sqlite>,
+    builder: &mut sqlx::QueryBuilder<sqlx::Sqlite>,
     column: &str,
     values: &[String],
 ) {
