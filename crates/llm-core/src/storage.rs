@@ -45,7 +45,7 @@ pub fn storage_key_for(prefix: &str, entity_id: Uuid, suffix: &str) -> String {
 pub fn sha256_bytes(data: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(data);
-    format!("{:x}", hasher.finalize())
+    hasher.finalize().iter().map(|b| format!("{b:02x}")).collect()
 }
 
 pub fn sha256_of_file(path: &Path) -> LlmResult<String> {
