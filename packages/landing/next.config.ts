@@ -1,8 +1,10 @@
 import type { NextConfig } from 'next';
 
+const NODE_ENV = process.env.NODE_ENV ?? 'development';
+
 const nextConfig: NextConfig = {
   output: 'export',
-  basePath: '/llm.rs',
+  basePath: NODE_ENV === 'production' ? '/llm.rs' : '',
   trailingSlash: true,
   images: {
     unoptimized: true,
