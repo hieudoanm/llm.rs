@@ -29,7 +29,7 @@ polars = { version = "=0.55.2", features = ["lazy", "serde", "csv"] }
 polars-lazy = "=0.55.2"
 protobuf = "=3.4.0"
 rand = "=0.10.3"
-rand08 = { package = "rand", version = "=0.8.6" }
+rand08 = { package = "rand", version = "=0.10.3" }
 regex = "=1.13.1"
 serde = { version = "=1.0.229", features = ["derive"] }
 serde_json = "=1.0.154"
