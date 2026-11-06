@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Landing page and documentation site for llm.rs — Machine Learning in Rust",
-  "packageManager": "pnpm@12.16.1",
+  "packageManager": "pnpm@12.18.0",
   "scripts": {
     "format": "prettier --cache --write .",
     "format:check": "prettier --cache --check .",
