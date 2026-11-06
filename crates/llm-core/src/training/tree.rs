@@ -2,7 +2,7 @@
 
 use rand::rngs::StdRng;
 use rand::seq::SliceRandom;
-use rand::{Rng, SeedableRng};
+use rand::{RngExt, SeedableRng};
 
 use super::model::{Tree, TreeEnsemble, TreeNode};
 
@@ -197,7 +197,7 @@ impl<'a> Builder<'a> {
                     let threshold = if self.params.extra_random {
                         let low = pairs[position].0;
                         let high = pairs[position + 1].0;
-                        self.rng.gen_range(low..=high)
+                        self.rng.random_range(low..=high)
                     } else {
                         (pairs[position].0 + pairs[position + 1].0) / 2.0
                     };
@@ -271,7 +271,7 @@ fn build_tree(
 
 fn bootstrap(indices: &[usize], rng: &mut StdRng) -> Vec<usize> {
     (0..indices.len())
-        .map(|_| indices[rng.gen_range(0..indices.len())])
+        .map(|_| indices[rng.random_range(0..indices.len())])
         .collect()
 }
 

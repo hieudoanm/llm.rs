@@ -6,7 +6,7 @@
 
 use rand::rngs::StdRng;
 use rand::seq::SliceRandom;
-use rand::{Rng, SeedableRng};
+use rand::{RngExt, SeedableRng};
 
 use super::model::{sigmoid, softmax, MlpLayer, MlpModel};
 
@@ -25,7 +25,7 @@ fn init_layer(inputs: usize, outputs: usize, rng: &mut StdRng) -> MlpLayer {
         weights: (0..outputs)
             .map(|_| {
                 (0..inputs)
-                    .map(|_| rng.gen_range(-limit..=limit))
+                    .map(|_| rng.random_range(-limit..=limit))
                     .collect()
             })
             .collect(),

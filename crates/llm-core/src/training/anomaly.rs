@@ -2,7 +2,7 @@
 //! envelope (Mahalanobis distance).
 
 use rand::rngs::StdRng;
-use rand::{Rng, SeedableRng};
+use rand::{RngExt, SeedableRng};
 
 use super::model::{average_path_length, EllipticModel, IsolationForest, IsolationNode, IsolationTree, LofModel};
 
@@ -30,7 +30,7 @@ fn build_isolation_tree(
     if dim == 0 {
         return index;
     }
-    let feature = rng.gen_range(0..dim);
+    let feature = rng.random_range(0..dim);
     let mut low = f64::INFINITY;
     let mut high = f64::NEG_INFINITY;
     for sample in &indices {
@@ -41,7 +41,7 @@ fn build_isolation_tree(
     if (high - low).abs() < 1e-12 {
         return index;
     }
-    let threshold = rng.gen_range(low..=high);
+    let threshold = rng.random_range(low..=high);
     let (left, right): (Vec<usize>, Vec<usize>) = indices
         .into_iter()
         .partition(|sample| x[*sample][feature] <= threshold);
@@ -71,7 +71,7 @@ pub fn fit_isolation_forest(
     for _ in 0..n_estimators.max(1) {
         let mut sample = Vec::with_capacity(sample_size);
         for _ in 0..sample_size {
-            sample.push(rng.gen_range(0..x.len().max(1)));
+            sample.push(rng.random_range(0..x.len().max(1)));
         }
         let mut nodes = Vec::new();
         build_isolation_tree(x, sample, 0, max_depth, &mut rng, &mut nodes);
