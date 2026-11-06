@@ -214,7 +214,7 @@ jobs:
           git push origin :refs/tags/cli-latest || true
 
       - name: Create/Update "cli-latest" Release
-        uses: softprops/action-gh-release@v3.0.3
+        uses: softprops/action-gh-release@v3.0.4
         with:
           tag_name: cli-latest
           name: "llm.rs (cli-latest)"
