@@ -27,7 +27,7 @@ ndarray-linalg = "=0.15.0"
 ndarray-rand = "=0.1.1"
 onnx-protobuf = "=0.2.3"
 polars = { version = "=0.38.3", features = ["lazy", "serde", "csv"] }
-polars-lazy = "=0.38.3"
+polars-lazy = "=0.55.2"
 protobuf = "=3.4.0"
 rand = "=0.8.8"
 regex = "=1.13.1"
