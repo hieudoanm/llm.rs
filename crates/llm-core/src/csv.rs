@@ -154,8 +154,9 @@ pub fn parse_csv(text: &str) -> LlmResult<(Vec<String>, usize)> {
         }
     }
 
-    let df = CsvReader::new(std::io::Cursor::new(text.as_bytes()))
-        .has_header(true)
+    let df = CsvReadOptions::default()
+        .with_has_header(true)
+        .into_reader_with_file_handle(std::io::Cursor::new(text.as_bytes()))
         .finish()
         .map_err(|err| {
             LlmError::new(

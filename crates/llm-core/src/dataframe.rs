@@ -19,8 +19,9 @@ type PolarsDataFrame = polars::prelude::DataFrame;
 impl DataFrame {
     pub fn from_csv_str(text: &str) -> LlmResult<Self> {
         let text = text.strip_prefix('\u{feff}').unwrap_or(text);
-        let inner = CsvReader::new(std::io::Cursor::new(text.as_bytes()))
-            .has_header(true)
+        let inner = CsvReadOptions::default()
+            .with_has_header(true)
+            .into_reader_with_file_handle(std::io::Cursor::new(text.as_bytes()))
             .finish()
             .map_err(|err| {
                 LlmError::new(
@@ -40,8 +41,9 @@ impl DataFrame {
                 format!("File cannot be opened: {err}"),
             )
         })?;
-        let inner = CsvReader::new(file)
-            .has_header(true)
+        let inner = CsvReadOptions::default()
+            .with_has_header(true)
+            .into_reader_with_file_handle(file)
             .finish()
             .map_err(|err| {
                 LlmError::new(
