@@ -42,7 +42,7 @@ tracing-subscriber = { version = "=0.3.23", features = ["env-filter"] }
 tower = "=0.5.3"
 tower-http = { version = "=0.7.1", features = ["cors", "compression-gzip", "trace"] }
 uuid = { version = "=1.29.0", features = ["v4", "serde"] }
-zip = { version = "=9.3.0", default-features = false, features = ["deflate"] }
+zip = { version = "=9.4.1", default-features = false, features = ["deflate"] }
 
 llm-core = { path = "llm-core" }
 llm-db = { path = "llm-db" }
