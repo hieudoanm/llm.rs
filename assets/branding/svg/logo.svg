@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#ffffff" />
+  <defs>
+    <pattern id="grid" width="16" height="16" patternUnits="userSpaceOnUse">
+      <path d="M16 0H0V16" fill="none" stroke="#e5e7eb" stroke-width="1" />
+    </pattern>
+  </defs>
+  <rect width="512" height="512" fill="url(#grid)" />
+  <g fill="none" stroke="#111827" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+    <line x1="144" y1="180" x2="64" y2="180" />
+    <line x1="144" y1="256" x2="64" y2="256" />
+    <line x1="144" y1="332" x2="64" y2="332" />
+    <line x1="368" y1="180" x2="448" y2="180" />
+    <line x1="368" y1="256" x2="448" y2="256" />
+    <line x1="368" y1="332" x2="448" y2="332" />
+    <line x1="180" y1="144" x2="180" y2="64" />
+    <line x1="256" y1="144" x2="256" y2="64" />
+    <line x1="332" y1="144" x2="332" y2="64" />
+    <line x1="180" y1="368" x2="180" y2="448" />
+    <line x1="256" y1="368" x2="256" y2="448" />
+    <line x1="332" y1="368" x2="332" y2="448" />
+    <rect x="144" y="144" width="224" height="224" rx="24" />
+    <circle cx="256" cy="256" r="56" />
+    <circle cx="256" cy="256" r="16" fill="#111827" stroke="none" />
+  </g>
+</svg>
