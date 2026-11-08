@@ -1,8 +1,0 @@
-node_modules/
-.next/
-out/
-*.tsbuildinfo
-.DS_Store
-.next/
-next-env.d.ts
-coverage

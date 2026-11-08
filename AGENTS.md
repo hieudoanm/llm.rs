@@ -24,7 +24,7 @@ The product and implementation specification lives in `docs/`. Start at the inde
 | -------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `crates/`            | Pure-Rust crates: `llm-core` (see `crates/llm-core/AGENTS.md`), `llm-db` (see `crates/llm-db/AGENTS.md`), `llm-cli` (see `crates/llm-cli/AGENTS.md`) |
 | `packages/desktop`   | Next.js + Tauri desktop UI. See `packages/desktop/AGENTS.md`.                                                               |
-| `packages/landing`   | Next.js landing/documentation site (GitHub Pages). See `packages/landing/AGENTS.md`.                                        |
+| `packages/landing`   | Static landing page (`index.html` + `styles.css`, no framework). See `packages/landing/AGENTS.md`.                                        |
 | `docs/`              | The specification — source of truth (see above).                                                                            |
 | `demo/`              | Recorded demo video, produced by `make e2e-demo`.                                                                     |
 | `.github/workflows/` | CI: Rust (cargo check + test), desktop (Tauri builds for all platforms), release artifacts (CLI + 7 desktop bundles). |

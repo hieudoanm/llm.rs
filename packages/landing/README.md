@@ -1,33 +1,27 @@
 # llm.rs landing page
 
-The landing page and documentation site for llm.rs (`@llm/landing`). It is a Next.js
-static export suitable for GitHub Pages, Netlify, Cloudflare Pages, or any static file
-host.
+The landing page for llm.rs — a plain static site (HTML + CSS, no framework,
+no build step) deployed to GitHub Pages at
+<https://hieudoanm.github.io/llm.rs>.
 
-## Development
+## Files
 
-```bash
-pnpm --filter @llm/landing dev
-pnpm --filter @llm/landing check
-```
+`index.html`, `styles.css`, `404.html`, and static assets (`logo.svg`,
+`favicon.ico`, `robots.txt`, `sitemap.xml`, `humans.txt`) — all at the package
+root, all deployed verbatim.
 
-## Build
-
-```bash
-pnpm --filter @llm/landing build
-```
-
-Set `NEXT_PUBLIC_SITE_URL` to the deployed origin when building so Open Graph image
-URLs are absolute:
+## Preview
 
 ```bash
-NEXT_PUBLIC_SITE_URL=https://example.com pnpm --filter @llm/landing build
+cd packages/landing
+python3 -m http.server 4173
 ```
 
-The production output is written to `out/`. The site uses a static export with trailing
-slashes and serves documentation at `/docs` from Markdown files in
-`packages/landing/docs/`.
+## Deploy
 
-Brand assets are stored in `public/images/`. Keep them synchronized with the canonical
-files in `docs/07-ui-ux-design/brand` and `docs/07-ui-ux-design/og` when branding
-changes.
+CI uploads this directory verbatim to GitHub Pages — there is no build step.
+
+Brand assets live in `logo.svg` (source) and `favicon.ico` (generated with
+ImageMagick: `magick -background none logo.svg -define icon:auto-resize=16,32,48 favicon.ico`).
+Keep them synchronized with the canonical files in `docs/07-ui-ux-design/brand`
+and `docs/07-ui-ux-design/og` when branding changes.

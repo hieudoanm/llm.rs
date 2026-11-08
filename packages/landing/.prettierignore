@@ -1,9 +1,0 @@
-.next/
-node_modules/
-pnpm-lock.yaml
-coverage/
-test-results/
-playwright-report/
-next-env.d.ts
-src-tauri/target/
-src-tauri/gen/

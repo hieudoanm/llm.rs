@@ -118,31 +118,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6.1.1
-        with:
-          version: 12.18.0
-
-      - name: Set up Node.js ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v7.1.0
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-
-      - name: Install landing dependencies
-        working-directory: ${{ github.workspace }}/packages/landing
-        run: pnpm install --frozen-lockfile
-
-      - name: Build landing page
-        working-directory: ${{ github.workspace }}/packages/landing
-        run: pnpm run build
-        env:
-          NEXT_PUBLIC_SITE_URL: https://hieudoanm.github.io/llm.rs
-
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5.0.0
         with:
-          path: ${{ github.workspace }}/packages/landing/out
+          path: ${{ github.workspace }}/packages/landing
 
       - name: Deploy to GitHub Pages
         if: github.ref == 'refs/heads/master'

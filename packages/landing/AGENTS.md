@@ -1,69 +1,34 @@
 # AGENTS.md — llm.rs landing page
 
-Guidance for AI agents working on the landing/documentation site (`packages/landing`). See the root [`AGENTS.md`](../../AGENTS.md) for repository-wide conventions.
+Guidance for AI agents working on the landing page (`packages/landing`). See the root [`AGENTS.md`](../../AGENTS.md) for repository-wide conventions.
 
 ## Overview
 
-The landing page is a statically-exported Next.js 16 site (App Router) deployed to GitHub Pages at `https://hieudoanm.github.io/llm.rs`. It runs at `basePath: '/llm.rs'`.
+The landing page is a plain static site — no framework, no build step, no package manifest, no JavaScript. The whole directory is uploaded verbatim to GitHub Pages at `https://hieudoanm.github.io/llm.rs` (project site, so all asset paths are relative).
 
-## Layout
+## Files
 
-- `src/app/` — App Router pages:
-  - `page.tsx` — home (landing)
-  - `docs/page.tsx` — docs index
-  - `docs/[slug]/page.tsx` — individual doc page
-  - `downloads/page.tsx` — download page
-  - `not-found.tsx`, `loading.tsx`, `error.tsx`, `global-error.tsx`
-  - `layout.tsx` — root layout with metadata + basePath-prefixed assets
-- `src/components/` — React components:
-  - `shared/` — `Footer`, `Navbar` (used across pages)
-  - `landing/` — `Hero`, `Bands`, `WhyLLM`, `Workflow`, `BuiltDifferent`, `Tools`, `GetStarted`, `Markdown` (home page sections)
-  - `docs/` — `DocsSearch`
-- `src/lib/` — `site.ts` (site metadata + `basePath`), `docs.ts` (doc registry)
-- `public/` — static assets (`images/`, `manifest.json`, `sw.js`)
-- `src/lib/__tests__/` — lib unit tests
-- `src/components/__tests__/` — component tests (co-located: `shared/__tests__/`, `landing/__tests__/`, `docs/__tests__/`)
+- `index.html` — the entire page (nav, hero + terminal, features, CLI, CTA, footer)
+- `styles.css` — the full stylesheet; design tokens live in `:root`
+- `404.html` — GitHub Pages 404 page, reuses `styles.css`
+- `logo.svg`, `favicon.ico` (generated from `logo.svg`), `robots.txt`, `sitemap.xml`, `humans.txt`
+- `AGENTS.md`, `README.md`, `LICENSE` — repo docs; they are uploaded to Pages too, which is harmless
 
-## Commands
+## Preview
+
+There is no build. Serve the directory with any static file server:
 
 ```sh
 cd packages/landing
-
-# Dev server (port 4173)
-pnpm dev
-
-# Production static build (output: out/ → out/llm.rs for basePath)
-pnpm build
-
-# Typecheck
-pnpm exec tsc --noEmit   # or pnpm check / pnpm typecheck
-
-# Lint
-pnpm lint
-
-# Format
-pnpm format
-
-# Unit tests (Vitest)
-pnpm test
-
-# Serve the built output locally
-pnpm serve
+python3 -m http.server 4173
 ```
 
 ## Conventions
 
-- **`basePath: '/llm.rs'`** — all internal navigation uses Next `<Link>` with root-relative paths (`href='/'`, `href='/docs'`, `href='/downloads'`). Images and assets must be prefixed with `basePath` from `src/lib/site.ts` (e.g. `src={`${basePath}/images/svg/llm-logo.svg`}`).
-- **Internal links:** use Next.js `<Link />` from `next/link`, not `<a>`, for same-site navigation. External links (GitHub, etc.) stay as `<a>`.
-- **Tests:** Vitest + React Testing Library, co-located `__tests__/` folders next to each component.
-- **Styling:** Tailwind CSS 4 with custom tokens; see `src/app/globals.css`.
-- **Deploy:** CI builds and deploys to GitHub Pages via `actions/upload-pages-artifact` + `actions/deploy-pages` (see `.github/workflows/ci.yaml`).
-
-## Tests
-
-89 tests across 23 files run via `pnpm test`. Tests are co-located with their components in `__tests__/` directories:
-
-- `src/components/shared/__tests__/` — Footer, Navbar
-- `src/components/landing/__tests__/` — Hero, Bands, WhyLLM, Workflow, BuiltDifferent, Tools, GetStarted, Markdown
-- `src/components/docs/__tests__/` — DocsSearch
-- `src/lib/__tests__/` — site, docs
+- **Light theme only.** Colours are CSS custom properties in `styles.css` (`--bg`, `--fg`, `--accent`, …). Do not add a dark theme or theme toggle.
+- **No frameworks, no JS, no package.json.** Keep it to HTML + CSS + static assets.
+- **Relative asset paths.** The site is served under the `/llm.rs` base path on GitHub Pages; use relative URLs (`logo.svg`, `styles.css`), never absolute `/…` paths.
+- **Accent colour is orange** (`--accent: #c2410c` family, `--accent-bright` for text on the dark terminal).
+- **Design rules.** Follow the 20 rules of AI unslop design: concrete headlines, one accent colour, consistent icons, no filler badges, real product artefacts over decoration.
+- **Docs and downloads** live on GitHub: link to `https://github.com/hieudoanm/llm.rs` (`/releases`, `/tree/master/docs`, `/tree/master/crates/llm-cli`) rather than adding pages.
+- **Deploy:** CI uploads `packages/landing` via `actions/upload-pages-artifact` + `actions/deploy-pages` (see `.github/workflows/ci.yaml`). No build step — edit files and they ship as-is.

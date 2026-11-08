@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>llm.rs — Machine Learning in Rust</title>
+    <meta
+      name="description"
+      content="Train supervised, semi-supervised, unsupervised, and offline reinforcement-learning models from CSV files. Export portable ONNX — all on your own machine."
+    />
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="icon" href="logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <nav>
+      <div class="wrap nav-inner">
+        <a class="brand" href="#top" aria-label="llm.rs home">
+          <img class="brand-mark" src="logo.svg" alt="" width="28" height="28" />
+          <span>llm.rs</span>
+        </a>
+        <a class="nav-link" href="https://github.com/hieudoanm/llm.rs" rel="noopener">GitHub</a>
+      </div>
+    </nav>
+
+    <header class="hero" id="top">
+      <div class="wrap">
+        <h1>Train ML models from CSV, on your own machine.</h1>
+        <p class="sub">
+          llm.rs handles classification, regression, semi-supervised self-training, clustering,
+          anomaly detection, and offline reinforcement learning — then exports a portable ONNX
+          model. No cloud, no account, no notebooks.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/hieudoanm/llm.rs" rel="noopener"
+            >View on GitHub</a
+          >
+          <a class="btn btn-ghost" href="#cli">Use the CLI</a>
+        </div>
+
+        <div class="terminal" role="img" aria-label="Example llm CLI session">
+          <div class="terminal-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="cmd">llm train --task classification …</span>
+          </div>
+          <pre><span class="prompt">$</span> llm dataset data/iris.csv
+registered dataset 3f2a91c7 (150 rows, 5 columns)
+
+<span class="prompt">$</span> llm train --dataset-id 3f2a91c7 --task classification \
+    --algorithm logistic_regression \
+    --features sepal_length,sepal_width,petal_length,petal_width \
+    --label species
+job 8c1d04e2 completed · accuracy 0.973 · f1 0.968
+
+<span class="prompt">$</span> llm export --job-id 8c1d04e2 --output model.onnx
+wrote model.onnx (12.4 KB)</pre>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Everything happens locally.</h2>
+          <p>
+            Your CSV and trained artefacts never leave your machine. Datasets, jobs, metrics, and
+            models persist to local SQLite storage.
+          </p>
+        </div>
+        <div class="grid">
+          <div class="card">
+            <svg
+              class="icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" />
+              <rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            <h3>Six task types</h3>
+            <p>
+              Classification, regression, semi-supervised, clustering, anomaly detection, and
+              offline RL share one workflow.
+            </p>
+          </div>
+          <div class="card">
+            <svg
+              class="icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="4" y="10" width="16" height="10" rx="2" />
+              <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+            </svg>
+            <h3>Local-first and private</h3>
+            <p>
+              No uploads, no API keys, no accounts. Everything persists to a local SQLite database
+              on your disk.
+            </p>
+          </div>
+          <div class="card">
+            <svg
+              class="icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <path d="M7 10l5 5 5-5" />
+              <path d="M12 15V3" />
+            </svg>
+            <h3>ONNX is the contract</h3>
+            <p>
+              Every successful job exports a portable .onnx model that runs in any ONNX-compatible
+              runtime, independent of the training code.
+            </p>
+          </div>
+          <div class="card">
+            <svg
+              class="icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="2" y="4" width="20" height="13" rx="2" />
+              <path d="M8 21h8M12 17v4" />
+            </svg>
+            <h3>Two surfaces, one engine</h3>
+            <p>
+              A native desktop app for the visual workflow, or the llm CLI for scripts and headless
+              training — same Rust core underneath.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="cli" style="border-top: 1px solid var(--line)">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Or drive it from the terminal.</h2>
+          <p>
+            The llm CLI registers datasets, trains models, inspects jobs, and exports artefacts —
+            built with Cargo from the same workspace.
+          </p>
+        </div>
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="cmd">llm train --task classification …</span>
+          </div>
+          <pre>cd crates
+cargo build --release -p llm-cli
+
+./target/release/llm dataset data/iris.csv
+./target/release/llm train \
+  --dataset-id &lt;id&gt; \
+  --task classification \
+  --algorithm logistic_regression \
+  --features sepal_length,sepal_width,petal_length,petal_width \
+  --label species
+./target/release/llm job &lt;job-id&gt;
+./target/release/llm export --job-id &lt;job-id&gt; --output model.onnx</pre>
+        </div>
+        <p class="note">
+          Desktop builds for macOS, Windows, and Linux are on the
+          <a href="https://github.com/hieudoanm/llm.rs/releases" rel="noopener">releases page</a>.
+        </p>
+      </div>
+    </section>
+
+    <section class="cta-band">
+      <div class="wrap cta-inner">
+        <h2>CSV in. ONNX out.</h2>
+        <p>Open source. Rust-powered. MIT licensed.</p>
+        <a class="btn btn-light" href="https://github.com/hieudoanm/llm.rs" rel="noopener"
+          >View the repository</a
+        >
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap footer-inner">
+        <a class="brand" href="#top" aria-label="llm.rs home">
+          <img class="brand-mark" src="logo.svg" alt="" width="24" height="24" />
+          <span>llm.rs</span>
+        </a>
+        <span>Built with Rust</span>
+        <a href="https://github.com/hieudoanm/llm.rs" rel="noopener">github.com/hieudoanm/llm.rs</a>
+      </div>
+    </footer>
+  </body>
+</html>
