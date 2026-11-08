@@ -41,6 +41,7 @@
   <main id="top">
     <section class="hero">
       <div class="container hero-inner">
+        <div class="hero-content">
         <h1>Train ML models from CSV, on your own machine.</h1>
         <p class="lede">
           llm.rs handles classification, regression, semi-supervised
@@ -57,6 +58,16 @@
           <div><dt>0</dt><dd>cloud calls</dd></div>
           <div><dt>ONNX</dt><dd>portable export</dd></div>
         </dl>
+        </div>
+        <figure class="terminal hero-demo">
+          <figcaption>CSV → ONNX</figcaption>
+          <pre><code><span class="prompt">$</span> llm dataset data/iris.csv
+<span class="out">registered dataset 3f2a91c7 (150 rows, 5 columns)</span>
+<span class="prompt">$</span> llm train --task classification …
+<span class="out">job 8c1d04e2 completed · accuracy 0.973</span>
+<span class="prompt">$</span> llm export --job-id 8c1d04e2 --output model.onnx
+<span class="out">wrote model.onnx (12.4 KB)</span></code></pre>
+        </figure>
       </div>
     </section>
 
