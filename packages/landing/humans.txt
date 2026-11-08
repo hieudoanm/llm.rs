@@ -1,7 +1,9 @@
 /* TEAM */
 Project: llm.rs — Machine Learning in Rust
-Role: Local-first CSV to ONNX machine-learning studio
-Repository: https://github.com/hieudoanm/llm.rs
+Site: https://hieudoanm.github.io/llm.rs/
+Source: https://github.com/hieudoanm/llm.rs
 
-/* THANKS */
-Built with HTML, CSS, and Rust.
+/* SITE */
+Last update: 2026/11/08
+Language: English
+Doctype: HTML5
