@@ -9,7 +9,7 @@ llm-core = { path = "../../../crates/llm-core" }
 llm-db = { path = "../../../crates/llm-db" }
 serde = { version = "=1.0.229", features = ["derive"] }
 serde_json = "=1.0.154"
-uuid = { version = "=1.29.1", features = ["v4", "serde"] }
+uuid = { version = "=1.29.2", features = ["v4", "serde"] }
 tokio = { version = "=1.54.1", features = ["full"] }
 tracing = "=0.1.44"
 tracing-subscriber = { version = "=0.3.23", features = ["env-filter"] }
