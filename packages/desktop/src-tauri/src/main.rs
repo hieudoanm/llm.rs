@@ -1,10 +1,10 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use llm_core::catalogue::{algorithms, find};
-use llm_core::config::get_settings;
-use llm_core::csv::parse_csv;
+use llm_core::config::{get_settings, setup_logging};
+use llm_core::csv::{decode_csv, parse_csv, sniff_binary, unsupported_binary_error};
 use llm_core::dataframe::DataFrame;
-use llm_core::domain::{Job, JobStatus, TaskType};
+use llm_core::domain::{ColumnPreview, Job, JobStatus, TaskType};
 use llm_core::storage::{artefact_path, ensure_dirs, write_artefact, write_dataset};
 use llm_core::training::{train, TrainingOutput};
 use llm_db::{artefacts, datasets, jobs, Database};
@@ -17,6 +17,31 @@ use base64::Engine;
 
 struct AppState {
     db: Mutex<Option<Database>>,
+}
+
+fn get_db(state: &AppState) -> Database {
+    state.db.lock().unwrap().as_ref().unwrap().clone()
+}
+
+/// Validate raw upload bytes and return `(header, row_count)`.
+fn validate_upload(bytes: &[u8], filename: &str) -> Result<(Vec<String>, usize), String> {
+    if let Some(label) = sniff_binary(bytes) {
+        return Err(unsupported_binary_error(label, filename).to_string());
+    }
+    let text = decode_csv(bytes).map_err(|e| e.to_string())?;
+    parse_csv(&text).map_err(|e| e.to_string())
+}
+
+fn column_previews(header: &[String]) -> Vec<ColumnPreview> {
+    header
+        .iter()
+        .map(|name| ColumnPreview {
+            name: name.clone(),
+            inferred_dtype: "Utf8".to_string(),
+            null_count: 0,
+            sample_values: vec![],
+        })
+        .collect()
 }
 
 #[derive(Serialize, Deserialize)]
@@ -59,23 +84,24 @@ fn list_algorithms(task: Option<String>) -> Vec<serde_json::Value> {
 #[tauri::command]
 async fn upload_dataset(state: tauri::State<'_, AppState>, path: String) -> Result<String, String> {
     let bytes = std::fs::read(&path).map_err(|e| e.to_string())?;
-    parse_csv(&String::from_utf8_lossy(&bytes)).map_err(|e| e.to_string())?;
+    let filename = std::path::Path::new(&path)
+        .file_name()
+        .and_then(|n| n.to_str())
+        .unwrap_or("unknown")
+        .to_string();
+    let (header, row_count) = validate_upload(&bytes, &filename)?;
 
     let (dataset_id, storage_key, sha256, size) = write_dataset(&bytes).map_err(|e| e.to_string())?;
 
-    let db = state.db.lock().unwrap().as_ref().unwrap().clone();
+    let db = get_db(&state);
     let dataset = llm_core::domain::Dataset {
         id: dataset_id,
-        original_filename: std::path::Path::new(&path)
-            .file_name()
-            .and_then(|n| n.to_str())
-            .unwrap_or("unknown")
-            .to_string(),
+        original_filename: filename,
         sha256,
         byte_size: size,
         storage_key,
-        columns: Vec::new(),
-        row_count: 0,
+        columns: column_previews(&header),
+        row_count: row_count as i64,
         created_at: llm_core::domain::utc_now(),
     };
     datasets::insert_dataset(db.pool(), &dataset).await.map_err(|e| e.to_string())?;
@@ -89,19 +115,19 @@ async fn upload_dataset_from_bytes(
     bytes: Vec<u8>,
     filename: String,
 ) -> Result<String, String> {
-    parse_csv(&String::from_utf8_lossy(&bytes)).map_err(|e| e.to_string())?;
+    let (header, row_count) = validate_upload(&bytes, &filename)?;
 
     let (dataset_id, storage_key, sha256, size) = write_dataset(&bytes).map_err(|e| e.to_string())?;
 
-    let db = state.db.lock().unwrap().as_ref().unwrap().clone();
+    let db = get_db(&state);
     let dataset = llm_core::domain::Dataset {
         id: dataset_id,
         original_filename: filename,
         sha256,
         byte_size: size,
         storage_key,
-        columns: Vec::new(),
-        row_count: 0,
+        columns: column_previews(&header),
+        row_count: row_count as i64,
         created_at: llm_core::domain::utc_now(),
     };
     datasets::insert_dataset(db.pool(), &dataset).await.map_err(|e| e.to_string())?;
@@ -128,7 +154,7 @@ async fn train_model(
     let dataset_id = Uuid::parse_str(&request.dataset_id)
         .map_err(|e| e.to_string())?;
 
-    let db = state.db.lock().unwrap().as_ref().unwrap().clone();
+    let db = get_db(&state);
     let dataset = datasets::get_dataset(db.pool(), dataset_id)
         .await
         .map_err(|e| e.to_string())?
@@ -183,61 +209,79 @@ async fn train_model(
         .await
         .map_err(|e| e.to_string())?;
 
-    let output: TrainingOutput = train(&job, &df).map_err(|e| e.to_string())?;
+    let result: Result<TrainResponse, String> = async {
+        let output: TrainingOutput = train(&job, &df).map_err(|e| e.to_string())?;
 
-    jobs::set_status(db.pool(), job.id, JobStatus::Exporting.as_str())
-        .await
+        jobs::set_status(db.pool(), job.id, JobStatus::Exporting.as_str())
+            .await
+            .map_err(|e| e.to_string())?;
+
+        let onnx_bytes = llm_core::export::onnx::export_onnx(&output.model)
+            .map_err(|e| e.to_string())?;
+
+        ensure_dirs().map_err(|e| e.to_string())?;
+        let (storage_key, _path, byte_size) = write_artefact(
+            job.id,
+            &onnx_bytes,
+            &format!("{}.onnx", job.id),
+        )
         .map_err(|e| e.to_string())?;
 
-    let onnx_bytes = llm_core::export::onnx::export_onnx(&output.model)
-        .map_err(|e| e.to_string())?;
+        let artefact = llm_core::domain::Artefact {
+            id: Uuid::new_v4(),
+            job_id: job.id,
+            format: llm_core::domain::ArtefactFormat::Onnx.as_str().to_string(),
+            filename: format!("{}.onnx", job.id),
+            byte_size,
+            storage_key,
+            created_at: llm_core::domain::utc_now(),
+        };
+        artefacts::insert_artefact(db.pool(), &artefact)
+            .await
+            .map_err(|e| e.to_string())?;
 
-    ensure_dirs().map_err(|e| e.to_string())?;
-    let (storage_key, _path, byte_size) = write_artefact(
-        job.id,
-        &onnx_bytes,
-        &format!("{}.onnx", job.id),
-    )
-    .map_err(|e| e.to_string())?;
+        jobs::set_status(db.pool(), job.id, JobStatus::Completed.as_str())
+            .await
+            .map_err(|e| e.to_string())?;
 
-    let artefact = llm_core::domain::Artefact {
-        id: Uuid::new_v4(),
-        job_id: job.id,
-        format: llm_core::domain::ArtefactFormat::Onnx.as_str().to_string(),
-        filename: format!("{}.onnx", job.id),
-        byte_size,
-        storage_key,
-        created_at: llm_core::domain::utc_now(),
-    };
-    artefacts::insert_artefact(db.pool(), &artefact).await.map_err(|e| e.to_string())?;
+        let metric = llm_core::domain::JobMetric {
+            job_id: job.id,
+            metrics: output.metrics.clone(),
+            charts: Some(output.charts.clone()),
+            created_at: llm_core::domain::utc_now(),
+        };
+        jobs::record_metrics(db.pool(), &metric)
+            .await
+            .map_err(|e| e.to_string())?;
+        jobs::record_completion(db.pool(), job.id, Some(output.metrics.clone()))
+            .await
+            .map_err(|e| e.to_string())?;
 
-    jobs::set_status(db.pool(), job.id, JobStatus::Completed.as_str())
-        .await
-        .map_err(|e| e.to_string())?;
+        Ok(TrainResponse {
+            job_id: job.id.to_string(),
+            status: "completed".to_string(),
+            metrics: output.metrics,
+            charts: output.charts,
+        })
+    }
+    .await;
 
-    let metric = llm_core::domain::JobMetric {
-        job_id: job.id,
-        metrics: output.metrics.clone(),
-        charts: Some(output.charts.clone()),
-        created_at: llm_core::domain::utc_now(),
-    };
-    jobs::record_metrics(db.pool(), &metric).await.map_err(|e| e.to_string())?;
-    jobs::record_completion(db.pool(), job.id, Some(output.metrics.clone()))
-        .await
-        .map_err(|e| e.to_string())?;
-
-    Ok(TrainResponse {
-        job_id: job.id.to_string(),
-        status: "completed".to_string(),
-        metrics: output.metrics,
-        charts: output.charts,
-    })
+    if let Err(err) = &result {
+        let _ = jobs::record_failure(
+            db.pool(),
+            job.id,
+            Some("TRAINING_FAILED".to_string()),
+            Some(err.clone()),
+        )
+        .await;
+    }
+    result
 }
 
 #[tauri::command]
 async fn get_job(state: tauri::State<'_, AppState>, job_id: String) -> Result<Value, String> {
     let uuid = Uuid::parse_str(&job_id).map_err(|e| e.to_string())?;
-    let db = state.db.lock().unwrap().as_ref().unwrap().clone();
+    let db = get_db(&state);
     let job = jobs::get_job(db.pool(), uuid)
         .await
         .map_err(|e| e.to_string())?
@@ -248,7 +292,7 @@ async fn get_job(state: tauri::State<'_, AppState>, job_id: String) -> Result<Va
 #[tauri::command]
 async fn list_jobs(state: tauri::State<'_, AppState>) -> Result<Value, String> {
     use llm_db::jobs::JobFilters;
-    let db = state.db.lock().unwrap().as_ref().unwrap().clone();
+    let db = get_db(&state);
     let filters = JobFilters::default();
     let job_list = jobs::list_jobs(db.pool(), &filters, 100, None)
         .await
@@ -264,14 +308,10 @@ async fn patch_job(
     tags: Vec<String>,
 ) -> Result<Value, String> {
     let uuid = Uuid::parse_str(&job_id).map_err(|e| e.to_string())?;
-    let db = state.db.lock().unwrap().as_ref().unwrap().clone();
-    let mut job = jobs::get_job(db.pool(), uuid)
+    let db = get_db(&state);
+    let job = jobs::update_metadata(db.pool(), uuid, name, tags)
         .await
-        .map_err(|e| e.to_string())?
-        .ok_or_else(|| format!("Job not found: {}", job_id))?;
-    job.name = name;
-    job.tags = tags;
-    jobs::insert_job(db.pool(), &job).await.map_err(|e| e.to_string())?;
+        .map_err(|e| e.to_string())?;
     Ok(serde_json::to_value(&job).map_err(|e| e.to_string())?)
 }
 
@@ -281,7 +321,7 @@ async fn get_dataset_insights(
     dataset_id: String,
 ) -> Result<Value, String> {
     let uuid = Uuid::parse_str(&dataset_id).map_err(|e| e.to_string())?;
-    let db = state.db.lock().unwrap().as_ref().unwrap().clone();
+    let db = get_db(&state);
     let insight = datasets::get_insight(db.pool(), uuid)
         .await
         .map_err(|e| e.to_string())?
@@ -296,7 +336,7 @@ async fn compare_jobs(state: tauri::State<'_, AppState>, ids: String) -> Result<
         .filter(|s| !s.is_empty())
         .map(|s| Uuid::parse_str(s.trim()).map_err(|e| e.to_string()))
         .collect::<Result<Vec<_>, _>>()?;
-    let db = state.db.lock().unwrap().as_ref().unwrap().clone();
+    let db = get_db(&state);
     let jobs_vec = jobs::jobs_by_ids(db.pool(), &job_ids)
         .await
         .map_err(|e| e.to_string())?;
@@ -309,7 +349,7 @@ async fn list_artefacts(
     job_id: String,
 ) -> Result<Value, String> {
     let uuid = Uuid::parse_str(&job_id).map_err(|e| e.to_string())?;
-    let db = state.db.lock().unwrap().as_ref().unwrap().clone();
+    let db = get_db(&state);
     let artefacts = artefacts::list_artefacts(db.pool(), uuid)
         .await
         .map_err(|e| e.to_string())?;
@@ -324,7 +364,7 @@ async fn download_artefact(
 ) -> Result<String, String> {
     let job_uuid = Uuid::parse_str(&job_id).map_err(|e| e.to_string())?;
     let artefact_uuid = Uuid::parse_str(&artefact_id).map_err(|e| e.to_string())?;
-    let db = state.db.lock().unwrap().as_ref().unwrap().clone();
+    let db = get_db(&state);
     let artefact = artefacts::get_artefact(db.pool(), job_uuid, artefact_uuid)
         .await
         .map_err(|e| e.to_string())?
@@ -335,9 +375,7 @@ async fn download_artefact(
 }
 
 fn run() {
-    tracing_subscriber::fmt()
-        .with_env_filter(get_settings().log_level.clone())
-        .init();
+    setup_logging(&get_settings().log_level);
 
     let db = tokio::runtime::Runtime::new()
         .unwrap()

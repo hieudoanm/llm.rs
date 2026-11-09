@@ -6,7 +6,7 @@
 //! warning, matching the Python service.
 //!
 //! The Rust port targets SQLite so it can run locally and inside Tauri. The
-//! `DATABASE_URL` and `SKL_DATA_DIR` names are unchanged; their defaults are
+//! `DATABASE_URL` and `LLM_DATA_DIR` names are unchanged; their defaults are
 //! relative to the working directory rather than `/var/lib/llm`.
 
 use std::path::PathBuf;
@@ -122,14 +122,14 @@ impl Settings {
 
     pub fn from_env() -> Self {
         let allow_credentials = bool_env(
-            "SKL_CORS_ALLOW_CREDENTIALS",
+            "LLM_CORS_ALLOW_CREDENTIALS",
             DEFAULT_CORS_ALLOW_CREDENTIALS,
         );
         Self {
             database_url: database_url(),
             data_dir: data_dir(),
             max_upload_mb: int_env(
-                "SKL_MAX_UPLOAD_MB",
+                "LLM_MAX_UPLOAD_MB",
                 DEFAULT_MAX_UPLOAD_MB,
                 1,
                 MAX_UPLOAD_MB,
@@ -138,61 +138,61 @@ impl Settings {
             cors_origins: cors_origins(allow_credentials),
             cors_allow_credentials: allow_credentials,
             enable_interactive_docs: bool_env(
-                "SKL_ENABLE_INTERACTIVE_DOCS",
+                "LLM_ENABLE_INTERACTIVE_DOCS",
                 DEFAULT_ENABLE_INTERACTIVE_DOCS,
             ),
             max_concurrent_jobs: int_env(
-                "SKL_MAX_CONCURRENT_JOBS",
+                "LLM_MAX_CONCURRENT_JOBS",
                 DEFAULT_MAX_CONCURRENT_JOBS,
                 1,
                 MAX_CONCURRENT_JOBS,
             ),
             job_timeout_seconds: int_env(
-                "SKL_JOB_TIMEOUT_SECONDS",
+                "LLM_JOB_TIMEOUT_SECONDS",
                 DEFAULT_JOB_TIMEOUT_SECONDS,
                 1,
                 MAX_JOB_TIMEOUT_SECONDS,
             ),
             job_max_attempts: int_env(
-                "SKL_JOB_MAX_ATTEMPTS",
+                "LLM_JOB_MAX_ATTEMPTS",
                 DEFAULT_JOB_MAX_ATTEMPTS,
                 1,
                 MAX_JOB_MAX_ATTEMPTS,
             ),
             job_retry_base_seconds: int_env(
-                "SKL_JOB_RETRY_BASE_SECONDS",
+                "LLM_JOB_RETRY_BASE_SECONDS",
                 DEFAULT_JOB_RETRY_BASE_SECONDS,
                 1,
                 MAX_JOB_RETRY_BASE_SECONDS,
             ),
             worker_stale_seconds: int_env(
-                "SKL_WORKER_STALE_SECONDS",
+                "LLM_WORKER_STALE_SECONDS",
                 DEFAULT_WORKER_STALE_SECONDS,
                 1,
                 MAX_WORKER_STALE_SECONDS,
             ),
-            rate_limit_enabled: bool_env("SKL_RATE_LIMIT_ENABLED", DEFAULT_RATE_LIMIT_ENABLED),
+            rate_limit_enabled: bool_env("LLM_RATE_LIMIT_ENABLED", DEFAULT_RATE_LIMIT_ENABLED),
             rate_limit_max_requests: int_env(
-                "SKL_RATE_LIMIT_MAX_REQUESTS",
+                "LLM_RATE_LIMIT_MAX_REQUESTS",
                 DEFAULT_RATE_LIMIT_MAX_REQUESTS,
                 1,
                 MAX_RATE_LIMIT_MAX_REQUESTS,
             ),
             rate_limit_window_seconds: int_env(
-                "SKL_RATE_LIMIT_WINDOW_SECONDS",
+                "LLM_RATE_LIMIT_WINDOW_SECONDS",
                 DEFAULT_RATE_LIMIT_WINDOW_SECONDS,
                 1,
                 MAX_RATE_LIMIT_WINDOW_SECONDS,
             ),
-            compression_enabled: bool_env("SKL_COMPRESSION_ENABLED", DEFAULT_COMPRESSION_ENABLED),
+            compression_enabled: bool_env("LLM_COMPRESSION_ENABLED", DEFAULT_COMPRESSION_ENABLED),
             compression_min_size: int_env(
-                "SKL_COMPRESSION_MIN_SIZE",
+                "LLM_COMPRESSION_MIN_SIZE",
                 DEFAULT_COMPRESSION_MIN_SIZE,
                 0,
                 MAX_COMPRESSION_MIN_SIZE,
             ),
             request_timeout_seconds: int_env(
-                "SKL_REQUEST_TIMEOUT_SECONDS",
+                "LLM_REQUEST_TIMEOUT_SECONDS",
                 DEFAULT_REQUEST_TIMEOUT_SECONDS,
                 1,
                 MAX_REQUEST_TIMEOUT_SECONDS,
@@ -307,11 +307,11 @@ fn normalise_origin(entry: &str) -> Option<String> {
 
 fn cors_origins(allow_credentials: bool) -> Vec<String> {
     let mut origins = Vec::new();
-    for entry in list_env("SKL_CORS_ORIGINS", DEFAULT_CORS_ORIGINS) {
+    for entry in list_env("LLM_CORS_ORIGINS", DEFAULT_CORS_ORIGINS) {
         if entry == "*" {
             if allow_credentials {
                 warn_invalid(
-                    "SKL_CORS_ORIGINS",
+                    "LLM_CORS_ORIGINS",
                     "*",
                     "a wildcard origin is not allowed while credentials are enabled",
                     &"the wildcard was dropped",
@@ -324,7 +324,7 @@ fn cors_origins(allow_credentials: bool) -> Vec<String> {
         match normalise_origin(&entry) {
             Some(origin) => origins.push(origin),
             None => warn_invalid(
-                "SKL_CORS_ORIGINS",
+                "LLM_CORS_ORIGINS",
                 &entry,
                 "not a valid origin",
                 &"the entry was dropped",
@@ -339,21 +339,13 @@ fn database_url() -> String {
 }
 
 fn data_dir() -> PathBuf {
-    let Some(raw) = env("SKL_DATA_DIR") else {
-        return PathBuf::from(DEFAULT_DATA_DIR);
-    };
-    let path = PathBuf::from(&raw);
-    if path.is_absolute() {
-        path
-    } else {
-        // Relative directories are valid for the local/Tauri build; unlike the
-        // container build they are resolved against the current directory.
-        path
-    }
+    // Relative directories are valid for the local/Tauri build; they are
+    // resolved against the current directory.
+    env("LLM_DATA_DIR").map_or_else(|| PathBuf::from(DEFAULT_DATA_DIR), PathBuf::from)
 }
 
 fn log_level() -> String {
-    let Some(raw) = env("SKL_LOG_LEVEL") else {
+    let Some(raw) = env("LLM_LOG_LEVEL") else {
         return DEFAULT_LOG_LEVEL.to_string();
     };
     let upper = raw.to_ascii_uppercase();
@@ -361,7 +353,7 @@ fn log_level() -> String {
         upper
     } else {
         warn_invalid(
-            "SKL_LOG_LEVEL",
+            "LLM_LOG_LEVEL",
             &raw,
             &format!("expected one of {}", LOG_LEVELS.join("/")),
             &DEFAULT_LOG_LEVEL,
@@ -380,4 +372,83 @@ pub fn setup_logging(level: &str) {
         .with_env_filter(tracing_subscriber::EnvFilter::new(filter))
         .with_target(false)
         .try_init();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// Pin the global settings cache before mutating the environment so
+    /// parallel tests keep their original configuration.
+    fn pin_settings_cache() {
+        get_settings();
+    }
+
+    #[test]
+    fn from_env_reads_llm_prefixed_variables() {
+        pin_settings_cache();
+        let vars = [
+            ("DATABASE_URL", "sqlite:///tmp/llm-test.db"),
+            ("LLM_DATA_DIR", "/tmp/llm-test-data"),
+            ("LLM_MAX_UPLOAD_MB", "42"),
+            ("LLM_LOG_LEVEL", "debug"),
+            ("LLM_CORS_ORIGINS", "https://a.example,https://b.example"),
+            ("LLM_CORS_ALLOW_CREDENTIALS", "true"),
+            ("LLM_ENABLE_INTERACTIVE_DOCS", "false"),
+            ("LLM_MAX_CONCURRENT_JOBS", "4"),
+            ("LLM_JOB_TIMEOUT_SECONDS", "60"),
+            ("LLM_JOB_MAX_ATTEMPTS", "3"),
+            ("LLM_JOB_RETRY_BASE_SECONDS", "5"),
+            ("LLM_WORKER_STALE_SECONDS", "120"),
+            ("LLM_RATE_LIMIT_ENABLED", "false"),
+            ("LLM_RATE_LIMIT_MAX_REQUESTS", "10"),
+            ("LLM_RATE_LIMIT_WINDOW_SECONDS", "30"),
+            ("LLM_COMPRESSION_ENABLED", "false"),
+            ("LLM_COMPRESSION_MIN_SIZE", "1024"),
+            ("LLM_REQUEST_TIMEOUT_SECONDS", "15"),
+        ];
+        for (key, value) in vars {
+            std::env::set_var(key, value);
+        }
+
+        let settings = Settings::from_env();
+        assert_eq!(settings.database_url, "sqlite:///tmp/llm-test.db");
+        assert_eq!(settings.data_dir, PathBuf::from("/tmp/llm-test-data"));
+        assert_eq!(settings.max_upload_mb, 42);
+        assert_eq!(settings.log_level, "DEBUG");
+        assert_eq!(
+            settings.cors_origins,
+            vec!["https://a.example".to_string(), "https://b.example".to_string()]
+        );
+        assert!(settings.cors_allow_credentials);
+        assert!(!settings.enable_interactive_docs);
+        assert_eq!(settings.max_concurrent_jobs, 4);
+        assert_eq!(settings.job_timeout_seconds, 60);
+        assert_eq!(settings.job_max_attempts, 3);
+        assert_eq!(settings.job_retry_base_seconds, 5);
+        assert_eq!(settings.worker_stale_seconds, 120);
+        assert!(!settings.rate_limit_enabled);
+        assert_eq!(settings.rate_limit_max_requests, 10);
+        assert_eq!(settings.rate_limit_window_seconds, 30);
+        assert!(!settings.compression_enabled);
+        assert_eq!(settings.compression_min_size, 1024);
+        assert_eq!(settings.request_timeout_seconds, 15);
+
+        // Invalid values fall back to defaults rather than failing startup.
+        std::env::set_var("LLM_MAX_UPLOAD_MB", "not-a-number");
+        std::env::set_var("LLM_JOB_MAX_ATTEMPTS", "999");
+        std::env::set_var("LLM_RATE_LIMIT_ENABLED", "maybe");
+        let settings = Settings::from_env();
+        assert_eq!(settings.max_upload_mb, DEFAULT_MAX_UPLOAD_MB);
+        assert_eq!(settings.job_max_attempts, DEFAULT_JOB_MAX_ATTEMPTS);
+        assert_eq!(settings.rate_limit_enabled, DEFAULT_RATE_LIMIT_ENABLED);
+
+        for (key, _) in vars {
+            std::env::remove_var(key);
+        }
+        std::env::remove_var("LLM_MAX_UPLOAD_MB");
+        std::env::remove_var("LLM_JOB_MAX_ATTEMPTS");
+        std::env::remove_var("LLM_RATE_LIMIT_ENABLED");
+        reset_settings();
+    }
 }

@@ -1,29 +1,26 @@
 # CLI — llm
 
 Part of [`11-deployment.md`](../11-deployment.md). Documents the `llm`
-command-line interface: offline train-and-export from a CSV, binary
-installation, and usage.
+command-line interface: offline train-and-export from a CSV, installation,
+and usage.
 
 ## Overview
 
-`llm` is the llm-client CLI. `llm run` trains a llm model
-from a CSV and exports a portable artefact (ONNX / PKL / JobLib) entirely
-offline — no backend, no database, no network required. Every input (file
-location, features, label, algorithm, output location) can be passed as flags
-or supplied interactively.
-
-The CLI is distributed as a single-file PyInstaller binary attached to the
-`latest` GitHub Release, and it can also be installed from source with `uv` or
-`pip`.
+`llm` is the llm.rs command-line client, implemented in Rust in
+[`crates/llm-cli`](../../crates/llm-cli). It registers CSV datasets, trains
+models, and exports portable ONNX artefacts. Dataset bytes and job records
+are persisted to the local SQLite database (`DATABASE_URL`, default
+`.llm-data/llm.db`) and the filesystem data directory (`LLM_DATA_DIR`).
 
 ## Installation
 
-### Option 1 — Prebuilt binary (recommended)
+### Option 1 — Prebuilt binary
 
-Download the `llm` binary from the `latest` release and place it on your PATH:
+Download the `llm` binary from the `latest` GitHub Release and place it on
+your `PATH`:
 
 ```bash
-curl -fsSL https://github.com/hieudoanm/llm-client/releases/download/latest/llm \
+curl -fsSL https://github.com/hieudoanm/llm.rs/releases/download/cli-latest/llm \
   -o "$HOME/.local/bin/llm"
 chmod +x "$HOME/.local/bin/llm"
 ```
@@ -34,118 +31,98 @@ Ensure `$HOME/.local/bin` is on your `PATH`, then:
 llm --help
 ```
 
-There is also a maintained installer script in the repository:
-
-```bash
-bash crates/llm-server/scripts/install.sh
-```
-
-It downloads the `latest` release binary to `$HOME/.local/bin/llm`.
-
 ### Option 2 — From source
 
 ```bash
-# From crates/llm-server
-cargo build --release
+# From crates/
+cargo build --release -p llm-cli
 # produces target/release/llm
 ```
 
-### Build a standalone binary
-
-```bash
-# From crates/llm-server
-cargo build --release   # produces target/release/llm (single-file executable)
-./target/release/llm --help
-```
+The binary is a single-file executable with no runtime dependencies.
 
 ## Usage
 
 ```bash
 # Show help
 llm --help
-llm run --help
 
-# Train from a CSV and export ONNX (all flags, non-interactive)
-llm run data/train.csv \
-  --features x1,x2 \
-  --label y \
-  --task-type regression \
-  --algorithm linear_regression \
-  --format onnx \
-  --output ./out/model.onnx \
-  --no-interactive
+# List algorithms (optionally filtered by task type)
+llm algorithms --task classification
 
-# Fully interactive (prompts for every missing input)
-llm run data/train.csv
+# Register a dataset
+llm dataset data/iris.csv
 
-# Clustering / anomaly detection (no label required)
-llm run data/train.csv \
-  --features x1,x2 \
-  --task-type clustering \
-  --algorithm kmeans \
-  --format onnx \
-  --no-interactive
+# Train a model
+llm train \
+  --dataset-id <uuid> \
+  --task classification \
+  --algorithm logistic_regression \
+  --features sepal_length,sepal_width,petal_length,petal_width \
+  --label species
+
+# Check job status and metrics
+llm job <job-id>
+
+# List jobs and datasets
+llm jobs
+llm datasets
+
+# Export the ONNX artefact
+llm export <job-id> model.onnx --format onnx
 ```
 
-### `llm run` flags
+### Commands
 
-| Flag               | Purpose                                                          |
-|--------------------|------------------------------------------------------------------|
-| `csv_path` (arg)   | Path to the input CSV with a header row (required)               |
-| `--output`, `-o`   | Output artefact path (default: `<csv stem>.<ext>`)               |
-| `--task-type`, `-t`| Task type: `classification`, `regression`, `semi_supervised`, `clustering`, `anomaly_detection` |
-| `--features`, `-f` | Comma-separated feature columns                                  |
-| `--label`, `-l`    | Label column (required for supervised / semi-supervised tasks)   |
-| `--algorithm`, `-a`| Algorithm id (prompted if omitted)                               |
-| `--format`         | Export format: `onnx`, `pkl`, `joblib` (default: `onnx`)         |
-| `--no-interactive` | Fail instead of prompting for missing input                      |
+| Command | Purpose |
+|---------|---------|
+| `llm algorithms [--task <type>]` | List available algorithms |
+| `llm dataset <path>` | Upload/register a CSV dataset |
+| `llm train` | Train a model and export ONNX |
+| `llm job <id>` | Show job status, metrics, and artefacts |
+| `llm export <job-id> <output> [--format onnx\|pkl\|joblib]` | Export a job's artefact |
+| `llm jobs` | List all jobs |
+| `llm datasets` | List all stored datasets |
 
-When a required input is omitted and stdin is a TTY, `llm` prompts
-interactively (`inquirer`). With `--no-interactive` or a non-TTY stdin, a
-missing required input causes a non-zero exit.
+### `llm train` flags
 
-## Environment
+| Flag | Purpose |
+|------|---------|
+| `--dataset-id` | Dataset UUID from `llm dataset` (required) |
+| `--task` | Task type: `classification`, `regression`, `semi_supervised`, `clustering`, `anomaly_detection`, `reinforcement_learning` (required) |
+| `--algorithm` | Algorithm id; see `llm algorithms` (required) |
+| `--features` | Comma-separated feature column names (required) |
+| `--label` | Label column; required for supervised / semi-supervised tasks |
+| `--hyperparameters` | JSON string of algorithm hyperparameters (default `{}`) |
+| `--split-ratio` | Train/test split ratio, 0.0–1.0 (default `0.2`) |
+| `--random-seed` | Random seed (default `42`) |
 
-| Variable       | Default                 | Description                      |
-|----------------|-------------------------|----------------------------------|
+## Configuration
 
-`llm` reads no environment variables. It is fully offline: the `run` command
-never contacts a backend.
+`llm` honours the shared environment configuration documented in
+[`environment-variables.md`](./environment-variables.md): `DATABASE_URL`,
+`LLM_DATA_DIR`, `LLM_LOG_LEVEL`, `RUST_LOG`, and the `LLM_*` job/worker
+tunables. Settings are resolved once at startup.
 
 ## Development
 
-From `crates/llm-server`:
+From `crates/`:
 
 ```bash
-make lint    # ruff check src tests
-make format  # ruff format + ruff check --fix
-make test    # pytest tests -v --cov=src/llm --cov-report=term-missing
-make build   # pyinstaller --onefile --name llm src/llm/pyinstaller_entry.py
+cargo build --release -p llm-cli   # build the binary
+cargo check -p llm-cli             # typecheck
+cargo test -p llm-cli              # unit tests
+cargo clippy -p llm-cli -- -D warnings
 ```
 
 ### Layout
 
 ```
-crates/llm-server/
-├── Cargo.toml   # packaging, dev deps (clippy, fmt)
-├── llm.spec         # PyInstaller spec (kept for reference; CI/build use the entry point)
-├── Makefile         # lint / test / format / build
-├── scripts/
-│   └── install.sh   # downloads the latest release binary
-├── src/llm/
-│   ├── __init__.py   # package entry, exposes main()
-│   ├── cli.py        # click group: run (offline)
-│   ├── helpers.py    # inquirer prompts, tabulate display, formatting
-│   ├── local.py      # offline train+export pipeline (no backend)
-│   ├── pipeline.py   # llm training pipelines per task type
-│   ├── estimator.py  # estimator construction
-│   ├── export.py     # ONNX / pickle / joblib export
-│   ├── preprocessor.py  # llm ColumnTransformer preprocessor
-│   ├── pyinstaller_entry.py  # frozen entry point (package context preserved)
-│   └── catalogue/    # algorithm catalogue (mirrors the backend)
-├── tests/            # pytest suite
-└── examples/         # demo CSV and run script
+crates/llm-cli/
+├── Cargo.toml
+├── README.md
+└── src/
+    ├── main.rs       # entry point, logging, command dispatch
+    ├── cli.rs        # clap subcommand definitions
+    └── commands/     # per-command handlers (dataset, train, job, export, ...)
 ```
-
-**See also:** [`local-development.md`](./local-development.md),
-[`environment-variables.md`](./environment-variables.md).

@@ -24,9 +24,9 @@ llm --help
 - `llm dataset <path>` - Upload/register a CSV dataset
 - `llm train ...` - Train a model from a dataset
 - `llm job <id>` - Show job status and metrics
-- `llm export --job-id <id> --output <path> [--format onnx|pkl|joblib]` - Export artefact
-- `llm artefacts` - List artefacts
+- `llm export <job-id> <output> [--format onnx|pkl|joblib]` - Export artefact
 - `llm jobs` - List jobs
+- `llm datasets` - List datasets
 
 ### Example
 
@@ -46,7 +46,7 @@ llm train \
 llm job <job_id>
 
 # Export ONNX
-llm export --job-id <job_id> --output model.onnx
+llm export <job_id> model.onnx --format onnx
 ```
 
 ## Dependencies

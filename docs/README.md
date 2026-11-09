@@ -254,7 +254,7 @@ See [`11-deployment.md`](11-deployment.md) and [`12-operations.md`](12-operation
 - **Local only:** Docker Compose with `frontend`, `backend`, and `sqlite`
 - **CLI:** `llm` — offline train-and-export binary (see
   [`11-deployment/cli.md`](./11-deployment/cli.md) and
-  [`crates/llm-server/scripts/install.sh`](../crates/llm-server/scripts/install.sh))
+  [`crates/llm-cli`](../crates/llm-cli))
 - CI: GitHub Actions quality gates
 - Cloud, Kubernetes, and Terraform are **out of scope** for this release
 

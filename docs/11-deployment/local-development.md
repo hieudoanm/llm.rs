@@ -2,106 +2,93 @@
 
 ## Prerequisites
 
-- Docker and Docker Compose v2
-- Node.js 26+ (frontend host tooling)
-- Rust toolchain (backend host tooling)
-- pnpm, cargo
+- Rust toolchain (cargo)
+- Node.js 26+ and pnpm (desktop frontend)
+- Tauri system dependencies for `packages/desktop` (see the
+  [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/))
 - Git
 
 ## Repository structure
 
 ```text
-llm/
+llm.rs/
 ├── crates/
-│   ├── llm-core/   # Pure-Rust core
-│   ├── llm-db/     # SQLite persistence
-│   ├── llm-api/    # Axum HTTP API and worker
-│   └── llm-server/ # Binary entry point
+│   ├── Cargo.toml    # Rust workspace
+│   ├── llm-core/     # Pure-Rust core (config, CSV, training, ONNX export, storage)
+│   ├── llm-db/       # SQLite persistence (sqlx)
+│   └── llm-cli/      # `llm` command-line binary
 ├── packages/
-│   └── frontend/    # Next.js
-├── docker-compose.yaml
-├── docs/
-└── README.md
+│   ├── desktop/      # Next.js + Tauri desktop app
+│   └── landing/      # Static landing page (plain HTML/CSS)
+├── docs/             # Product & implementation specification
+├── demo/             # Recorded demo video and assets
+└── .env.example      # Environment template (copy to .env)
 ```
 
-## Docker Compose services
+## Configuration
 
-Defined in [`docker-compose.yaml`](../../docker-compose.yaml). Both images build
-from the **repository root** context.
-
-### backend
-
-- Build: `crates/llm-server/Dockerfile`
-- Port: `127.0.0.1:8000`
-- Volume: `llm_data:/var/lib/llm`
-- Env: `DATABASE_URL`, `LLM_DATA_DIR`, `LLM_MAX_UPLOAD_MB` (upload cap in MiB, default 10), plus
-  `LLM_LOG_LEVEL`, `LLM_CORS_ORIGINS`, `LLM_CORS_ALLOW_CREDENTIALS`, `LLM_ENABLE_INTERACTIVE_DOCS`,
-  `LLM_MAX_CONCURRENT_JOBS`, `LLM_JOB_TIMEOUT_SECONDS`, `LLM_JOB_MAX_ATTEMPTS`,
-  `LLM_JOB_RETRY_BASE_SECONDS`, `LLM_WORKER_STALE_SECONDS` (see below)
-- Healthcheck: `GET /healthz`
-
-Every variable the backend reads is listed in
-[`environment-variables.md`](./environment-variables.md), which is the single source of truth.
-
-### frontend
-
-- Build: `packages/frontend/Dockerfile`
-- Port: `127.0.0.1:3000`
-- Env: `NEXT_PUBLIC_API_URL=http://127.0.0.1:8000` (baked in at build time),
-  `NEXT_PUBLIC_API_DOCS_URL` (defaults to `${NEXT_PUBLIC_API_URL}/docs` when empty)
-- Depends on: backend healthy
+Copy `.env.example` to `.env` to override defaults. The full variable list —
+`DATABASE_URL`, `LLM_DATA_DIR`, `LLM_LOG_LEVEL`, `RUST_LOG`, and the `LLM_*`
+job/worker tunables — is documented in
+[`environment-variables.md`](./environment-variables.md), which is the single
+source of truth. Unset variables fall back to the defaults compiled into
+`llm-core`.
 
 ## Workflow
 
-```bash
-cp .env.example .env
-docker compose up --build   # or: make up
-```
-
-Open `http://127.0.0.1:3000`. API docs: `http://127.0.0.1:8000/docs` (Swagger UI) and
-`http://127.0.0.1:8000/redoc` (ReDoc); the raw schema is at
-`http://127.0.0.1:8000/openapi.json`. The committed copy of the schema lives in
-[`06-api-specification/backend/openapi.yaml`](../06-api-specification/backend/openapi.yaml).
-
-## CLI
-
-The `llm` CLI is a standalone offline tool (no backend required). Install the
-latest release binary:
+### Rust workspace
 
 ```bash
-curl -fsSL https://github.com/hieudoanm/llm-client/releases/download/latest/llm \
-  -o "$HOME/.local/bin/llm"
-chmod +x "$HOME/.local/bin/llm"
+cd crates
+cargo build --release -p llm-cli   # build the `llm` binary
+cargo test --workspace             # run all Rust tests
+cargo check --workspace --all-targets
 ```
 
-Full CLI documentation lives in
-[`11-deployment/cli.md`](./cli.md); the CLI source is in `crates/llm-server/`.
+Or from the repository root: `make cli`, `make cli-test`, `make rust-check`,
+`make rust-test`.
 
-Make shortcuts (from the repository root): `make up` brings up the whole
-stack with Docker Compose and `make down` shuts it down. Host mode (optional):
-`make start` runs the API and frontend on the host — the Makefile passes all `LLM_*`
-variables from the environment (`.env`).
+### Desktop app
+
+```bash
+cd packages/desktop
+pnpm install
+pnpm dev          # Next.js dev server + Tauri dev concurrently
+pnpm lint         # eslint
+pnpm exec tsc --noEmit   # typecheck
+pnpm test         # Vitest unit tests
+pnpm build        # production Next.js build
+pnpm build:tauri  # Tauri bundle
+```
+
+Or from the repository root: `make desktop-dev`, `make desktop-build`,
+`make desktop-test`.
+
+### CLI
+
+The `llm` CLI is a standalone tool backed by the same SQLite database and
+data directory as the desktop app. See [`cli.md`](./cli.md) for the full
+command reference; source lives in `crates/llm-cli/`.
 
 ## Tests
 
 ```bash
-make e2e        # Playwright scenarios (backend + frontend must already be up)
-make e2e-demo   # same scenarios recorded to demo/demo.mp4 (starts/stops services)
+make test         # Rust workspace tests + desktop Vitest suite
+make cli-test     # llm-cli tests only
+make desktop-test # desktop frontend tests only
 ```
+
+Desktop e2e (Playwright) specs live in `packages/desktop/e2e/`; see
+`packages/desktop/AGENTS.md` for how to run them.
 
 ## Data
 
-Volumes persist jobs across restarts. Reset:
+Both the CLI and the desktop app persist to `.llm-data/` by default: the
+SQLite database at `DATABASE_URL` (default `.llm-data/llm.db`) plus uploaded
+datasets and ONNX artefacts under `LLM_DATA_DIR`.
+
+To reset local state, stop the app and remove the data directory:
 
 ```bash
-# Reset the entire stack including SQLite data and artefacts
-docker compose down -v && docker compose up --build -d
+rm -rf .llm-data
 ```
-
-Or use the Makefile:
-
-```bash
-make down  # stops and removes containers; add -v to wipe volumes
-```
-
-`docker compose down -v` deletes artefacts and the SQLite database.

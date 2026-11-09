@@ -1,4 +1,4 @@
-.PHONY: help cli cli-build cli-run desktop desktop-dev desktop-build test rust-check rust-test
+.PHONY: help cli cli-run cli-test desktop-dev desktop-build desktop-test test rust-check rust-test release
 
 CRATES_DIR := crates
 DESKTOP_DIR := packages/desktop

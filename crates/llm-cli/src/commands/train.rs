@@ -91,63 +91,77 @@ pub async fn cmd_train(
     jobs::insert_job(db.pool(), &job).await?;
     jobs::set_status(db.pool(), job.id, JobStatus::Training.as_str()).await?;
 
-    println!("Training job {}...", job.id);
-    println!("  Task: {}", task);
-    println!("  Algorithm: {}", algorithm_id);
-    println!("  Features: {:?}", job.feature_columns);
-    println!("  Label: {:?}", job.label_column);
+    let result: Result<()> = async {
+        println!("Training job {}...", job.id);
+        println!("  Task: {}", task);
+        println!("  Algorithm: {}", algorithm_id);
+        println!("  Features: {:?}", job.feature_columns);
+        println!("  Label: {:?}", job.label_column);
 
-    let output: TrainingOutput = train(&job, &df)
-        .map_err(|e| anyhow::anyhow!("Training failed: {}", e))?;
+        let output: TrainingOutput = train(&job, &df)
+            .map_err(|e| anyhow::anyhow!("Training failed: {}", e))?;
 
-    jobs::set_status(db.pool(), job.id, JobStatus::Exporting.as_str()).await?;
+        jobs::set_status(db.pool(), job.id, JobStatus::Exporting.as_str()).await?;
 
-    println!("\nTraining completed!");
-    println!("  Model kind: {:?}", output.model.kind);
-    println!("\nMetrics:");
-    let metrics_json = serde_json::to_string_pretty(&output.metrics)?;
-    println!("  {}", metrics_json);
+        println!("\nTraining completed!");
+        println!("  Model kind: {:?}", output.model.kind);
+        println!("\nMetrics:");
+        let metrics_json = serde_json::to_string_pretty(&output.metrics)?;
+        println!("  {}", metrics_json);
 
-    if !output.charts.as_object().map_or(true, |m| m.is_empty()) {
-        println!("\nCharts:");
-        println!("  {}", serde_json::to_string_pretty(&output.charts)?);
+        if !output.charts.as_object().map_or(true, |m| m.is_empty()) {
+            println!("\nCharts:");
+            println!("  {}", serde_json::to_string_pretty(&output.charts)?);
+        }
+
+        let onnx_bytes = export::onnx::export_onnx(&output.model)
+            .map_err(|e| anyhow::anyhow!("ONNX export failed: {}", e))?;
+
+        ensure_dirs()?;
+        let (storage_key, path, byte_size) =
+            write_artefact(job.id, &onnx_bytes, &format!("{}.onnx", job.id))?;
+
+        let artefact = llm_core::domain::Artefact {
+            id: Uuid::new_v4(),
+            job_id: job.id,
+            format: ArtefactFormat::Onnx.as_str().to_string(),
+            filename: format!("{}.onnx", job.id),
+            byte_size,
+            storage_key,
+            created_at: utc_now(),
+        };
+        artefacts::insert_artefact(db.pool(), &artefact).await?;
+
+        jobs::set_status(db.pool(), job.id, JobStatus::Completed.as_str()).await?;
+
+        let metric = llm_core::domain::JobMetric {
+            job_id: job.id,
+            metrics: output.metrics,
+            charts: Some(output.charts),
+            created_at: utc_now(),
+        };
+        jobs::record_metrics(db.pool(), &metric).await?;
+
+        jobs::record_completion(db.pool(), job.id, Some(metric.metrics)).await?;
+
+        println!("\nONNX exported to: {}", path.display());
+        println!("  Size: {} bytes", onnx_bytes.len());
+        println!("  Job {} completed", job.id);
+
+        Ok(())
     }
+    .await;
 
-    let onnx_bytes = export::onnx::export_onnx(&output.model)
-        .map_err(|e| anyhow::anyhow!("ONNX export failed: {}", e))?;
-
-    ensure_dirs()?;
-    let (storage_key, path, byte_size) =
-        write_artefact(job.id, &onnx_bytes, &format!("{}.onnx", job.id))?;
-
-    let artefact = llm_core::domain::Artefact {
-        id: Uuid::new_v4(),
-        job_id: job.id,
-        format: ArtefactFormat::Onnx.as_str().to_string(),
-        filename: format!("{}.onnx", job.id),
-        byte_size,
-        storage_key,
-        created_at: utc_now(),
-    };
-    artefacts::insert_artefact(db.pool(), &artefact).await?;
-
-    jobs::set_status(db.pool(), job.id, JobStatus::Completed.as_str()).await?;
-
-    let metric = llm_core::domain::JobMetric {
-        job_id: job.id,
-        metrics: output.metrics,
-        charts: Some(output.charts),
-        created_at: utc_now(),
-    };
-    jobs::record_metrics(db.pool(), &metric).await?;
-
-    jobs::record_completion(db.pool(), job.id, Some(metric.metrics)).await?;
-
-    println!("\nONNX exported to: {}", path.display());
-    println!("  Size: {} bytes", onnx_bytes.len());
-    println!("  Job {} completed", job.id);
-
-    Ok(())
+    if let Err(err) = &result {
+        let _ = jobs::record_failure(
+            db.pool(),
+            job.id,
+            Some("TRAINING_FAILED".to_string()),
+            Some(err.to_string()),
+        )
+        .await;
+    }
+    result
 }
 
 #[cfg(test)]

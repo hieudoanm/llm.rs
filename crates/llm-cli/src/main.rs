@@ -6,14 +6,12 @@ mod commands;
 use clap::Parser;
 use cli::{Cli, Commands};
 use commands::{cmd_algorithms, cmd_dataset, cmd_datasets, cmd_export, cmd_job, cmd_jobs, cmd_train};
-use llm_core::config::get_settings;
+use llm_core::config::{get_settings, setup_logging};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let settings = get_settings();
-    tracing_subscriber::fmt()
-        .with_env_filter(settings.log_level.clone())
-        .init();
+    setup_logging(&settings.log_level);
 
     let cli = Cli::parse();
 

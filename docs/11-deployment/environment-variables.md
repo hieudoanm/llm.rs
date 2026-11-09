@@ -101,17 +101,17 @@ not through the developer's shell.
 | Variable                      | Read by                                        | Documented in                                 |
 | ----------------------------- | ---------------------------------------------- | --------------------------------------------- |
 | `DATABASE_URL`                | `crates/llm-core/src/config.rs` → `crates/llm-db/src/lib.rs` | [`04-architecture.md`](../04-architecture.md) §4.4 |
-| `LLM_DATA_DIR`               | `crates/llm-core/src/config.rs` → `crates/llm-core/src/storage/filesystem.rs` | [`05-data-model.md`](../05-data-model.md) §5   |
-| `LLM_MAX_UPLOAD_MB`           | `crates/llm-core/src/config.rs` → `crates/llm-api/src/routes/datasets.rs` | [`FEATURE-01`](../02-features/FEATURE-01-Dataset-Upload.md) |
-| `LLM_LOG_LEVEL`               | `crates/llm-core/src/config.rs` → `crates/llm-server/src/main.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `LLM_CORS_ORIGINS`            | `crates/llm-core/src/config.rs` → `crates/llm-api/src/middleware.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md), [`09-testing-strategy.md`](../09-testing-strategy.md) |
-| `LLM_CORS_ALLOW_CREDENTIALS`  | `crates/llm-core/src/config.rs` → `crates/llm-api/src/middleware.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `LLM_ENABLE_INTERACTIVE_DOCS` | `crates/llm-core/src/config.rs` → `crates/llm-api/src/lib.rs` | [`FEATURE-18`](../02-features/FEATURE-18-Client-Resilience-and-Guidance.md) |
-| `LLM_MAX_CONCURRENT_JOBS`     | `crates/llm-core/src/config.rs` → `crates/llm-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `LLM_JOB_TIMEOUT_SECONDS`     | `crates/llm-core/src/config.rs` → `crates/llm-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `LLM_JOB_MAX_ATTEMPTS`        | `crates/llm-core/src/config.rs` → `crates/llm-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `LLM_JOB_RETRY_BASE_SECONDS`  | `crates/llm-core/src/config.rs` → `crates/llm-api/src/worker.rs` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
-| `LLM_WORKER_STALE_SECONDS`    | `crates/llm-core/src/config.rs` → `crates/llm-api/src/worker.rs` | [`04-architecture.md`](../04-architecture.md) §8 |
+| `LLM_DATA_DIR`               | `crates/llm-core/src/config.rs` → `crates/llm-core/src/storage.rs`` | [`05-data-model.md`](../05-data-model.md) §5   |
+| `LLM_MAX_UPLOAD_MB`           | `crates/llm-core/src/config.rs` (enforced by upload handlers)` | [`FEATURE-01`](../02-features/FEATURE-01-Dataset-Upload.md) |
+| `LLM_LOG_LEVEL`               | `crates/llm-core/src/config.rs` → `crates/llm-cli/src/main.rs`, `packages/desktop/src-tauri/src/main.rs`` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_CORS_ORIGINS`            | `crates/llm-core/src/config.rs` (reserved for the HTTP layer)` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md), [`09-testing-strategy.md`](../09-testing-strategy.md) |
+| `LLM_CORS_ALLOW_CREDENTIALS`  | `crates/llm-core/src/config.rs` (reserved for the HTTP layer)` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_ENABLE_INTERACTIVE_DOCS` | `crates/llm-core/src/config.rs` (reserved for the HTTP layer)` | [`FEATURE-18`](../02-features/FEATURE-18-Client-Resilience-and-Guidance.md) |
+| `LLM_MAX_CONCURRENT_JOBS`     | `crates/llm-core/src/config.rs` (reserved for the job worker)` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_JOB_TIMEOUT_SECONDS`     | `crates/llm-core/src/config.rs` (reserved for the job worker)` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_JOB_MAX_ATTEMPTS`        | `crates/llm-core/src/config.rs` (reserved for the job worker)` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_JOB_RETRY_BASE_SECONDS`  | `crates/llm-core/src/config.rs` (reserved for the job worker)` | [`FEATURE-17`](../02-features/FEATURE-17-Reliable-Job-Execution.md) |
+| `LLM_WORKER_STALE_SECONDS`    | `crates/llm-core/src/config.rs` (reserved for the job worker)` | [`04-architecture.md`](../04-architecture.md) §8 |
 | `NEXT_PUBLIC_API_URL`         | `packages/frontend/src/lib/api.ts`             | [`06-api-specification.md`](../06-api-specification.md) §3 |
 | `NEXT_PUBLIC_API_DOCS_URL`    | `packages/frontend/src/components/layout/Footer.tsx` | [`FEATURE-18`](../02-features/FEATURE-18-Client-Resilience-and-Guidance.md) |
 
