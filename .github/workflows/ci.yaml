@@ -112,8 +112,25 @@ jobs:
           path: ${{ github.workspace }}/packages/desktop/src-tauri/target/release/bundle/*
           retention-days: 7
 
-  landing:
-    name: App - Landing
+  landing-build:
+    name: Landing - Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Upload Pages artifact
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-pages-artifact@v5.0.0
+        with:
+          path: ${{ github.workspace }}/packages/landing
+
+  landing-deploy:
+    name: Landing - Deploy
+    needs: landing-build
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -122,17 +139,7 @@ jobs:
       id-token: write
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7.0.1
-
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v5.0.0
-        with:
-          path: ${{ github.workspace }}/packages/landing
-
       - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/master'
-        id: deployment
         uses: actions/deploy-pages@v5.0.1
 
   release:
