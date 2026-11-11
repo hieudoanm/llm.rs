@@ -1758,7 +1758,6 @@ dependencies = [
  "polars-lazy",
  "protobuf",
  "rand 0.10.3",
- "rand 0.8.6",
  "regex",
  "serde",
  "serde_json",
