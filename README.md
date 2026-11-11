@@ -1,5 +1,8 @@
 # Machine Learning in Rust (llm.rs)
 
+[![CI](https://github.com/hieudoanm/llm.rs/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/hieudoanm/llm.rs/actions/workflows/ci.yaml?branch=master)  [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+
 **Train supervised, semi-supervised, unsupervised, and offline reinforcement-learning models from CSV files. Export them as portable ONNX models — all on your own machine.**
 
 keywords: `machine-learning`, `ml`, `rust`, `onnx`, `csv`, `training`, `desktop`, `tauri`, `nextjs`, `supervised`, `unsupervised`, `reinforcement-learning`, `anomaly-detection`, `clustering`, `regression`, `classification`
