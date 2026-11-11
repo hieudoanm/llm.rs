@@ -16,12 +16,20 @@ are persisted to the local SQLite database (`DATABASE_URL`, default
 
 ### Option 1 — Prebuilt binary
 
-Download the `llm` binary from the `latest` GitHub Release and place it on
-your `PATH`:
+Download the `llm` binary for your platform from the `latest` GitHub
+Release and place it on your `PATH`:
 
 ```bash
-curl -fsSL https://github.com/hieudoanm/llm.rs/releases/download/cli-latest/llm \
+# macOS (Apple Silicon)
+curl -fsSL https://github.com/hieudoanm/llm.rs/releases/download/latest/llm-aarch64-apple-darwin \
   -o "$HOME/.local/bin/llm"
+
+# Linux (x86_64)
+curl -fsSL https://github.com/hieudoanm/llm.rs/releases/download/latest/llm-x86_64-unknown-linux-gnu \
+  -o "$HOME/.local/bin/llm"
+
+# Windows (x86_64) — download llm-x86_64-pc-windows-msvc.exe instead
+
 chmod +x "$HOME/.local/bin/llm"
 ```
 

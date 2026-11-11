@@ -127,7 +127,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           cd ${{ github.workspace }}/packages/desktop/src-tauri/target/release/bundle/macos
-          zip -r -X LLM.app.zip LLM.app
+          app=$(ls -d *.app | head -n1)
+          zip -r -X "${app%.app}.app.zip" "$app"
 
       - name: Build Linux bundles
         if: runner.os == 'Linux'
@@ -146,7 +147,7 @@ jobs:
           name: llm-desktop-macos
           path: |
             ${{ github.workspace }}/packages/desktop/src-tauri/target/release/bundle/dmg/*.dmg
-            ${{ github.workspace }}/packages/desktop/src-tauri/target/release/bundle/macos/LLM.app.zip
+            ${{ github.workspace }}/packages/desktop/src-tauri/target/release/bundle/macos/*.app.zip
           if-no-files-found: error
           retention-days: 7
 
