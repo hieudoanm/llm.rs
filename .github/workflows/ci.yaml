@@ -82,7 +82,7 @@ jobs:
           retention-days: 7
 
   desktop-build:
-    name: App - Desktop (${{ matrix.os }})
+    name: Desktop build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -117,6 +117,18 @@ jobs:
       - name: Install desktop dependencies
         working-directory: ${{ github.workspace }}/packages/desktop
         run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        working-directory: ${{ github.workspace }}/packages/desktop
+        run: pnpm run typecheck
+
+      - name: Lint
+        working-directory: ${{ github.workspace }}/packages/desktop
+        run: pnpm run lint
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/packages/desktop
+        run: pnpm run test
 
       - name: Build macOS bundles
         if: runner.os == 'macOS'
