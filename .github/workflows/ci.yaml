@@ -4,20 +4,19 @@ on:
   push:
     branches: [master]
   pull_request:
+    branches: [master]
   release:
     types: [published]
+  workflow_dispatch:
 
 permissions:
-  contents: write
-  pages: write
-  id-token: write
+  contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
-  NODE_VERSION: "26"
   DATABASE_URL: sqlite:////tmp/llm-data/llm.db
   LLM_DATA_DIR: /tmp/llm-data
 
@@ -32,6 +31,9 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2.9.3
 
       - name: Rust check
         working-directory: ${{ github.workspace }}/crates
@@ -67,6 +69,9 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2.9.3
+
       - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -75,13 +80,11 @@ jobs:
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6.1.1
-        with:
-          version: 12.18.0
 
-      - name: Set up Node.js ${{ env.NODE_VERSION }}
+      - name: Set up Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .nvmrc
           cache: pnpm
 
       - name: Install desktop dependencies
@@ -113,6 +116,10 @@ jobs:
     name: App - Landing
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
     steps:
       - name: Checkout repository
@@ -127,10 +134,6 @@ jobs:
         if: github.ref == 'refs/heads/master'
         id: deployment
         uses: actions/deploy-pages@v5.0.1
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
   release:
     name: Publish Release Artifacts
