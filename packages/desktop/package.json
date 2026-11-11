@@ -21,7 +21,7 @@
     "openapi:types": "openapi-typescript ../../docs/06-api-specification/backend/openapi.yaml -o src/lib/apiTypes.ts"
   },
   "dependencies": {
-    "@hookform/resolvers": "7.0.5",
+    "@hookform/resolvers": "7.0.6",
     "@tanstack/react-query": "5.107.1",
     "@tanstack/react-virtual": "3.14.26",
     "@tauri-apps/api": "2.12.4",
