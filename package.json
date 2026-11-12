@@ -1,16 +1,26 @@
 {
   "name": "@llm/workspace",
   "version": "0.0.1",
+  "private": true,
   "description": "llm - Local Learning Machine",
+  "license": "MIT",
+  "author": {
+    "name": "Hieu Doan",
+    "email": "hieu.doan.professional@gmail.com",
+    "url": "https://hieudoanm.github.io"
+  },
   "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": "26.13.1"
+  },
   "scripts": {
     "dev": "turbo run dev",
-    "lint": "turbo run lint",
     "build": "turbo run build",
-    "format": "turbo run format",
-    "typecheck": "turbo run typecheck",
+    "lint": "turbo run lint",
     "test": "turbo run test",
     "test:coverage": "turbo run test:coverage",
+    "typecheck": "turbo run typecheck",
+    "format": "turbo run format",
     "prepare": "husky || true"
   },
   "devDependencies": {
