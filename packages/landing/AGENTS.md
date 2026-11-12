@@ -1,52 +1,41 @@
-# AGENTS.md — llm.rs landing page
+# AGENTS.md — packages/landing
 
-Guidance for AI agents working on the landing page (`packages/landing`). See the root [`AGENTS.md`](../../AGENTS.md) for repository-wide conventions.
+Next.js 16 (App Router) static-export landing page + Tailwind CSS v4 + DaisyUI
+5, deployed to GitHub Pages at `https://hieudoanm.github.io/llm.rs/` (project
+site — `basePath: "/llm.rs"`, `assetPrefix` likewise in production).
 
-## Overview
+## Commands
 
-The landing page is a plain static site — no framework, no build step, no package manifest, no JavaScript except a tiny year-injection snippet. The whole directory is uploaded verbatim to GitHub Pages at `https://hieudoanm.github.io/llm.rs` (project site, so all asset paths are relative).
-
-## Files
-
-- `index.html` — the entire page (nav, hero + terminal, features, CLI, CTA, footer)
-- `styles.css` — the full stylesheet; design tokens live in `:root`
-- `404.html` — GitHub Pages 404 page, reuses `styles.css`
-- `logo.svg`, `favicon.ico` (generated from `logo.svg`), `robots.txt`, `sitemap.xml`, `humans.txt`
-- `AGENTS.md`, `README.md`, `LICENSE` — repo docs; they are uploaded to Pages too, which is harmless
-
-## Preview
-
-There is no build. Serve the directory with any static file server:
-
-```sh
-cd packages/landing
-python3 -m http.server 4173
+```bash
+pnpm install
+pnpm run dev      # dev server (basePath applies)
+pnpm run build    # static export → out/ (uploaded to Pages by CI)
+pnpm run lint
 ```
+
+## Structure
+
+- `src/app/layout.tsx` — metadata, fonts, and the global `Navbar`/`Footer` (all
+  content passed as props).
+- `src/app/page.tsx` — page content as data passed to the shared components.
+- `src/components/molecules/` — shared components (`Navbar`, `Hero`, `Features`,
+  `CTA`, `Footer`, `SectionHead`, `Terminal`). These files are **byte-identical
+  across all `hieudoanm/*/packages/landing` repos** — do not fork them; pass
+  content via props instead.
+- `src/app/globals.css` — Tailwind v4 imports + the custom DaisyUI `llm.rs`
+  light theme.
+- `public/` — `favicon.ico`, `favicon.svg`, `logo.*`, `og.png`, `robots.txt`,
+  `sitemap.xml`, `humans.txt`, served under `/llm.rs/` in production.
 
 ## Conventions
 
-- **Fonts:** Inter (sans) loaded via the Google Fonts `<link>` in `index.html`; mono stack `ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace`. Tokens: `--font-sans` / `--font-mono`. Do not add other typefaces.
-
-- **Light theme only.** Colours are CSS custom properties in `styles.css` (`--bg`, `--fg`, `--accent`, …). Do not add a dark theme or theme toggle.
-- **No frameworks, no package.json.** The only script allowed is the tiny year-injection snippet in the footer. Keep it to HTML + CSS + static assets.
-- **Relative asset paths.** The site is served under the `/llm.rs` base path on GitHub Pages; use relative URLs (`logo.svg`, `styles.css`), never absolute `/…` paths.
-- **Accent colour is orange** (`--accent: #c2410c` family, `--accent-bright` for text on the dark terminal).
-- **Design rules.** Follow the 20 rules of AI unslop design: concrete headlines, one accent colour, consistent icons, no filler badges, real product artefacts over decoration.
-- **Docs and downloads** live on GitHub: link to `https://github.com/hieudoanm/llm.rs` (`/releases`, `/tree/master/docs`, `/tree/master/crates/llm-cli`) rather than adding pages.
-- **Deploy:** CI uploads `packages/landing` via `actions/upload-pages-artifact` + `actions/deploy-pages` (see `.github/workflows/ci.yaml`). No build step — edit files and they ship as-is.
-
-## Footer
-
-The footer follows the shared contract: `© {year} {repo-name}` (lowercase
-repo name, dynamic year via `<span id="year">` + the year script), a
-one-line tagline/license descriptor, and a right-aligned `<nav
-aria-label="Footer">` with exactly two links — `GitHub` (repo root) and
-`README` (`<repo>#readme`), both `target="_blank" rel="noreferrer"`.
-
-## Features & CTA sections
-
-`#features` and `#install` follow the shared template: centered
-`.section-head` (h2 + one supporting paragraph), a `.grid-3` card grid
-(`article.card` = `.card-icon` + h3 + p), and a closing CTA section on the
-alt background (`.section-alt`, `.container-narrow`) ending in a
-`.cta-row` with a primary `btn-lg` action plus at most one ghost button.
+- Keep `output: "export"` in `next.config.ts` — the site must build to static
+  HTML in `out/`; no server features or API routes.
+- `basePath`/`assetPrefix` are `/llm.rs` in production builds; `next/link` and
+  metadata get it automatically, raw `<img src>` paths must include it (see the
+  `LOGO` constant in `layout.tsx`).
+- Theme is light-only via `data-theme="llm.rs"` on `<html>`; accent colours
+  differ per repo but every theme is light.
+- Fonts: Inter via `next/font`; mono stack for terminal/code only.
+- Design follows the "AI unslop" rules: no filler badges, monospace only for
+  code/commands, real CLI output in demos.
