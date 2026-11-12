@@ -1,4 +1,6 @@
-# Machine Learning in Rust (llm.rs)
+# llm.rs
+
+**Machine Learning in Rust**
 
 [![CI](https://github.com/hieudoanm/llm.rs/actions/workflows/ci.yaml/badge.svg?branch=master)](https://github.com/hieudoanm/llm.rs/actions/workflows/ci.yaml?branch=master)  [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -9,9 +11,9 @@ keywords: `machine-learning`, `ml`, `rust`, `onnx`, `csv`, `training`, `desktop`
 
 Machine Learning in Rust (llm.rs) is a local, full-stack training studio for tabular data. Upload a CSV with a header row, map feature columns to **X** and (when the task requires it) a label column to **Y**, or declare experience columns for offline reinforcement learning, choose a task — classification, regression, semi-supervised, clustering, anomaly detection, or reinforcement learning — and an algorithm from the curated catalogue. Train asynchronously and download a portable **ONNX** artefact. Everything runs locally via Docker Compose — no cloud account or infrastructure setup.
 
-[📄 Documentation](docs/README.md) · [🚀 Quick Start](#get-started) · [🔍 See It In Action](#see-it-in-action) · [🧪 Try Algorithms](packages/desktop/src/app/algorithms/page.tsx)
-
-![llm](docs/07-ui-ux-design/og/images/og.png)
+<p align="center">
+  <img src="assets/branding/png/og.png" alt="llm.rs — train ML models from CSV and export ONNX" width="720">
+</p>
 
 ## The Problem
 
