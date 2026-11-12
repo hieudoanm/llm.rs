@@ -7,7 +7,7 @@
 
 **Train supervised, semi-supervised, unsupervised, and offline reinforcement-learning models from CSV files. Export them as portable ONNX models — all on your own machine.**
 
-keywords: `machine-learning`, `ml`, `rust`, `onnx`, `csv`, `training`, `desktop`, `tauri`, `nextjs`, `supervised`, `unsupervised`, `reinforcement-learning`, `anomaly-detection`, `clustering`, `regression`, `classification`
+Topics: `machine-learning`, `ml`, `rust`, `onnx`, `csv`, `training`, `desktop`, `tauri`, `nextjs`, `supervised`, `unsupervised`, `reinforcement-learning`, `anomaly-detection`, `clustering`, `regression`, `classification`
 
 Machine Learning in Rust (llm.rs) is a local, full-stack training studio for tabular data. Upload a CSV with a header row, map feature columns to **X** and (when the task requires it) a label column to **Y**, or declare experience columns for offline reinforcement learning, choose a task — classification, regression, semi-supervised, clustering, anomaly detection, or reinforcement learning — and an algorithm from the curated catalogue. Train asynchronously and download a portable **ONNX** artefact. Everything runs locally via Docker Compose — no cloud account or infrastructure setup.
 
