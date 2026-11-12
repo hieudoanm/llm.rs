@@ -150,7 +150,7 @@ const HomePage: NextPage = () => (
         { value: '0', label: 'cloud calls' },
         { value: 'ONNX', label: 'portable export' },
       ]}>
-      <Terminal caption="CSV → ONNX" lines={HERO_LINES} />
+      <Terminal lines={HERO_LINES} />
     </Hero>
 
     <Features
@@ -169,7 +169,6 @@ const HomePage: NextPage = () => (
           {DEMO_TERMINALS.map((t) => (
             <Terminal
               key={t.caption}
-              caption={t.caption}
               lines={t.lines}
               className={t.wide ? 'lg:col-span-2' : ''}
             />
@@ -198,7 +197,7 @@ const HomePage: NextPage = () => (
           title="Get started"
           description="Desktop builds for macOS, Windows, and Linux are on the releases page. Or build the CLI from source with Cargo."
         />
-        <Terminal caption="Build the CLI" lines={INSTALL_LINES} />
+        <Terminal lines={INSTALL_LINES} />
         <p className="text-base-content/60 mt-6 text-center text-sm">
           Prebuilt desktop bundles are on the{' '}
           <a
