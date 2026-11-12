@@ -222,15 +222,16 @@ wrote model.onnx (12.4 KB)</code></pre>
 
   <footer class="footer">
     <div class="container footer-inner">
-      <span>© 2026 llm.rs</span>
+      <span>© <span id="year">2026</span> llm.rs</span>
       <span>Local ML studio · MIT licensed</span>
-      <nav>
+      <nav aria-label="Footer">
         <a href="https://github.com/hieudoanm/llm.rs" target="_blank" rel="noreferrer">GitHub</a>
         <a href="https://github.com/hieudoanm/llm.rs#readme" target="_blank" rel="noreferrer">README</a>
-        <a href="https://github.com/hieudoanm/llm.rs/releases" target="_blank" rel="noreferrer">Releases</a>
       </nav>
     </div>
   </footer>
-
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>

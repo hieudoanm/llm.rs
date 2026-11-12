@@ -4,7 +4,7 @@ Guidance for AI agents working on the landing page (`packages/landing`). See the
 
 ## Overview
 
-The landing page is a plain static site — no framework, no build step, no package manifest, no JavaScript. The whole directory is uploaded verbatim to GitHub Pages at `https://hieudoanm.github.io/llm.rs` (project site, so all asset paths are relative).
+The landing page is a plain static site — no framework, no build step, no package manifest, no JavaScript except a tiny year-injection snippet. The whole directory is uploaded verbatim to GitHub Pages at `https://hieudoanm.github.io/llm.rs` (project site, so all asset paths are relative).
 
 ## Files
 
@@ -28,9 +28,17 @@ python3 -m http.server 4173
 - **Fonts:** Inter (sans) loaded via the Google Fonts `<link>` in `index.html`; mono stack `ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace`. Tokens: `--font-sans` / `--font-mono`. Do not add other typefaces.
 
 - **Light theme only.** Colours are CSS custom properties in `styles.css` (`--bg`, `--fg`, `--accent`, …). Do not add a dark theme or theme toggle.
-- **No frameworks, no JS, no package.json.** Keep it to HTML + CSS + static assets.
+- **No frameworks, no package.json.** The only script allowed is the tiny year-injection snippet in the footer. Keep it to HTML + CSS + static assets.
 - **Relative asset paths.** The site is served under the `/llm.rs` base path on GitHub Pages; use relative URLs (`logo.svg`, `styles.css`), never absolute `/…` paths.
 - **Accent colour is orange** (`--accent: #c2410c` family, `--accent-bright` for text on the dark terminal).
 - **Design rules.** Follow the 20 rules of AI unslop design: concrete headlines, one accent colour, consistent icons, no filler badges, real product artefacts over decoration.
 - **Docs and downloads** live on GitHub: link to `https://github.com/hieudoanm/llm.rs` (`/releases`, `/tree/master/docs`, `/tree/master/crates/llm-cli`) rather than adding pages.
 - **Deploy:** CI uploads `packages/landing` via `actions/upload-pages-artifact` + `actions/deploy-pages` (see `.github/workflows/ci.yaml`). No build step — edit files and they ship as-is.
+
+## Footer
+
+The footer follows the shared contract: `© {year} {repo-name}` (lowercase
+repo name, dynamic year via `<span id="year">` + the year script), a
+one-line tagline/license descriptor, and a right-aligned `<nav
+aria-label="Footer">` with exactly two links — `GitHub` (repo root) and
+`README` (`<repo>#readme`), both `target="_blank" rel="noreferrer"`.
