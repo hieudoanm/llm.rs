@@ -21,8 +21,8 @@ env:
   LLM_DATA_DIR: /tmp/llm-data
 
 jobs:
-  cli:
-    name: CLI
+  cli-check:
+    name: CLI check
     runs-on: ubuntu-latest
 
     steps:
@@ -46,6 +46,10 @@ jobs:
   cli-build:
     name: CLI build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    # Release binaries are only needed for the master-branch release job;
+    # PRs are covered by the `cli-check` job.
+    if: github.event_name != 'pull_request'
+    needs: cli-check
     strategy:
       fail-fast: false
       matrix:
@@ -82,9 +86,46 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  desktop-check:
+    name: Desktop check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6.1.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+
+      - name: Install desktop dependencies
+        working-directory: ${{ github.workspace }}/packages/desktop
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        working-directory: ${{ github.workspace }}/packages/desktop
+        run: pnpm run typecheck
+
+      - name: Lint
+        working-directory: ${{ github.workspace }}/packages/desktop
+        run: pnpm run lint
+
+      - name: Test
+        working-directory: ${{ github.workspace }}/packages/desktop
+        run: pnpm run test
+
   desktop-build:
     name: Desktop build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    # Release bundles are only needed for the master-branch release job;
+    # PRs are covered by the `desktop-check` job.
+    if: github.event_name != 'pull_request'
+    needs: desktop-check
     strategy:
       fail-fast: false
       matrix:
@@ -118,18 +159,6 @@ jobs:
       - name: Install desktop dependencies
         working-directory: ${{ github.workspace }}/packages/desktop
         run: pnpm install --frozen-lockfile
-
-      - name: Typecheck
-        working-directory: ${{ github.workspace }}/packages/desktop
-        run: pnpm run typecheck
-
-      - name: Lint
-        working-directory: ${{ github.workspace }}/packages/desktop
-        run: pnpm run lint
-
-      - name: Test
-        working-directory: ${{ github.workspace }}/packages/desktop
-        run: pnpm run test
 
       - name: Build macOS bundles
         if: runner.os == 'macOS'
