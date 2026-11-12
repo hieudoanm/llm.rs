@@ -25,6 +25,8 @@ python3 -m http.server 4173
 
 ## Conventions
 
+- **Fonts:** Inter (sans) loaded via the Google Fonts `<link>` in `index.html`; mono stack `ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, monospace`. Tokens: `--font-sans` / `--font-mono`. Do not add other typefaces.
+
 - **Light theme only.** Colours are CSS custom properties in `styles.css` (`--bg`, `--fg`, `--accent`, …). Do not add a dark theme or theme toggle.
 - **No frameworks, no JS, no package.json.** Keep it to HTML + CSS + static assets.
 - **Relative asset paths.** The site is served under the `/llm.rs` base path on GitHub Pages; use relative URLs (`logo.svg`, `styles.css`), never absolute `/…` paths.
