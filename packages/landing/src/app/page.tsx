@@ -7,6 +7,7 @@ import SectionHead from '@/components/molecules/SectionHead';
 import Terminal from '@/components/molecules/Terminal';
 import {
   LuActivity,
+  LuBot,
   LuDownload,
   LuGrid3X3,
   LuLayers,
@@ -50,6 +51,11 @@ const FEATURES: Feature[] = [
     icon: LuLayers,
     title: 'Offline reinforcement learning',
     body: 'Train RL policies without a simulator service — environments run locally alongside the model.',
+  },
+  {
+    icon: LuBot,
+    title: 'MCP server',
+    body: 'llm mcp exposes datasets, algorithms, training jobs, and ONNX export to MCP clients — agents can run the full local ML workflow over stdio.',
   },
 ];
 

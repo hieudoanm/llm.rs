@@ -10,7 +10,7 @@ portable **ONNX** model. Everything runs on your own machine.
 - **Getting started** — run the stack with Docker Compose or build the CLI.
 - **Concepts** — tasks, algorithms, jobs, and the ONNX export.
 - **API reference** — the backend HTTP API.
-- **Guides** — the desktop app and common workflows.
+- **Guides** — the desktop app, common workflows, and the MCP server.
 
 ## Interfaces
 
@@ -18,4 +18,4 @@ portable **ONNX** model. Everything runs on your own machine.
 | ----------- | ----------------------------------------------------------- |
 | Web app     | Next.js frontend + Rust backend + SQLite via Docker Compose |
 | Desktop app | Next.js + Tauri desktop UI (`packages/desktop`)             |
-| CLI         | `llm` binary (`crates/llm-cli`)                             |
+| CLI         | `llm` binary (`crates/llm-cli`), including `llm mcp`        |
