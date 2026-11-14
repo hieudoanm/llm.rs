@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 use llm_core::error::LlmResult;
 
-use super::helpers::{parse_query_timestamp, parse_sort, split, invalid};
+use super::helpers::{invalid, parse_query_timestamp, parse_sort, split};
 
 #[derive(Debug, Clone)]
 pub struct JobFilters {
@@ -80,7 +80,10 @@ pub fn parse_filters(input: ParseFiltersInput) -> LlmResult<JobFilters> {
         if trimmed.is_empty() {
             None
         } else {
-            let truncated: String = trimmed.chars().take(super::helpers::MAX_QUERY_LENGTH).collect();
+            let truncated: String = trimmed
+                .chars()
+                .take(super::helpers::MAX_QUERY_LENGTH)
+                .collect();
             Some(truncated)
         }
     });
@@ -140,7 +143,10 @@ mod tests {
     #[test]
     fn test_job_cursor_creation() {
         let id = uuid::Uuid::new_v4();
-        let cursor = JobCursor { value: "2023-01-01T00:00:00Z".to_string(), id };
+        let cursor = JobCursor {
+            value: "2023-01-01T00:00:00Z".to_string(),
+            id,
+        };
         assert_eq!(cursor.value, "2023-01-01T00:00:00Z");
         assert_eq!(cursor.id, id);
     }
@@ -178,7 +184,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             q: Some("test query"),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert_eq!(filters.q, Some("test query".to_string()));
     }
 
@@ -187,7 +194,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             q: Some("  test query  "),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert_eq!(filters.q, Some("test query".to_string()));
     }
 
@@ -197,7 +205,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             q: Some(&long_query),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert_eq!(filters.q.as_ref().map(|s| s.len()), Some(200));
     }
 
@@ -215,7 +224,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             statuses: Some("validating,training"),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert_eq!(filters.statuses.len(), 2);
         assert_eq!(filters.statuses[0], "validating");
         assert_eq!(filters.statuses[1], "training");
@@ -226,7 +236,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             statuses: Some("  "),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert!(filters.statuses.is_empty());
     }
 
@@ -235,7 +246,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             task_types: Some("classification,regression"),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert_eq!(filters.task_types.len(), 2);
         assert_eq!(filters.task_types[0], "classification");
         assert_eq!(filters.task_types[1], "regression");
@@ -246,7 +258,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             algorithm_ids: Some("algo1,algo2"),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert_eq!(filters.algorithm_ids.len(), 2);
         assert_eq!(filters.algorithm_ids[0], "algo1");
         assert_eq!(filters.algorithm_ids[1], "algo2");
@@ -257,7 +270,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             tags: Some("tag1,tag2"),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert_eq!(filters.tags.len(), 2);
         assert_eq!(filters.tags[0], "tag1");
         assert_eq!(filters.tags[1], "tag2");
@@ -268,7 +282,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             created_from: Some("2023-01-01T00:00:00Z"),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert!(filters.created_from.is_some());
     }
 
@@ -277,7 +292,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             created_to: Some("2023-12-31T23:59:59Z"),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert!(filters.created_to.is_some());
     }
 
@@ -286,7 +302,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             sort: Some("createdAt:asc"),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert_eq!(filters.sort_field, "createdAt");
         assert_eq!(filters.sort_direction, "asc");
     }
@@ -296,7 +313,8 @@ mod tests {
         let filters = parse_filters(ParseFiltersInput {
             sort: Some("status:desc"),
             ..Default::default()
-        }).unwrap();
+        })
+        .unwrap();
         assert_eq!(filters.sort_field, "status");
         assert_eq!(filters.sort_direction, "desc");
     }
@@ -356,7 +374,10 @@ mod tests {
     #[test]
     fn test_job_cursor_cloning() {
         let id = uuid::Uuid::new_v4();
-        let original = JobCursor { value: "2023-01-01T00:00:00Z".to_string(), id };
+        let original = JobCursor {
+            value: "2023-01-01T00:00:00Z".to_string(),
+            id,
+        };
         let cloned = original.clone();
         assert_eq!(original.value, cloned.value);
         assert_eq!(original.id, cloned.id);
@@ -380,7 +401,9 @@ mod tests {
     fn parse_query_timestamp_basic_and_empty() {
         assert!(parse_query_timestamp("createdAt", Some("2025-06-15T12:30:00Z")).is_ok());
         assert!(parse_query_timestamp("createdAt", None).unwrap().is_none());
-        assert!(parse_query_timestamp("createdAt", Some("")).unwrap().is_none());
+        assert!(parse_query_timestamp("createdAt", Some(""))
+            .unwrap()
+            .is_none());
     }
 
     #[test]
@@ -391,7 +414,12 @@ mod tests {
             ("status", "asc"),
             ("algorithmId", "asc"),
         ] {
-            assert_eq!(parse_sort(Some(format!("{field}:{dir}").as_str())).unwrap().0, field);
+            assert_eq!(
+                parse_sort(Some(format!("{field}:{dir}").as_str()))
+                    .unwrap()
+                    .0,
+                field
+            );
         }
     }
 
@@ -418,17 +446,20 @@ mod tests {
     #[test]
     fn sort_expression_mapping() {
         use crate::jobs::helpers::sort_expression;
-        assert_eq!(sort_expression(&JobFilters {
-            statuses: Vec::new(),
-            task_types: Vec::new(),
-            algorithm_ids: Vec::new(),
-            tags: Vec::new(),
-            q: None,
-            created_from: None,
-            created_to: None,
-            sort_field: "createdAt".to_string(),
-            sort_direction: "desc".to_string(),
-        }), "j.created_at");
+        assert_eq!(
+            sort_expression(&JobFilters {
+                statuses: Vec::new(),
+                task_types: Vec::new(),
+                algorithm_ids: Vec::new(),
+                tags: Vec::new(),
+                q: None,
+                created_from: None,
+                created_to: None,
+                sort_field: "createdAt".to_string(),
+                sort_direction: "desc".to_string(),
+            }),
+            "j.created_at"
+        );
         assert_eq!(
             sort_expression(&JobFilters {
                 statuses: Vec::new(),

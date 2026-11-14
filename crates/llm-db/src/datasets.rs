@@ -67,61 +67,57 @@ pub async fn insert_insight(pool: &SqlitePool, insight: &DatasetInsight) -> LlmR
     Ok(())
 }
 
-pub async fn get_insight(
-    pool: &SqlitePool,
-    dataset_id: Uuid,
-) -> LlmResult<Option<DatasetInsight>> {
-    let row = sqlx::query_as::<_, InsightRow>(
-        "SELECT * FROM dataset_insights WHERE dataset_id = ?1",
-    )
-    .bind(dataset_id.to_string())
-    .fetch_optional(pool)
-    .await
-    .map_err(|err| database_error("loading dataset insights", err))?;
+pub async fn get_insight(pool: &SqlitePool, dataset_id: Uuid) -> LlmResult<Option<DatasetInsight>> {
+    let row =
+        sqlx::query_as::<_, InsightRow>("SELECT * FROM dataset_insights WHERE dataset_id = ?1")
+            .bind(dataset_id.to_string())
+            .fetch_optional(pool)
+            .await
+            .map_err(|err| database_error("loading dataset insights", err))?;
     row.map(InsightRow::into_domain).transpose()
 }
 
 #[cfg(test)]
 mod tests {
-use super::*;
-use llm_core::domain::ColumnPreview;
-use chrono::Utc;
-use serde_json::json;
+    use super::*;
+    use chrono::Utc;
+    use llm_core::domain::ColumnPreview;
+    use serde_json::json;
 
-fn create_test_dataset() -> Dataset {
-    Dataset {
-        id: Uuid::new_v4(),
-        original_filename: "test.csv".to_string(),
-        sha256: "abc123".to_string(),
-        byte_size: 1000,
-        storage_key: "test-key".to_string(),
-        columns: vec![ColumnPreview {
-            name: "col1".to_string(),
-            inferred_dtype: "f64".to_string(),
-            null_count: 0,
-            sample_values: vec![],
-        }],
-        row_count: 10,
-        created_at: Utc::now(),
+    fn create_test_dataset() -> Dataset {
+        Dataset {
+            id: Uuid::new_v4(),
+            original_filename: "test.csv".to_string(),
+            sha256: "abc123".to_string(),
+            byte_size: 1000,
+            storage_key: "test-key".to_string(),
+            columns: vec![ColumnPreview {
+                name: "col1".to_string(),
+                inferred_dtype: "f64".to_string(),
+                null_count: 0,
+                sample_values: vec![],
+            }],
+            row_count: 10,
+            created_at: Utc::now(),
+        }
     }
-}
 
-fn create_test_insight() -> DatasetInsight {
-    DatasetInsight {
-        dataset_id: Uuid::new_v4(),
-        row_count: 100,
-        column_count: 5,
-        total_missing: 3,
-        columns: json!([{
-            "name": "col1"
-        }]),
-        warnings: json!([{
-            "type": "missing",
-            "count": 3
-        }]),
-        created_at: Utc::now(),
+    fn create_test_insight() -> DatasetInsight {
+        DatasetInsight {
+            dataset_id: Uuid::new_v4(),
+            row_count: 100,
+            column_count: 5,
+            total_missing: 3,
+            columns: json!([{
+                "name": "col1"
+            }]),
+            warnings: json!([{
+                "type": "missing",
+                "count": 3
+            }]),
+            created_at: Utc::now(),
+        }
     }
-}
 
     #[tokio::test]
     async fn test_insert_and_get_dataset() {

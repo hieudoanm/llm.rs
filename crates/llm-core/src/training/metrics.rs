@@ -34,7 +34,11 @@ pub fn classification_metrics(y_true: &[usize], y_pred: &[usize], n_classes: usi
             .filter(|(truth, pred)| **truth == class && **pred != class)
             .count() as f64;
         let precision = if tp + fp == 0.0 { 0.0 } else { tp / (tp + fp) };
-        let recall = if tp + fnn == 0.0 { 0.0 } else { tp / (tp + fnn) };
+        let recall = if tp + fnn == 0.0 {
+            0.0
+        } else {
+            tp / (tp + fnn)
+        };
         let f1 = if precision + recall == 0.0 {
             0.0
         } else {
@@ -87,7 +91,11 @@ pub fn per_class_metrics(
                 .count() as f64;
             let support = y_true.iter().filter(|truth| **truth == class).count();
             let precision = if tp + fp == 0.0 { 0.0 } else { tp / (tp + fp) };
-            let recall = if tp + fnn == 0.0 { 0.0 } else { tp / (tp + fnn) };
+            let recall = if tp + fnn == 0.0 {
+                0.0
+            } else {
+                tp / (tp + fnn)
+            };
             let f1 = if precision + recall == 0.0 {
                 0.0
             } else {
@@ -113,7 +121,10 @@ pub fn regression_metrics(y_true: &[f64], y_pred: &[f64]) -> Value {
         .sum::<f64>()
         / n;
     let mean = y_true.iter().sum::<f64>() / n;
-    let ss_tot = y_true.iter().map(|value| (value - mean).powi(2)).sum::<f64>();
+    let ss_tot = y_true
+        .iter()
+        .map(|value| (value - mean).powi(2))
+        .sum::<f64>();
     let ss_res = y_true
         .iter()
         .zip(y_pred)
@@ -132,10 +143,7 @@ pub fn regression_metrics(y_true: &[f64], y_pred: &[f64]) -> Value {
 }
 
 fn sq_distance(a: &[f64], b: &[f64]) -> f64 {
-    a.iter()
-        .zip(b)
-        .map(|(x, y)| (x - y).powi(2))
-        .sum::<f64>()
+    a.iter().zip(b).map(|(x, y)| (x - y).powi(2)).sum::<f64>()
 }
 
 /// Mean silhouette coefficient, or `None` for a degenerate labelling.

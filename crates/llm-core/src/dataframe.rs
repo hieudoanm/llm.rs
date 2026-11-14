@@ -174,7 +174,6 @@ impl DataFrame {
         }
         seen
     }
-
 }
 
 pub fn parse_number(raw: &str) -> Option<f64> {
@@ -186,7 +185,10 @@ pub fn parse_number(raw: &str) -> Option<f64> {
     if matches!(lowered.as_str(), "nan" | "null" | "none" | "na" | "n/a") {
         return None;
     }
-    trimmed.parse::<f64>().ok().filter(|value| value.is_finite())
+    trimmed
+        .parse::<f64>()
+        .ok()
+        .filter(|value| value.is_finite())
 }
 
 /// Parse a cell as a label, treating the documented unlabelled tokens as missing.

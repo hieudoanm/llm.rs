@@ -29,7 +29,9 @@ fn date_patterns() -> &'static [Regex] {
 }
 
 fn is_date_like(value: &str) -> bool {
-    date_patterns().iter().any(|pattern| pattern.is_match(value))
+    date_patterns()
+        .iter()
+        .any(|pattern| pattern.is_match(value))
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
@@ -366,7 +368,10 @@ mod tests {
             warning_action("CONSTANT_COLUMN"),
             "Remove this column from the feature set."
         );
-        assert_eq!(warning_action("HIGH_MISSING_RATE"), "Impute or drop this column.");
+        assert_eq!(
+            warning_action("HIGH_MISSING_RATE"),
+            "Impute or drop this column."
+        );
         assert_eq!(
             warning_action("ALL_VALUES_MISSING"),
             "This column carries no information."
@@ -383,8 +388,14 @@ mod tests {
             warning_action("MIXED_TYPES"),
             "Convert this column to a single type before using it."
         );
-        assert_eq!(warning_action("TEXT_COLUMN"), "Not usable as a numeric feature.");
-        assert_eq!(warning_action("SINGLE_VALUE_LABEL"), "Add more labelled rows.");
+        assert_eq!(
+            warning_action("TEXT_COLUMN"),
+            "Not usable as a numeric feature."
+        );
+        assert_eq!(
+            warning_action("SINGLE_VALUE_LABEL"),
+            "Add more labelled rows."
+        );
         assert_eq!(warning_action("UNKNOWN"), "");
     }
 
@@ -505,10 +516,14 @@ mod tests {
         let _profile = profile_dataframe(&frame);
         let frame2 = DataFrame::from_csv_str("a\n5\n5\n5\n").unwrap();
         let profile2 = profile_dataframe(&frame2);
-        assert!(profile2.columns[0].warnings.contains(&"CONSTANT_COLUMN".to_string()));
+        assert!(profile2.columns[0]
+            .warnings
+            .contains(&"CONSTANT_COLUMN".to_string()));
         let frame3 = DataFrame::from_csv_str("id\n1\n2\n3\n").unwrap();
         let profile3 = profile_dataframe(&frame3);
-        assert!(profile3.columns[0].warnings.contains(&"POSSIBLE_ID_COLUMN".to_string()));
+        assert!(profile3.columns[0]
+            .warnings
+            .contains(&"POSSIBLE_ID_COLUMN".to_string()));
     }
 
     #[test]
@@ -527,15 +542,16 @@ mod tests {
         }
         let frame3 = DataFrame::from_csv_str(&s).unwrap();
         let profile3 = profile_dataframe(&frame3);
-        assert!(profile3.columns[1].warnings.contains(&"TEXT_COLUMN".to_string()));
+        assert!(profile3.columns[1]
+            .warnings
+            .contains(&"TEXT_COLUMN".to_string()));
     }
 
     #[test]
     fn profile_single_value_label() {
         let frame = DataFrame::from_csv_str("x,label\n1,A\n2,A\n3,A\n").unwrap();
         let profile = profile_dataframe(&frame);
-        assert!(profile
-            .columns[1]
+        assert!(profile.columns[1]
             .warnings
             .contains(&"SINGLE_VALUE_LABEL".to_string()));
         assert!(profile

@@ -43,11 +43,10 @@ impl Database {
                 .journal_mode(SqliteJournalMode::Wal)
                 .synchronous(SqliteSynchronous::Normal)
         } else {
-            SqliteConnectOptions::from_str(settings.database_url.trim()).map_err(|err| {
-                LlmError::internal(format!("invalid DATABASE_URL: {err}"))
-            })?
-            .create_if_missing(true)
-            .foreign_keys(true)
+            SqliteConnectOptions::from_str(settings.database_url.trim())
+                .map_err(|err| LlmError::internal(format!("invalid DATABASE_URL: {err}")))?
+                .create_if_missing(true)
+                .foreign_keys(true)
         };
 
         let pool = SqlitePoolOptions::new()
@@ -73,7 +72,9 @@ impl Database {
             .max_connections(1)
             .connect_with(options)
             .await
-            .map_err(|err| LlmError::internal(format!("failed to open in-memory database: {err}")))?;
+            .map_err(|err| {
+                LlmError::internal(format!("failed to open in-memory database: {err}"))
+            })?;
         let database = Database { pool };
         database.migrate().await?;
         Ok(database)

@@ -4,7 +4,7 @@ use anyhow::Result;
 use llm_core::catalogue::find;
 use llm_core::config::get_settings;
 use llm_core::dataframe::DataFrame;
-use llm_core::domain::{ArtefactFormat, Job, JobStatus, TaskType, utc_now};
+use llm_core::domain::{utc_now, ArtefactFormat, Job, JobStatus, TaskType};
 use llm_core::export;
 use llm_core::storage::{dataset_path, ensure_dirs, write_artefact};
 use llm_core::training::{train, TrainingOutput};
@@ -25,13 +25,15 @@ pub async fn cmd_train(
     let dataset_id = Uuid::parse_str(dataset_id_str)
         .map_err(|e| anyhow::anyhow!("Invalid dataset ID: {}", e))?;
 
-    let spec = find(algorithm_id)
-        .ok_or_else(|| anyhow::anyhow!("Unknown algorithm: {}", algorithm_id))?;
+    let spec =
+        find(algorithm_id).ok_or_else(|| anyhow::anyhow!("Unknown algorithm: {}", algorithm_id))?;
 
     if spec.task_type != *task {
         return Err(anyhow::anyhow!(
             "Algorithm {} is for task {}, not {}",
-            algorithm_id, spec.task_type, task
+            algorithm_id,
+            spec.task_type,
+            task
         ));
     }
 
@@ -98,8 +100,8 @@ pub async fn cmd_train(
         println!("  Features: {:?}", job.feature_columns);
         println!("  Label: {:?}", job.label_column);
 
-        let output: TrainingOutput = train(&job, &df)
-            .map_err(|e| anyhow::anyhow!("Training failed: {}", e))?;
+        let output: TrainingOutput =
+            train(&job, &df).map_err(|e| anyhow::anyhow!("Training failed: {}", e))?;
 
         jobs::set_status(db.pool(), job.id, JobStatus::Exporting.as_str()).await?;
 
@@ -171,5 +173,3 @@ mod tests {
         assert!(true);
     }
 }
-
-

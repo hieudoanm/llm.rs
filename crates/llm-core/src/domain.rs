@@ -10,7 +10,6 @@ use uuid::Uuid;
 
 use crate::error::{LlmError, LlmResult};
 
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize, ValueEnum)]
 #[serde(rename_all = "snake_case")]
 pub enum TaskType {
@@ -72,9 +71,7 @@ impl FromStr for TaskType {
             "clustering" => Ok(TaskType::Clustering),
             "anomaly_detection" => Ok(TaskType::AnomalyDetection),
             "reinforcement_learning" => Ok(TaskType::ReinforcementLearning),
-            other => Err(LlmError::validation(format!(
-                "Invalid taskType: {other}"
-            ))),
+            other => Err(LlmError::validation(format!("Invalid taskType: {other}"))),
         }
     }
 }
@@ -118,10 +115,7 @@ impl JobStatus {
     }
 
     pub fn ordinal(self) -> i64 {
-        JobStatus::ALL
-            .iter()
-            .position(|s| *s == self)
-            .unwrap_or(0) as i64
+        JobStatus::ALL.iter().position(|s| *s == self).unwrap_or(0) as i64
     }
 
     pub fn is_terminal(self) -> bool {
@@ -353,7 +347,11 @@ mod tests {
 
     #[test]
     fn serde_roundtrip_artefact_format() {
-        for f in [ArtefactFormat::Onnx, ArtefactFormat::Pkl, ArtefactFormat::Joblib] {
+        for f in [
+            ArtefactFormat::Onnx,
+            ArtefactFormat::Pkl,
+            ArtefactFormat::Joblib,
+        ] {
             let j = serde_json::to_string(&f).unwrap();
             let f2: ArtefactFormat = serde_json::from_str(&j).unwrap();
             assert_eq!(f2, f);
@@ -424,7 +422,10 @@ mod tests {
     fn display_fromstr() {
         assert_eq!(JobStatus::Completed.as_str(), "completed");
         assert_eq!(format!("{}", JobStatus::Failed), "failed");
-        assert_eq!("training".parse::<JobStatus>().unwrap(), JobStatus::Training);
+        assert_eq!(
+            "training".parse::<JobStatus>().unwrap(),
+            JobStatus::Training
+        );
         assert!("bad".parse::<JobStatus>().is_err());
         assert!(JobStatus::Completed.is_terminal());
         assert!(JobStatus::Training.is_active());
@@ -432,7 +433,10 @@ mod tests {
         assert!(!JobStatus::Queued.is_terminal());
 
         assert_eq!(format!("{}", ArtefactFormat::Onnx), "onnx");
-        assert_eq!("pkl".parse::<ArtefactFormat>().unwrap(), ArtefactFormat::Pkl);
+        assert_eq!(
+            "pkl".parse::<ArtefactFormat>().unwrap(),
+            ArtefactFormat::Pkl
+        );
         assert!("joblib".parse::<ArtefactFormat>().unwrap() == ArtefactFormat::Joblib);
         assert!("bad".parse::<ArtefactFormat>().is_err());
     }
@@ -494,12 +498,30 @@ mod tests {
 
     #[test]
     fn fromstr_task_type() {
-        assert_eq!("classification".parse::<TaskType>().unwrap(), TaskType::Classification);
-        assert_eq!("regression".parse::<TaskType>().unwrap(), TaskType::Regression);
-        assert_eq!("semi_supervised".parse::<TaskType>().unwrap(), TaskType::SemiSupervised);
-        assert_eq!("clustering".parse::<TaskType>().unwrap(), TaskType::Clustering);
-        assert_eq!("anomaly_detection".parse::<TaskType>().unwrap(), TaskType::AnomalyDetection);
-        assert_eq!("reinforcement_learning".parse::<TaskType>().unwrap(), TaskType::ReinforcementLearning);
+        assert_eq!(
+            "classification".parse::<TaskType>().unwrap(),
+            TaskType::Classification
+        );
+        assert_eq!(
+            "regression".parse::<TaskType>().unwrap(),
+            TaskType::Regression
+        );
+        assert_eq!(
+            "semi_supervised".parse::<TaskType>().unwrap(),
+            TaskType::SemiSupervised
+        );
+        assert_eq!(
+            "clustering".parse::<TaskType>().unwrap(),
+            TaskType::Clustering
+        );
+        assert_eq!(
+            "anomaly_detection".parse::<TaskType>().unwrap(),
+            TaskType::AnomalyDetection
+        );
+        assert_eq!(
+            "reinforcement_learning".parse::<TaskType>().unwrap(),
+            TaskType::ReinforcementLearning
+        );
         assert!("bad".parse::<TaskType>().is_err());
     }
 

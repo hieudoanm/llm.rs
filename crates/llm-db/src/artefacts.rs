@@ -68,14 +68,13 @@ pub async fn get_artefact(
     job_id: Uuid,
     artefact_id: Uuid,
 ) -> LlmResult<Option<Artefact>> {
-    let row = sqlx::query_as::<_, ArtefactRow>(
-        "SELECT * FROM artefacts WHERE id = ?1 AND job_id = ?2",
-    )
-    .bind(artefact_id.to_string())
-    .bind(job_id.to_string())
-    .fetch_optional(pool)
-    .await
-    .map_err(|err| database_error("loading an artefact", err))?;
+    let row =
+        sqlx::query_as::<_, ArtefactRow>("SELECT * FROM artefacts WHERE id = ?1 AND job_id = ?2")
+            .bind(artefact_id.to_string())
+            .bind(job_id.to_string())
+            .fetch_optional(pool)
+            .await
+            .map_err(|err| database_error("loading an artefact", err))?;
     row.map(ArtefactRow::into_domain).transpose()
 }
 
@@ -90,25 +89,24 @@ pub async fn delete_artefacts(pool: &SqlitePool, job_id: Uuid) -> LlmResult<()> 
 
 /// The storage keys of a job's artefacts, so the caller can remove the files.
 pub async fn storage_keys(pool: &SqlitePool, job_id: Uuid) -> LlmResult<Vec<String>> {
-    let keys = sqlx::query_scalar::<_, String>(
-        "SELECT storage_key FROM artefacts WHERE job_id = ?1",
-    )
-    .bind(job_id.to_string())
-    .fetch_all(pool)
-    .await
-    .map_err(|err| database_error("listing artefact storage keys", err))?;
+    let keys =
+        sqlx::query_scalar::<_, String>("SELECT storage_key FROM artefacts WHERE job_id = ?1")
+            .bind(job_id.to_string())
+            .fetch_all(pool)
+            .await
+            .map_err(|err| database_error("listing artefact storage keys", err))?;
     Ok(keys)
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use llm_core::domain::{Artefact, Dataset, Job};
-    use chrono::Utc;
-    use serde_json::Value;
-    use uuid::Uuid;
     use crate::datasets;
     use crate::jobs::writes::insert_job;
+    use chrono::Utc;
+    use llm_core::domain::{Artefact, Dataset, Job};
+    use serde_json::Value;
+    use uuid::Uuid;
 
     fn create_test_dataset() -> Dataset {
         Dataset {
@@ -193,7 +191,9 @@ mod tests {
         let dataset = create_test_dataset();
         datasets::insert_dataset(db.pool(), &dataset).await.unwrap();
         let job_id = create_test_job(&db, dataset.id).await;
-        insert_artefact(db.pool(), &create_test_artefact(job_id, "storage-key-1")).await.unwrap();
+        insert_artefact(db.pool(), &create_test_artefact(job_id, "storage-key-1"))
+            .await
+            .unwrap();
         let mut artefact2 = create_test_artefact(job_id, "storage-key-2");
         artefact2.id = Uuid::new_v4();
         artefact2.filename = "model.pkl".to_string();
@@ -215,7 +215,9 @@ mod tests {
         let dataset = create_test_dataset();
         datasets::insert_dataset(db.pool(), &dataset).await.unwrap();
         let job_id = create_test_job(&db, dataset.id).await;
-        insert_artefact(db.pool(), &create_test_artefact(job_id, "storage-key-1")).await.unwrap();
+        insert_artefact(db.pool(), &create_test_artefact(job_id, "storage-key-1"))
+            .await
+            .unwrap();
         let result = list_artefacts_for_jobs(db.pool(), &[job_id]).await.unwrap();
         assert_eq!(result.len(), 1);
     }
@@ -236,7 +238,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_artefact_not_found() {
         let db = crate::Database::in_memory().await.unwrap();
-        let result = get_artefact(db.pool(), Uuid::new_v4(), Uuid::new_v4()).await.unwrap();
+        let result = get_artefact(db.pool(), Uuid::new_v4(), Uuid::new_v4())
+            .await
+            .unwrap();
         assert!(result.is_none());
     }
 
@@ -259,7 +263,9 @@ mod tests {
         let dataset = create_test_dataset();
         datasets::insert_dataset(db.pool(), &dataset).await.unwrap();
         let job_id = create_test_job(&db, dataset.id).await;
-        insert_artefact(db.pool(), &create_test_artefact(job_id, "storage-key-1")).await.unwrap();
+        insert_artefact(db.pool(), &create_test_artefact(job_id, "storage-key-1"))
+            .await
+            .unwrap();
         delete_artefacts(db.pool(), job_id).await.unwrap();
         let retrieved = list_artefacts(db.pool(), job_id).await.unwrap();
         assert!(retrieved.is_empty());
@@ -271,7 +277,9 @@ mod tests {
         let dataset = create_test_dataset();
         datasets::insert_dataset(db.pool(), &dataset).await.unwrap();
         let job_id = create_test_job(&db, dataset.id).await;
-        insert_artefact(db.pool(), &create_test_artefact(job_id, "storage-key-1")).await.unwrap();
+        insert_artefact(db.pool(), &create_test_artefact(job_id, "storage-key-1"))
+            .await
+            .unwrap();
         let keys = storage_keys(db.pool(), job_id).await.unwrap();
         assert_eq!(keys.len(), 1);
         assert_eq!(keys[0], "storage-key-1");

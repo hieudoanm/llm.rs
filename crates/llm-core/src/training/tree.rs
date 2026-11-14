@@ -48,7 +48,9 @@ fn mean_target(targets: &[Vec<f64>], indices: &[usize], dim: usize) -> Vec<f64> 
             }
         }
     }
-    sums.into_iter().map(|value| value / indices.len() as f64).collect()
+    sums.into_iter()
+        .map(|value| value / indices.len() as f64)
+        .collect()
 }
 
 impl<'a> Builder<'a> {
@@ -117,15 +119,7 @@ impl<'a> Builder<'a> {
         for feature in features {
             let mut pairs: Vec<(f64, usize)> = indices
                 .iter()
-                .map(|index| {
-                    (
-                        self.x[*index]
-                            .get(feature)
-                            .copied()
-                            .unwrap_or(0.0),
-                        *index,
-                    )
-                })
+                .map(|index| (self.x[*index].get(feature).copied().unwrap_or(0.0), *index))
                 .collect();
             pairs.sort_by(|a, b| a.0.partial_cmp(&b.0).unwrap_or(std::cmp::Ordering::Equal));
             if pairs.len() < 2 {
@@ -185,7 +179,8 @@ impl<'a> Builder<'a> {
                     let total_sum = prefix[pairs.len()][0];
                     let left_sum = prefix[position + 1][0];
                     let right_sum = total_sum - left_sum;
-                    (prefix_sq[pairs.len()] - prefix_sq[position + 1]
+                    (prefix_sq[pairs.len()]
+                        - prefix_sq[position + 1]
                         - right_sum * right_sum / right_n)
                         .max(0.0)
                 };
@@ -233,9 +228,7 @@ impl<'a> Builder<'a> {
         };
         let (left_indices, right_indices): (Vec<usize>, Vec<usize>) = indices
             .iter()
-            .partition(|index| {
-                self.x[**index].get(feature).copied().unwrap_or(0.0) <= threshold
-            });
+            .partition(|index| self.x[**index].get(feature).copied().unwrap_or(0.0) <= threshold);
         if left_indices.is_empty() || right_indices.is_empty() {
             return node_index;
         }

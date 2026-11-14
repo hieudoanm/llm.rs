@@ -41,7 +41,9 @@ fn is_truthy(raw: &str) -> bool {
     match lowered.as_str() {
         "true" | "1" | "yes" | "y" => true,
         "false" | "0" | "no" | "n" | "" => false,
-        _ => parse_number(&lowered).map(|value| value != 0.0).unwrap_or(false),
+        _ => parse_number(&lowered)
+            .map(|value| value != 0.0)
+            .unwrap_or(false),
     }
 }
 
@@ -72,7 +74,11 @@ pub fn prepare_transitions(df: &DataFrame, job: &Job) -> LlmResult<(Vec<Transiti
     }
     let action_col = rl.action_column.trim();
     let reward_col = rl.reward_column.trim();
-    let done_col = rl.done_column.as_deref().map(str::trim).filter(|c| !c.is_empty());
+    let done_col = rl
+        .done_column
+        .as_deref()
+        .map(str::trim)
+        .filter(|c| !c.is_empty());
     let episode_col = rl
         .episode_column
         .as_deref()
@@ -329,7 +335,10 @@ fn design_matrix(
         .map(|transition| {
             let mut row = preprocessor.transform_numeric(&transition.state);
             let mut one_hot = vec![0.0; actions.len()];
-            if let Some(index) = actions.iter().position(|action| action == &transition.action) {
+            if let Some(index) = actions
+                .iter()
+                .position(|action| action == &transition.action)
+            {
                 one_hot[index] = 1.0;
             }
             row.extend(one_hot);
@@ -421,15 +430,11 @@ pub fn train_reinforcement_learning(
     let has_episodes = transitions.iter().any(|t| t.episode.is_some());
     let (train, test) = split_transitions(&transitions, has_episodes, split_ratio, seed);
 
-    let n_iterations = job
-        .hyperparameter::<i64>("n_iterations", 10)
-        .clamp(1, 50) as usize;
+    let n_iterations = job.hyperparameter::<i64>("n_iterations", 10).clamp(1, 50) as usize;
     let gamma = job.hyperparameter::<f64>("gamma", 0.9);
     let max_depth = job.hyperparameter::<i64>("max_depth", 3).clamp(1, 20) as usize;
     let learning_rate = job.hyperparameter::<f64>("learning_rate", 0.1);
-    let n_estimators = job
-        .hyperparameter::<i64>("n_estimators", 100)
-        .clamp(1, 200) as usize;
+    let n_estimators = job.hyperparameter::<i64>("n_estimators", 100).clamp(1, 200) as usize;
 
     // Fit the preprocessor on the training state block.
     let mut csv_text = preprocessor.feature_columns.join(",") + "\n";
@@ -442,8 +447,8 @@ pub fn train_reinforcement_learning(
         }
         csv_text.push('\n');
     }
-    let state_frame = DataFrame::from_csv_str(&csv_text)
-        .expect("state frame CSV round-trip should succeed");
+    let state_frame =
+        DataFrame::from_csv_str(&csv_text).expect("state frame CSV round-trip should succeed");
     let preprocessor = Preprocessor::fit(&state_frame, &preprocessor.feature_columns)?;
 
     let params = TreeParams {

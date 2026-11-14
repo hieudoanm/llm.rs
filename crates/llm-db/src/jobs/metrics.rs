@@ -57,8 +57,7 @@ pub async fn metrics_by_ids(
     if job_ids.is_empty() {
         return Ok(HashMap::new());
     }
-    let mut builder =
-        QueryBuilder::<Sqlite>::new("SELECT * FROM job_metrics WHERE job_id IN (");
+    let mut builder = QueryBuilder::<Sqlite>::new("SELECT * FROM job_metrics WHERE job_id IN (");
     let mut separated = builder.separated(", ");
     for job_id in job_ids {
         separated.push_bind(job_id.to_string());
@@ -90,12 +89,12 @@ pub async fn delete_metrics(pool: &SqlitePool, job_id: Uuid) -> LlmResult<()> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use llm_core::domain::{Dataset, Job, JobMetric};
-    use chrono::Utc;
-    use serde_json::Value;
-    use uuid::Uuid;
     use crate::datasets;
     use crate::jobs::writes::insert_job;
+    use chrono::Utc;
+    use llm_core::domain::{Dataset, Job, JobMetric};
+    use serde_json::Value;
+    use uuid::Uuid;
 
     fn create_test_dataset() -> Dataset {
         Dataset {

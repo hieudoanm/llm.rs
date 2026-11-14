@@ -87,7 +87,9 @@ pub fn fit(
     let mut order: Vec<usize> = (0..x.len()).collect();
     let mut momentum: Vec<Vec<Vec<f64>>> = layers
         .iter()
-        .map(|layer| vec![vec![0.0; layer.weights.first().map(Vec::len).unwrap_or(0)]; layer.weights.len()])
+        .map(|layer| {
+            vec![vec![0.0; layer.weights.first().map(Vec::len).unwrap_or(0)]; layer.weights.len()]
+        })
         .collect();
     let mut momentum_bias: Vec<Vec<f64>> = layers
         .iter()
@@ -104,7 +106,12 @@ pub fn fit(
         for batch in order.chunks(batch_size) {
             let mut grad_w: Vec<Vec<Vec<f64>>> = layers
                 .iter()
-                .map(|layer| vec![vec![0.0; layer.weights.first().map(Vec::len).unwrap_or(0)]; layer.weights.len()])
+                .map(|layer| {
+                    vec![
+                        vec![0.0; layer.weights.first().map(Vec::len).unwrap_or(0)];
+                        layer.weights.len()
+                    ]
+                })
                 .collect();
             let mut grad_b: Vec<Vec<f64>> = layers
                 .iter()
@@ -147,7 +154,8 @@ pub fn fit(
                     }
                     if layer_index > 0 {
                         let previous = &layers[layer_index - 1];
-                        let previous_output = &activations[layer_index];                        let mut previous_delta = vec![0.0; previous.weights.len()];
+                        let previous_output = &activations[layer_index];
+                        let mut previous_delta = vec![0.0; previous.weights.len()];
                         for input_index in 0..previous.weights.len() {
                             let mut sum = 0.0;
                             for (unit, weights) in layers[layer_index].weights.iter().enumerate() {
@@ -170,8 +178,9 @@ pub fn fit(
                     for feature in 0..layers[layer_index].weights[unit].len() {
                         let gradient = grad_w[layer_index][unit][feature] * scale
                             + alpha * layers[layer_index].weights[unit][feature];
-                        momentum[layer_index][unit][feature] =
-                            0.9 * momentum[layer_index][unit][feature] - learning_rate_init * gradient;
+                        momentum[layer_index][unit][feature] = 0.9
+                            * momentum[layer_index][unit][feature]
+                            - learning_rate_init * gradient;
                         layers[layer_index].weights[unit][feature] +=
                             momentum[layer_index][unit][feature];
                     }

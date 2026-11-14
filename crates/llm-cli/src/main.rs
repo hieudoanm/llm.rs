@@ -2,14 +2,20 @@
 
 mod cli;
 mod commands;
+mod mcp;
 
 use clap::Parser;
 use cli::{Cli, Commands};
-use commands::{cmd_algorithms, cmd_dataset, cmd_datasets, cmd_export, cmd_job, cmd_jobs, cmd_train};
+use commands::{
+    cmd_algorithms, cmd_dataset, cmd_datasets, cmd_export, cmd_job, cmd_jobs, cmd_train,
+};
 use llm_core::config::{get_settings, setup_logging};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    if std::env::args().nth(1).as_deref() == Some("mcp") {
+        return mcp::run().map_err(Into::into);
+    }
     let settings = get_settings();
     setup_logging(&settings.log_level);
 
@@ -52,5 +58,6 @@ async fn main() -> anyhow::Result<()> {
         } => cmd_export(&job_id, &output, &format).await,
         Commands::Jobs => cmd_jobs().await,
         Commands::Datasets => cmd_datasets(),
+        Commands::Mcp => unreachable!("handled before dispatch"),
     }
 }

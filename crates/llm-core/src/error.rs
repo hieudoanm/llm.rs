@@ -50,7 +50,11 @@ impl LlmError {
     }
 
     pub fn database() -> Self {
-        Self::new(500, "DATABASE_ERROR", "A database error occurred. Please retry.")
+        Self::new(
+            500,
+            "DATABASE_ERROR",
+            "A database error occurred. Please retry.",
+        )
     }
 
     pub fn service_unavailable(message: impl Into<String>) -> Self {

@@ -72,7 +72,10 @@ mod tests {
             created_at: "2025-06-15T10:00:00Z".to_string(),
         };
         let domain: llm_core::domain::Dataset = ds.into_domain().unwrap();
-        assert_eq!(domain.id, Uuid::parse_str("123e4567-e89b-12d3-a456-426614174000").unwrap());
+        assert_eq!(
+            domain.id,
+            Uuid::parse_str("123e4567-e89b-12d3-a456-426614174000").unwrap()
+        );
         assert_eq!(domain.original_filename, "data.csv");
         assert_eq!(domain.byte_size, 100);
     }
@@ -105,8 +108,14 @@ mod tests {
             updated_at: "2025-06-15T08:00:01Z".to_string(),
         };
         let domain: llm_core::domain::Job = row.into_domain().unwrap();
-        assert_eq!(domain.id, Uuid::parse_str("123e4567-e89b-12d3-a456-426614174000").unwrap());
-        assert_eq!(domain.dataset_id, Uuid::parse_str("123e4567-e89b-12d3-a456-426614174001").unwrap());
+        assert_eq!(
+            domain.id,
+            Uuid::parse_str("123e4567-e89b-12d3-a456-426614174000").unwrap()
+        );
+        assert_eq!(
+            domain.dataset_id,
+            Uuid::parse_str("123e4567-e89b-12d3-a456-426614174001").unwrap()
+        );
         assert_eq!(domain.feature_columns, vec!["x".to_string()]);
         assert!(domain.export_pkl);
         assert!(!domain.export_joblib);
@@ -123,7 +132,10 @@ mod tests {
             created_at: now,
         };
         let domain: llm_core::domain::JobMetric = row.into_domain().unwrap();
-        assert_eq!(domain.job_id, Uuid::parse_str("123e4567-e89b-12d3-a456-426614174000").unwrap());
+        assert_eq!(
+            domain.job_id,
+            Uuid::parse_str("123e4567-e89b-12d3-a456-426614174000").unwrap()
+        );
         assert_eq!(domain.charts, None);
     }
 
@@ -148,7 +160,8 @@ mod tests {
     fn encode_decode_insight_row() {
         let now = "2025-06-15T10:00:00Z".to_string();
         let columns = serde_json::to_string(&serde_json::json!([{ "name": "a" }])).unwrap();
-        let warnings = serde_json::to_string(&serde_json::json!([{ "type": "missing", "count": 3 }])).unwrap();
+        let warnings =
+            serde_json::to_string(&serde_json::json!([{ "type": "missing", "count": 3 }])).unwrap();
         let row = InsightRow {
             dataset_id: "123e4567-e89b-12d3-a456-426614174000".to_string(),
             row_count: 100,
@@ -239,9 +252,8 @@ impl JobRow {
         Ok(Job {
             id: uuid::Uuid::parse_str(&self.id)
                 .map_err(|err| LlmError::internal(format!("invalid job id: {err}")))?,
-            dataset_id: uuid::Uuid::parse_str(&self.dataset_id).map_err(|err| {
-                LlmError::internal(format!("invalid job dataset id: {err}"))
-            })?,
+            dataset_id: uuid::Uuid::parse_str(&self.dataset_id)
+                .map_err(|err| LlmError::internal(format!("invalid job dataset id: {err}")))?,
             task_type: self.task_type,
             algorithm_id: self.algorithm_id,
             feature_columns: decode_json(&self.feature_columns, "feature columns")?,
@@ -312,9 +324,8 @@ impl ArtefactRow {
         Ok(Artefact {
             id: uuid::Uuid::parse_str(&self.id)
                 .map_err(|err| LlmError::internal(format!("invalid artefact id: {err}")))?,
-            job_id: uuid::Uuid::parse_str(&self.job_id).map_err(|err| {
-                LlmError::internal(format!("invalid artefact job id: {err}"))
-            })?,
+            job_id: uuid::Uuid::parse_str(&self.job_id)
+                .map_err(|err| LlmError::internal(format!("invalid artefact job id: {err}")))?,
             format: self.format,
             filename: self.filename,
             byte_size: self.byte_size,

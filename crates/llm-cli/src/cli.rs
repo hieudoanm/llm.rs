@@ -4,7 +4,12 @@ use clap::Parser;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
-#[command(name = "llm", author, version, about = "Local Learning Machine - train ML models from CSV and export ONNX")]
+#[command(
+    name = "llm",
+    author,
+    version,
+    about = "Local Learning Machine - train ML models from CSV and export ONNX"
+)]
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
@@ -68,6 +73,8 @@ pub enum Commands {
     Jobs,
     /// List all datasets
     Datasets,
+    /// Run an MCP server over stdio JSON-RPC
+    Mcp,
 }
 
 #[cfg(test)]
@@ -200,7 +207,11 @@ mod tests {
             "model.onnx",
         ]);
         match cli.command {
-            Commands::Export { job_id, output, format } => {
+            Commands::Export {
+                job_id,
+                output,
+                format,
+            } => {
                 assert_eq!(job_id, "123e4567-e89b-12d3-a456-426614174000");
                 assert_eq!(output.to_str().unwrap(), "model.onnx");
                 assert_eq!(format, "onnx");
@@ -239,4 +250,3 @@ mod tests {
         assert!(matches!(cli.command, Commands::Datasets));
     }
 }
-

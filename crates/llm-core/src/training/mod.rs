@@ -122,9 +122,8 @@ fn tree_params(
     let min_samples_leaf = hp_usize(job, "min_samples_leaf").unwrap_or(1).max(1);
     let max_features = match job.hyperparameters.get("max_features") {
         Some(value) => parse_max_features(Some(value), dim),
-        None => default_max_features.and_then(|raw| {
-            parse_max_features(Some(&Value::String(raw.to_string())), dim)
-        }),
+        None => default_max_features
+            .and_then(|raw| parse_max_features(Some(&Value::String(raw.to_string())), dim)),
     };
     tree::TreeParams {
         max_depth: max_depth.min(64),
@@ -147,10 +146,7 @@ fn kernel_gamma(job: &Job, dim: usize) -> f64 {
 fn contamination(job: &Job) -> f64 {
     match job.hyperparameters.get("contamination") {
         Some(Value::String(raw)) if raw == "auto" => 0.1,
-        Some(Value::Number(number)) => number
-            .as_f64()
-            .unwrap_or(0.1)
-            .clamp(0.001, 0.5),
+        Some(Value::Number(number)) => number.as_f64().unwrap_or(0.1).clamp(0.001, 0.5),
         Some(Value::String(raw)) => raw.parse::<f64>().unwrap_or(0.1).clamp(0.001, 0.5),
         _ => 0.1,
     }
@@ -249,8 +245,12 @@ fn fit_classifier(
 ) -> Model {
     let dim = x.first().map(Vec::len).unwrap_or(0);
     match algorithm {
-        "logistic_regression" | "logistic_regression_cv" | "calibrated_classifier_cv"
-        | "self_training_classifier" | "label_propagation" | "label_spreading" => {
+        "logistic_regression"
+        | "logistic_regression_cv"
+        | "calibrated_classifier_cv"
+        | "self_training_classifier"
+        | "label_propagation"
+        | "label_spreading" => {
             let max_iter = hp_usize(job, "max_iter").unwrap_or(100);
             let c = hp_f64(job, "C").unwrap_or(1.0);
             Model::Linear(linear::fit_logistic(x, y, classes, c, max_iter, seed))
@@ -325,20 +325,30 @@ fn fit_classifier(
                 hp_f64(job, "radius"),
             ))
         }
-        "gaussian_naive_bayes" => {
-            Model::NaiveBayes(naive_bayes::fit_gaussian(x, y, classes))
-        }
+        "gaussian_naive_bayes" => Model::NaiveBayes(naive_bayes::fit_gaussian(x, y, classes)),
         "bernoulli_nb" => {
             let alpha = hp_f64(job, "alpha").unwrap_or(1.0);
             Model::NaiveBayes(naive_bayes::fit_discrete(x, y, classes, "bernoulli", alpha))
         }
         "multinomial_nb" | "complement_nb" => {
             let alpha = hp_f64(job, "alpha").unwrap_or(1.0);
-            Model::NaiveBayes(naive_bayes::fit_discrete(x, y, classes, "multinomial", alpha))
+            Model::NaiveBayes(naive_bayes::fit_discrete(
+                x,
+                y,
+                classes,
+                "multinomial",
+                alpha,
+            ))
         }
         "categorical_nb" => {
             let alpha = hp_f64(job, "alpha").unwrap_or(1.0);
-            Model::NaiveBayes(naive_bayes::fit_discrete(x, y, classes, "categorical", alpha))
+            Model::NaiveBayes(naive_bayes::fit_discrete(
+                x,
+                y,
+                classes,
+                "categorical",
+                alpha,
+            ))
         }
         "svm_classifier" | "nu_svc" => {
             let gamma = kernel_gamma(job, dim);
@@ -403,7 +413,10 @@ fn fit_classifier(
 fn fit_regressor(job: &Job, algorithm: &str, x: &[Vec<f64>], y: &[f64], seed: u64) -> Model {
     let dim = x.first().map(Vec::len).unwrap_or(0);
     match algorithm {
-        "linear_regression" | "lars" | "theil_sen_regressor" | "ransac_regressor"
+        "linear_regression"
+        | "lars"
+        | "theil_sen_regressor"
+        | "ransac_regressor"
         | "isotonic_regression" => Model::Linear(linear::fit_regression(x, y, 0.0, 0.0, 100)),
         "ridge_regression" | "bayesian_ridge" => {
             let alpha = hp_f64(job, "alpha").unwrap_or(1.0);
@@ -588,12 +601,7 @@ fn fit_anomaly(job: &Job, x: &[Vec<f64>], seed: u64) -> Model {
             Model::Elliptic(anomaly::fit_one_class(x, nu))
         }
         "elliptic_envelope" => Model::Elliptic(anomaly::fit_elliptic(x, contamination)),
-        _ => Model::IsolationForest(anomaly::fit_isolation_forest(
-            x,
-            100,
-            contamination,
-            seed,
-        )),
+        _ => Model::IsolationForest(anomaly::fit_isolation_forest(x, 100, contamination, seed)),
     }
 }
 
@@ -687,10 +695,7 @@ fn train_supervised(job: &Job, df: &DataFrame) -> LlmResult<TrainingOutput> {
             classes.len(),
             seed,
         );
-        let y_pred: Vec<usize> = x_test
-            .iter()
-            .map(|row| model.predict_index(row))
-            .collect();
+        let y_pred: Vec<usize> = x_test.iter().map(|row| model.predict_index(row)).collect();
         let metrics = metrics::classification_metrics(&y_test, &y_pred, classes.len());
         let trained = TrainedModel {
             model,
@@ -710,7 +715,7 @@ fn train_supervised(job: &Job, df: &DataFrame) -> LlmResult<TrainingOutput> {
         let mut rows: Vec<(usize, f64)> = Vec::new();
         let index = df.column_index(label_column).unwrap_or(0);
         for row in 0..df.row_count() {
-            if let Some(value) = df.get(row, index)            .and_then(|raw| parse_number(&raw)) {
+            if let Some(value) = df.get(row, index).and_then(|raw| parse_number(&raw)) {
                 rows.push((row, value));
             }
         }
@@ -722,10 +727,22 @@ fn train_supervised(job: &Job, df: &DataFrame) -> LlmResult<TrainingOutput> {
             ));
         }
         let (train_positions, test_positions) = split_indices(rows.len(), ratio, seed);
-        let train_rows: Vec<usize> = train_positions.iter().map(|position| rows[*position].0).collect();
-        let test_rows: Vec<usize> = test_positions.iter().map(|position| rows[*position].0).collect();
-        let y_train: Vec<f64> = train_positions.iter().map(|position| rows[*position].1).collect();
-        let y_test: Vec<f64> = test_positions.iter().map(|position| rows[*position].1).collect();
+        let train_rows: Vec<usize> = train_positions
+            .iter()
+            .map(|position| rows[*position].0)
+            .collect();
+        let test_rows: Vec<usize> = test_positions
+            .iter()
+            .map(|position| rows[*position].0)
+            .collect();
+        let y_train: Vec<f64> = train_positions
+            .iter()
+            .map(|position| rows[*position].1)
+            .collect();
+        let y_test: Vec<f64> = test_positions
+            .iter()
+            .map(|position| rows[*position].1)
+            .collect();
 
         let train_frame = subset_frame(df, &train_rows);
         let test_frame = subset_frame(df, &test_rows);
@@ -931,10 +948,7 @@ fn train_clustering(job: &Job, df: &DataFrame) -> LlmResult<TrainingOutput> {
     let preprocessor = preprocess::Preprocessor::fit(df, &job.feature_columns)?;
     let points = preprocessor.transform_frame(df);
     let model = fit_clusterer(job, &points, seed);
-    let labels: Vec<usize> = points
-        .iter()
-        .map(|point| model.nearest(point))
-        .collect();
+    let labels: Vec<usize> = points.iter().map(|point| model.nearest(point)).collect();
 
     let mut metrics = serde_json::Map::new();
     let distinct: BTreeSet<usize> = labels.iter().copied().collect();

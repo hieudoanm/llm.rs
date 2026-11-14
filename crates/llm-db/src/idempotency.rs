@@ -55,7 +55,9 @@ pub async fn lookup(pool: &SqlitePool, key: &str, body_hash: &str) -> LlmResult<
         .with_details(serde_json::json!({ "idempotencyKey": key })));
     }
     let body = serde_json::from_str(&row.response_body).map_err(|err| {
-        LlmError::internal(format!("failed to decode a cached idempotent response: {err}"))
+        LlmError::internal(format!(
+            "failed to decode a cached idempotent response: {err}"
+        ))
     })?;
     Ok(Some(body))
 }
@@ -110,11 +112,11 @@ pub async fn record(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::datasets;
+    use crate::jobs::writes::insert_job;
     use chrono::Utc;
     use serde_json::json;
     use uuid::Uuid;
-    use crate::datasets;
-    use crate::jobs::writes::insert_job;
 
     fn create_test_dataset() -> llm_core::domain::Dataset {
         llm_core::domain::Dataset {
@@ -178,7 +180,9 @@ mod tests {
         let dataset = create_test_dataset();
         datasets::insert_dataset(db.pool(), &dataset).await.unwrap();
         let job_id = create_test_job(&db, dataset.id).await;
-        let result = lookup(db.pool(), &create_test_key(), &create_test_body_hash()).await.unwrap();
+        let result = lookup(db.pool(), &create_test_key(), &create_test_body_hash())
+            .await
+            .unwrap();
         assert!(result.is_none());
     }
 
@@ -191,7 +195,9 @@ mod tests {
         let key = create_test_key();
         let body_hash = create_test_body_hash();
         let response_body = create_test_response_body();
-        record(db.pool(), &key, &body_hash, job_id, &response_body).await.unwrap();
+        record(db.pool(), &key, &body_hash, job_id, &response_body)
+            .await
+            .unwrap();
 
         let result = lookup(db.pool(), &key, &body_hash).await.unwrap();
         assert!(result.is_some());
@@ -210,16 +216,16 @@ mod tests {
         let response_body = create_test_response_body();
 
         // Record with short TTL
-        record(db.pool(), &key, &body_hash, job_id, &response_body).await.unwrap();
+        record(db.pool(), &key, &body_hash, job_id, &response_body)
+            .await
+            .unwrap();
         // Manually expire the key by setting an old expires_at
-        sqlx::query(
-            "UPDATE idempotency_keys SET expires_at = ?1 WHERE key = ?2",
-        )
-        .bind("2020-01-01T00:00:00Z")
-        .bind(&key)
-        .execute(db.pool())
-        .await
-        .unwrap();
+        sqlx::query("UPDATE idempotency_keys SET expires_at = ?1 WHERE key = ?2")
+            .bind("2020-01-01T00:00:00Z")
+            .bind(&key)
+            .execute(db.pool())
+            .await
+            .unwrap();
 
         let result = lookup(db.pool(), &key, &body_hash).await.unwrap();
         assert!(result.is_none());
@@ -236,7 +242,9 @@ mod tests {
         let body_hash_2 = "0987654321fedcba0987654321fedcba0987654321fedcba0987654321".to_string();
         let response_body_1 = create_test_response_body();
 
-        record(db.pool(), &key, &body_hash_1, job_id, &response_body_1).await.unwrap();
+        record(db.pool(), &key, &body_hash_1, job_id, &response_body_1)
+            .await
+            .unwrap();
 
         let result = lookup(db.pool(), &key, &body_hash_2).await;
         assert!(result.is_err());
@@ -254,8 +262,12 @@ mod tests {
         let response_body_1 = create_test_response_body();
         let response_body_2 = json!({"result": "updated"});
 
-        record(db.pool(), &key, &body_hash_1, job_id, &response_body_1).await.unwrap();
-        record(db.pool(), &key, &body_hash_2, job_id, &response_body_2).await.unwrap();
+        record(db.pool(), &key, &body_hash_1, job_id, &response_body_1)
+            .await
+            .unwrap();
+        record(db.pool(), &key, &body_hash_2, job_id, &response_body_2)
+            .await
+            .unwrap();
 
         let result = lookup(db.pool(), &key, &body_hash_2).await.unwrap();
         assert!(result.is_some());

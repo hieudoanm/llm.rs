@@ -132,12 +132,7 @@ fn subsample(x: &[Vec<f64>], y: &[f64]) -> (Vec<Vec<f64>>, Vec<f64>) {
 }
 
 /// Kernel ridge regression.
-pub fn fit_regression(
-    x: &[Vec<f64>],
-    y: &[f64],
-    gamma: f64,
-    alpha: f64,
-) -> KernelModel {
+pub fn fit_regression(x: &[Vec<f64>], y: &[f64], gamma: f64, alpha: f64) -> KernelModel {
     let (support, targets) = subsample(x, y);
     let (coefficients, bias) = solve_kernel_system(&support, &targets, gamma, alpha);
     KernelModel {

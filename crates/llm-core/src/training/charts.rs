@@ -288,11 +288,7 @@ fn pca_projection(points: &[Vec<f64>], seed: u64) -> (Vec<f64>, Vec<f64>) {
 }
 
 /// Charts for clustering jobs.
-pub fn clustering_charts(
-    points: &[Vec<f64>],
-    labels: &[usize],
-    seed: u64,
-) -> Value {
+pub fn clustering_charts(points: &[Vec<f64>], labels: &[usize], seed: u64) -> Value {
     let cluster_count = labels
         .iter()
         .copied()
@@ -308,7 +304,8 @@ pub fn clustering_charts(
     }
 
     let indices = sample_indices(points.len(), MAX_POINTS, seed);
-    let sampled_points: Vec<Vec<f64>> = indices.iter().map(|index| points[*index].clone()).collect();
+    let sampled_points: Vec<Vec<f64>> =
+        indices.iter().map(|index| points[*index].clone()).collect();
     let sampled_labels: Vec<usize> = indices.iter().map(|index| labels[*index]).collect();
     let (x, y) = pca_projection(&sampled_points, seed);
 

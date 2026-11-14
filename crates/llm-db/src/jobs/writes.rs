@@ -121,22 +121,20 @@ pub async fn mark_attempt(pool: &SqlitePool, job_id: Uuid) -> LlmResult<()> {
     Ok(())
 }
 
-pub async fn schedule_retry(
-    pool: &SqlitePool,
-    job_id: Uuid,
-    delay_seconds: i64,
-) -> LlmResult<()> {
+pub async fn schedule_retry(pool: &SqlitePool, job_id: Uuid, delay_seconds: i64) -> LlmResult<()> {
     let now = Utc::now();
     let next_attempt = now + chrono::Duration::seconds(delay_seconds);
     let now_ts = timestamp(now);
     let next_ts = timestamp(next_attempt);
-    sqlx::query("UPDATE jobs SET status = 'retrying', next_attempt_at = ?1, updated_at = ?2 WHERE id = ?3")
-        .bind(next_ts)
-        .bind(now_ts)
-        .bind(job_id.to_string())
-        .execute(pool)
-        .await
-        .map_err(|err| database_error("scheduling job retry", err))?;
+    sqlx::query(
+        "UPDATE jobs SET status = 'retrying', next_attempt_at = ?1, updated_at = ?2 WHERE id = ?3",
+    )
+    .bind(next_ts)
+    .bind(now_ts)
+    .bind(job_id.to_string())
+    .execute(pool)
+    .await
+    .map_err(|err| database_error("scheduling job retry", err))?;
     Ok(())
 }
 
@@ -201,10 +199,10 @@ pub async fn update_metadata(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use llm_core::domain::Job;
-    use chrono::Utc;
-    use serde_json::Value;
     use crate::jobs::queries;
+    use chrono::Utc;
+    use llm_core::domain::Job;
+    use serde_json::Value;
 
     use crate::datasets;
     use llm_core::domain::Dataset;
@@ -287,11 +285,21 @@ mod tests {
         datasets::insert_dataset(db.pool(), &dataset).await.unwrap();
         let job = create_test_job_with_dataset(dataset.id);
         insert_job(db.pool(), &job).await.unwrap();
-        record_failure(db.pool(), job.id, Some("ERR_001".to_string()), Some("Something failed".to_string())).await.unwrap();
+        record_failure(
+            db.pool(),
+            job.id,
+            Some("ERR_001".to_string()),
+            Some("Something failed".to_string()),
+        )
+        .await
+        .unwrap();
         let retrieved = queries::get_job(db.pool(), job.id).await.unwrap().unwrap();
         assert_eq!(retrieved.status, "failed");
         assert_eq!(retrieved.error_code, Some("ERR_001".to_string()));
-        assert_eq!(retrieved.error_message, Some("Something failed".to_string()));
+        assert_eq!(
+            retrieved.error_message,
+            Some("Something failed".to_string())
+        );
     }
 
     #[tokio::test]
@@ -301,7 +309,9 @@ mod tests {
         datasets::insert_dataset(db.pool(), &dataset).await.unwrap();
         let job = create_test_job_with_dataset(dataset.id);
         insert_job(db.pool(), &job).await.unwrap();
-        record_completion(db.pool(), job.id, Some(serde_json::json!({"lib": "1.0"}))).await.unwrap();
+        record_completion(db.pool(), job.id, Some(serde_json::json!({"lib": "1.0"})))
+            .await
+            .unwrap();
         let retrieved = queries::get_job(db.pool(), job.id).await.unwrap().unwrap();
         assert_eq!(retrieved.status, "completed");
     }
@@ -345,7 +355,9 @@ mod tests {
     #[tokio::test]
     async fn test_job_exists_false() {
         let db = crate::Database::in_memory().await.unwrap();
-        assert!(!queries::job_exists(db.pool(), Uuid::new_v4()).await.unwrap());
+        assert!(!queries::job_exists(db.pool(), Uuid::new_v4())
+            .await
+            .unwrap());
     }
 
     #[tokio::test]
@@ -362,6 +374,8 @@ mod tests {
     #[tokio::test]
     async fn test_delete_job_not_found() {
         let db = crate::Database::in_memory().await.unwrap();
-        assert!(!queries::delete_job(db.pool(), Uuid::new_v4()).await.unwrap());
+        assert!(!queries::delete_job(db.pool(), Uuid::new_v4())
+            .await
+            .unwrap());
     }
 }

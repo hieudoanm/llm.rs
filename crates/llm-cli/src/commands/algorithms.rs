@@ -14,11 +14,11 @@ pub fn cmd_algorithms(task: Option<TaskType>) -> Result<()> {
 
     println!("Available algorithms:\n");
     for spec in &filtered {
+        println!("  {} ({}) - {}", spec.id, spec.task_type, spec.description);
         println!(
-            "  {} ({}) - {}",
-            spec.id, spec.task_type, spec.description
+            "    Default hyperparameters: {}",
+            spec.default_hyperparameters
         );
-        println!("    Default hyperparameters: {}", spec.default_hyperparameters);
     }
     Ok(())
 }
@@ -45,5 +45,3 @@ mod tests {
         assert!(result.is_ok());
     }
 }
-
-

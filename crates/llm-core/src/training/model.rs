@@ -174,7 +174,11 @@ impl KnnModel {
         if (self.p - 1.0).abs() < f64::EPSILON {
             a.iter().zip(b).map(|(x, y)| (x - y).abs()).sum()
         } else if (self.p - 2.0).abs() < f64::EPSILON {
-            a.iter().zip(b).map(|(x, y)| (x - y).powi(2)).sum::<f64>().sqrt()
+            a.iter()
+                .zip(b)
+                .map(|(x, y)| (x - y).powi(2))
+                .sum::<f64>()
+                .sqrt()
         } else {
             a.iter()
                 .zip(b)
@@ -329,11 +333,7 @@ impl MlpModel {
                         .zip(&current)
                         .map(|(weight, input)| weight * input)
                         .sum::<f64>();
-                next.push(if last {
-                    value
-                } else {
-                    self.activate(value)
-                });
+                next.push(if last { value } else { self.activate(value) });
             }
             current = next;
         }
@@ -385,7 +385,13 @@ impl ClusterModel {
         }
         let mut log_components = Vec::with_capacity(self.centers.len());
         for (index, center) in self.centers.iter().enumerate() {
-            let mut log_prob = self.weights.get(index).copied().unwrap_or(1.0).max(1e-12).ln();
+            let mut log_prob = self
+                .weights
+                .get(index)
+                .copied()
+                .unwrap_or(1.0)
+                .max(1e-12)
+                .ln();
             for (feature, value) in x.iter().enumerate() {
                 let variance = self.variances[index]
                     .get(feature)
@@ -484,7 +490,13 @@ impl LofModel {
         let mut distances: Vec<f64> = self
             .x
             .iter()
-            .map(|row| row.iter().zip(x).map(|(a, b)| (a - b).powi(2)).sum::<f64>().sqrt())
+            .map(|row| {
+                row.iter()
+                    .zip(x)
+                    .map(|(a, b)| (a - b).powi(2))
+                    .sum::<f64>()
+                    .sqrt()
+            })
             .collect();
         distances.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
         distances
@@ -558,11 +570,7 @@ impl KernelModel {
     pub fn raw(&self, x: &[f64]) -> Vec<f64> {
         let mut out = self.bias.clone();
         for (index, support) in self.x.iter().enumerate() {
-            let squared: f64 = support
-                .iter()
-                .zip(x)
-                .map(|(a, b)| (a - b).powi(2))
-                .sum();
+            let squared: f64 = support.iter().zip(x).map(|(a, b)| (a - b).powi(2)).sum();
             let kernel = (-self.gamma * squared).exp();
             for output in 0..self.n_outputs {
                 out[output] += self.alpha[index][output] * kernel;

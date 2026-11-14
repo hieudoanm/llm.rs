@@ -60,7 +60,9 @@ pub fn parse_query_timestamp(field: &str, value: Option<&str>) -> LlmResult<Opti
 
 pub fn parse_sort(value: Option<&str>) -> LlmResult<(String, String)> {
     match value {
-        Some(raw) if raw.trim().is_empty() => Ok((SORT_FIELDS[0].0.to_string(), SORT_FIELDS[0].1.to_string())),
+        Some(raw) if raw.trim().is_empty() => {
+            Ok((SORT_FIELDS[0].0.to_string(), SORT_FIELDS[0].1.to_string()))
+        }
         Some(raw) => {
             let trimmed = raw.trim();
             let (field, direction) = if let Some(idx) = trimmed.rfind(':') {
@@ -107,7 +109,10 @@ pub enum Comparable {
     Timestamp(DateTime<Utc>),
 }
 
-pub fn comparable_value(filters: &crate::jobs::filters::JobFilters, value: &str) -> LlmResult<Comparable> {
+pub fn comparable_value(
+    filters: &crate::jobs::filters::JobFilters,
+    value: &str,
+) -> LlmResult<Comparable> {
     match filters.sort_field.as_str() {
         "createdAt" | "updatedAt" => parse_cursor_timestamp(value).map(Comparable::Timestamp),
         "status" | "algorithmId" => Ok(Comparable::Text(value.to_string())),
@@ -125,10 +130,7 @@ pub fn sort_expression(filters: &crate::jobs::filters::JobFilters) -> String {
     }
 }
 
-pub fn push_bound(
-    builder: &mut sqlx::QueryBuilder<sqlx::Sqlite>,
-    value: &Comparable,
-) {
+pub fn push_bound(builder: &mut sqlx::QueryBuilder<sqlx::Sqlite>, value: &Comparable) {
     match value {
         Comparable::Text(v) => {
             builder.push_bind(v.clone());
@@ -142,11 +144,7 @@ pub fn push_bound(
     }
 }
 
-pub fn push_in(
-    builder: &mut sqlx::QueryBuilder<sqlx::Sqlite>,
-    column: &str,
-    values: &[String],
-) {
+pub fn push_in(builder: &mut sqlx::QueryBuilder<sqlx::Sqlite>, column: &str, values: &[String]) {
     if values.is_empty() {
         return;
     }
@@ -162,7 +160,8 @@ pub fn push_in(
 
 pub fn encode<T: serde::Serialize>(value: &T, field: &str) -> LlmResult<String> {
     let bytes = serde_json::to_vec(value).map_err(|err| {
-        LlmError::validation("Invalid job payload").with_details(serde_json::json!({"field": field, "error": err.to_string()}))
+        LlmError::validation("Invalid job payload")
+            .with_details(serde_json::json!({"field": field, "error": err.to_string()}))
     })?;
     Ok(URL_SAFE_NO_PAD.encode(bytes))
 }
@@ -190,16 +189,28 @@ pub fn job_key(
     random_seed: i64,
 ) -> String {
     let mut canonical = serde_json::Map::new();
-    canonical.insert("datasetId".to_string(), Value::String(dataset_id.to_string()));
+    canonical.insert(
+        "datasetId".to_string(),
+        Value::String(dataset_id.to_string()),
+    );
     canonical.insert("taskType".to_string(), Value::String(task_type.to_string()));
-    canonical.insert("algorithmId".to_string(), Value::String(algorithm_id.to_string()));
+    canonical.insert(
+        "algorithmId".to_string(),
+        Value::String(algorithm_id.to_string()),
+    );
     let mut feature_list = features.to_vec();
     feature_list.sort();
-    canonical.insert("features".to_string(), Value::Array(feature_list.into_iter().map(Value::String).collect()));
-    canonical.insert("label".to_string(), match label {
-        Some(value) => Value::String(value.to_string()),
-        None => Value::Null,
-    });
+    canonical.insert(
+        "features".to_string(),
+        Value::Array(feature_list.into_iter().map(Value::String).collect()),
+    );
+    canonical.insert(
+        "label".to_string(),
+        match label {
+            Some(value) => Value::String(value.to_string()),
+            None => Value::Null,
+        },
+    );
     let mut hyper = hyperparameters.clone();
     if let Value::Object(map) = &mut hyper {
         let mut keys: Vec<String> = map.keys().cloned().collect();
@@ -238,8 +249,14 @@ mod tests {
     #[test]
     fn encode_serializes_with_sorted_json_keys() {
         let mut canonical = serde_json::Map::new();
-        canonical.insert("z".to_string(), serde_json::Value::String("first".to_string()));
-        canonical.insert("a".to_string(), serde_json::Value::Number(serde_json::Number::from_f64(0.2).unwrap()));
+        canonical.insert(
+            "z".to_string(),
+            serde_json::Value::String("first".to_string()),
+        );
+        canonical.insert(
+            "a".to_string(),
+            serde_json::Value::Number(serde_json::Number::from_f64(0.2).unwrap()),
+        );
         let value = Value::Object(canonical);
         let encoded = encode(&value, "tag").unwrap();
 
@@ -560,11 +577,15 @@ mod tests {
 
     #[test]
     fn test_push_bound_timestamp() {
+        use chrono::{DateTime, Utc};
         use sqlx::QueryBuilder;
         use sqlx::Sqlite;
-        use chrono::{DateTime, Utc};
         let mut builder: QueryBuilder<Sqlite> = QueryBuilder::new("");
-        let value = Comparable::Timestamp(DateTime::parse_from_rfc3339("2023-01-01T00:00:00Z").unwrap().with_timezone(&Utc));
+        let value = Comparable::Timestamp(
+            DateTime::parse_from_rfc3339("2023-01-01T00:00:00Z")
+                .unwrap()
+                .with_timezone(&Utc),
+        );
         push_bound(&mut builder, &value);
     }
 
@@ -590,8 +611,26 @@ mod tests {
     fn test_job_key_deterministic() {
         let features = vec!["f1".to_string(), "f2".to_string()];
         let hyper = serde_json::json!({"param": 1});
-        let key1 = job_key("ds1", "classification", "algo1", &features, Some("label"), &hyper, 0.8, 42);
-        let key2 = job_key("ds1", "classification", "algo1", &features, Some("label"), &hyper, 0.8, 42);
+        let key1 = job_key(
+            "ds1",
+            "classification",
+            "algo1",
+            &features,
+            Some("label"),
+            &hyper,
+            0.8,
+            42,
+        );
+        let key2 = job_key(
+            "ds1",
+            "classification",
+            "algo1",
+            &features,
+            Some("label"),
+            &hyper,
+            0.8,
+            42,
+        );
         assert_eq!(key1, key2);
     }
 
@@ -599,16 +638,52 @@ mod tests {
     fn test_job_key_different_inputs() {
         let features = vec!["f1".to_string()];
         let hyper = serde_json::json!({"param": 1});
-        let key1 = job_key("ds1", "classification", "algo1", &features, Some("label"), &hyper, 0.8, 42);
-        let key2 = job_key("ds2", "classification", "algo1", &features, Some("label"), &hyper, 0.8, 42);
+        let key1 = job_key(
+            "ds1",
+            "classification",
+            "algo1",
+            &features,
+            Some("label"),
+            &hyper,
+            0.8,
+            42,
+        );
+        let key2 = job_key(
+            "ds2",
+            "classification",
+            "algo1",
+            &features,
+            Some("label"),
+            &hyper,
+            0.8,
+            42,
+        );
         assert_ne!(key1, key2);
     }
 
     #[test]
     fn test_job_key_sorted_features() {
         let hyper = serde_json::json!({"param": 1});
-        let key1 = job_key("ds1", "classification", "algo1", &["b".to_string(), "a".to_string()], None, &hyper, 0.8, 42);
-        let key2 = job_key("ds1", "classification", "algo1", &["a".to_string(), "b".to_string()], None, &hyper, 0.8, 42);
+        let key1 = job_key(
+            "ds1",
+            "classification",
+            "algo1",
+            &["b".to_string(), "a".to_string()],
+            None,
+            &hyper,
+            0.8,
+            42,
+        );
+        let key2 = job_key(
+            "ds1",
+            "classification",
+            "algo1",
+            &["a".to_string(), "b".to_string()],
+            None,
+            &hyper,
+            0.8,
+            42,
+        );
         assert_eq!(key1, key2);
     }
 
@@ -617,8 +692,26 @@ mod tests {
         let hyper1 = serde_json::json!({"b": 2, "a": 1});
         let hyper2 = serde_json::json!({"a": 1, "b": 2});
         let features = vec!["f1".to_string()];
-        let key1 = job_key("ds1", "classification", "algo1", &features, None, &hyper1, 0.8, 42);
-        let key2 = job_key("ds1", "classification", "algo1", &features, None, &hyper2, 0.8, 42);
+        let key1 = job_key(
+            "ds1",
+            "classification",
+            "algo1",
+            &features,
+            None,
+            &hyper1,
+            0.8,
+            42,
+        );
+        let key2 = job_key(
+            "ds1",
+            "classification",
+            "algo1",
+            &features,
+            None,
+            &hyper2,
+            0.8,
+            42,
+        );
         assert_eq!(key1, key2);
     }
 

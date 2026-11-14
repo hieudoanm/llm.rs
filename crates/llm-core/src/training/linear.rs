@@ -83,8 +83,7 @@ pub fn fit_regression(
 ) -> LinearModel {
     let l1_ratio = l1_ratio.clamp(0.0, 1.0);
     let (weights, bias) = if l1_ratio <= 1e-9 {
-        ridge_solve(x, y, alpha)
-            .unwrap_or_else(|| gradient_regression(x, y, alpha, 100, 0.01))
+        ridge_solve(x, y, alpha).unwrap_or_else(|| gradient_regression(x, y, alpha, 100, 0.01))
     } else {
         coordinate_descent(x, y, alpha, l1_ratio, max_iter.max(1))
     };
@@ -98,8 +97,8 @@ pub fn fit_regression(
 }
 
 pub fn fit_ridge_regression(x: &[Vec<f64>], y: &[f64], alpha: f64) -> LinearModel {
-    let (weights, bias) = ridge_solve(x, y, alpha)
-        .unwrap_or_else(|| gradient_regression(x, y, alpha, 500, 0.01));
+    let (weights, bias) =
+        ridge_solve(x, y, alpha).unwrap_or_else(|| gradient_regression(x, y, alpha, 500, 0.01));
     LinearModel {
         weights: vec![weights],
         bias: vec![bias],
@@ -154,12 +153,7 @@ fn gradient_regression(
         let mut gradient = vec![0.0; dim];
         let mut bias_gradient = 0.0;
         for (row, target) in x.iter().zip(y) {
-            let prediction = bias
-                + row
-                    .iter()
-                    .zip(&weights)
-                    .map(|(a, b)| a * b)
-                    .sum::<f64>();
+            let prediction = bias + row.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>();
             let error = prediction - target;
             for index in 0..dim {
                 gradient[index] += error * row[index];
@@ -216,20 +210,13 @@ fn coordinate_descent(
                 denominator += row[feature] * row[feature];
             }
             let threshold = alpha * l1_ratio * n;
-            weights[feature] =
-                soft_threshold(rho, threshold) / (denominator + alpha * (1.0 - l1_ratio) * n).max(1e-12);
+            weights[feature] = soft_threshold(rho, threshold)
+                / (denominator + alpha * (1.0 - l1_ratio) * n).max(1e-12);
         }
         bias = y
             .iter()
             .zip(x)
-            .map(|(target, row)| {
-                target
-                    - row
-                        .iter()
-                        .zip(&weights)
-                        .map(|(a, b)| a * b)
-                        .sum::<f64>()
-            })
+            .map(|(target, row)| target - row.iter().zip(&weights).map(|(a, b)| a * b).sum::<f64>())
             .sum::<f64>()
             / n;
     }
@@ -285,7 +272,8 @@ pub fn fit_logistic(
                 let target = if y[*index] == class { 1.0 } else { 0.0 };
                 let error = probabilities[class] - target;
                 for feature in 0..dim {
-                    weights[class][feature] -= step * (error * row[feature] + regularization * weights[class][feature]);
+                    weights[class][feature] -=
+                        step * (error * row[feature] + regularization * weights[class][feature]);
                 }
                 bias[class] -= step * error;
             }
@@ -393,12 +381,7 @@ pub fn fit_sgd_classifier(
     fit_logistic(x, y, n_classes, c, max_iter.min(100), seed)
 }
 
-pub fn fit_sgd_regression(
-    x: &[Vec<f64>],
-    y: &[f64],
-    alpha: f64,
-    max_iter: usize,
-) -> LinearModel {
+pub fn fit_sgd_regression(x: &[Vec<f64>], y: &[f64], alpha: f64, max_iter: usize) -> LinearModel {
     let (weights, bias) = gradient_regression(x, y, alpha, max_iter.min(500).max(1), 0.01);
     LinearModel {
         weights: vec![weights],

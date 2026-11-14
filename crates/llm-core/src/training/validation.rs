@@ -25,9 +25,9 @@ pub fn validate_hyperparameters(
     hyperparameters: &Value,
     row_count: Option<i64>,
 ) -> LlmResult<()> {
-    let object = hyperparameters.as_object().ok_or_else(|| {
-        invalid("INVALID_HYPERPARAMETERS: hyperparameters must be an object")
-    })?;
+    let object = hyperparameters
+        .as_object()
+        .ok_or_else(|| invalid("INVALID_HYPERPARAMETERS: hyperparameters must be an object"))?;
 
     let allowed = allowed_hyperparameters(algorithm_id);
     let unknown: Vec<&String> = object
@@ -54,7 +54,11 @@ pub fn validate_hyperparameters(
             }
         }
         "kmeans" | "mini_batch_kmeans" => {
-            validate_clusters("n_clusters", int(value("n_clusters")).unwrap_or(3), row_count)?;
+            validate_clusters(
+                "n_clusters",
+                int(value("n_clusters")).unwrap_or(3),
+                row_count,
+            )?;
         }
         "gaussian_mixture" => {
             validate_clusters(
@@ -82,9 +86,7 @@ pub fn validate_hyperparameters(
         "fitted_q_iteration" => {
             let iterations = int(value("n_iterations")).unwrap_or(10);
             if !(1..=50).contains(&iterations) {
-                return Err(invalid(
-                    "n_iterations must be an integer between 1 and 50",
-                ));
+                return Err(invalid("n_iterations must be an integer between 1 and 50"));
             }
             let gamma = number(value("gamma")).unwrap_or(0.9);
             if !(0.0..=1.0).contains(&gamma) {

@@ -10,8 +10,7 @@ use std::fs;
 use std::path::Path;
 
 pub async fn cmd_dataset(path: &Path) -> Result<()> {
-    let bytes = fs::read(path)
-        .map_err(|e| anyhow::anyhow!("Failed to read file: {}", e))?;
+    let bytes = fs::read(path).map_err(|e| anyhow::anyhow!("Failed to read file: {}", e))?;
 
     let _ = parse_csv(&String::from_utf8_lossy(&bytes))?;
 
@@ -72,5 +71,3 @@ mod tests {
         assert!(true);
     }
 }
-
-

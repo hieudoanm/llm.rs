@@ -4,7 +4,9 @@
 use rand::rngs::StdRng;
 use rand::{RngExt, SeedableRng};
 
-use super::model::{average_path_length, EllipticModel, IsolationForest, IsolationNode, IsolationTree, LofModel};
+use super::model::{
+    average_path_length, EllipticModel, IsolationForest, IsolationNode, IsolationTree, LofModel,
+};
 
 fn build_isolation_tree(
     x: &[Vec<f64>],

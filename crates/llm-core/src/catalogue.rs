@@ -804,7 +804,9 @@ pub fn allowed_hyperparameters(algorithm_id: &str) -> Vec<String> {
             "min_samples_leaf",
             "random_state",
         ],
-        "decision_tree_classifier" | "decision_tree_regressor" | "extra_tree_classifier"
+        "decision_tree_classifier"
+        | "decision_tree_regressor"
+        | "extra_tree_classifier"
         | "extra_tree_regressor" => vec![
             "max_depth",
             "min_samples_split",
@@ -815,7 +817,10 @@ pub fn allowed_hyperparameters(algorithm_id: &str) -> Vec<String> {
             vec!["n_neighbors", "weights", "p"]
         }
         "radius_neighbors_classifier" | "radius_neighbors_regressor" => vec!["radius", "weights"],
-        "gaussian_naive_bayes" | "bernoulli_nb" | "categorical_nb" | "complement_nb"
+        "gaussian_naive_bayes"
+        | "bernoulli_nb"
+        | "categorical_nb"
+        | "complement_nb"
         | "multinomial_nb" => vec!["alpha", "var_smoothing"],
         "svm_classifier" | "nu_svc" | "svm_regressor" | "nu_svr" => {
             vec!["C", "kernel", "gamma", "nu", "epsilon", "degree"]
@@ -838,7 +843,12 @@ pub fn allowed_hyperparameters(algorithm_id: &str) -> Vec<String> {
             vec!["n_estimators", "learning_rate", "random_state"]
         }
         "bagging_classifier" | "bagging_regressor" => {
-            vec!["n_estimators", "max_samples", "max_features", "random_state"]
+            vec![
+                "n_estimators",
+                "max_samples",
+                "max_features",
+                "random_state",
+            ]
         }
         "ridge_regression" | "ridge_classifier" | "bayesian_ridge" => vec!["alpha", "random_state"],
         "lasso_regression" | "lasso_cv" | "elastic_net_regression" => {
@@ -879,7 +889,14 @@ pub fn allowed_hyperparameters(algorithm_id: &str) -> Vec<String> {
             "random_state",
         ],
         "one_class_svm" | "local_outlier_factor" | "elliptic_envelope" => {
-            vec!["kernel", "nu", "gamma", "n_neighbors", "contamination", "random_state"]
+            vec![
+                "kernel",
+                "nu",
+                "gamma",
+                "n_neighbors",
+                "contamination",
+                "random_state",
+            ]
         }
         "agglomerative_clustering" => vec!["n_clusters", "linkage"],
         "dbscan" => vec!["eps", "min_samples"],

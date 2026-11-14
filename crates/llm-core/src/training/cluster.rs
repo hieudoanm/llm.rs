@@ -68,11 +68,19 @@ fn fit_kmeans_hand_rolled(
         }
     }
 
-    let iterations = if mini_batch { max_iter.min(50) } else { max_iter.min(200) };
+    let iterations = if mini_batch {
+        max_iter.min(50)
+    } else {
+        max_iter.min(200)
+    };
     for _ in 0..iterations.max(1) {
         let mut sums = vec![vec![0.0; dim]; k];
         let mut counts = vec![0usize; k];
-        let sample_count = if mini_batch { x.len().min(1024) } else { x.len() };
+        let sample_count = if mini_batch {
+            x.len().min(1024)
+        } else {
+            x.len()
+        };
         for row in x.iter().take(sample_count) {
             let mut nearest = 0usize;
             let mut nearest_distance = f64::INFINITY;
@@ -152,9 +160,12 @@ pub fn fit_kmeans(
     let dataset: linfa::DatasetBase<ndarray::Array2<f64>, ndarray::Array1<()>> =
         DatasetBase::from(data);
 
-    match KMeans::params_with_rng(k, <rand08::rngs::StdRng as rand08::SeedableRng>::seed_from_u64(seed))
-        .max_n_iterations(max_iter.max(1) as u64)
-        .fit(&dataset)
+    match KMeans::params_with_rng(
+        k,
+        <rand08::rngs::StdRng as rand08::SeedableRng>::seed_from_u64(seed),
+    )
+    .max_n_iterations(max_iter.max(1) as u64)
+    .fit(&dataset)
     {
         Ok(model) => {
             let centroids = model.centroids();
@@ -193,8 +204,7 @@ pub fn fit_gmm(x: &[Vec<f64>], k: usize, seed: u64, max_iter: usize) -> ClusterM
                 for feature in 0..dim {
                     let variance: f64 = variances[component][feature].max(1e-9);
                     let mean = base.centers[component][feature];
-                    log_prob += -0.5
-                        * ((row[feature] - mean).powi(2) / variance + variance.ln());
+                    log_prob += -0.5 * ((row[feature] - mean).powi(2) / variance + variance.ln());
                 }
                 responsibilities[row_index][component] = log_prob;
             }
@@ -333,12 +343,7 @@ pub fn fit_agglomerative(x: &[Vec<f64>], k: usize, seed: u64) -> ClusterModel {
     model
 }
 
-pub fn fit_placeholder_kmeans(
-    x: &[Vec<f64>],
-    k: usize,
-    seed: u64,
-    kind: &str,
-) -> ClusterModel {
+pub fn fit_placeholder_kmeans(x: &[Vec<f64>], k: usize, seed: u64, kind: &str) -> ClusterModel {
     let mut model = fit_kmeans(x, k, seed, 100, false);
     model.kind = kind.to_string();
     model

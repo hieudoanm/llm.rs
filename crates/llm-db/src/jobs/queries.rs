@@ -26,7 +26,9 @@ pub fn decode_cursor(cursor: &str) -> LlmResult<(String, Uuid)> {
         .map_err(|_| LlmError::validation("Invalid cursor"))?;
     let text = String::from_utf8(bytes).map_err(|_| LlmError::validation("Invalid cursor"))?;
     let mut parts = text.splitn(2, '|');
-    let value = parts.next().ok_or_else(|| LlmError::validation("Invalid cursor"))?;
+    let value = parts
+        .next()
+        .ok_or_else(|| LlmError::validation("Invalid cursor"))?;
     let id = parts
         .next()
         .and_then(|raw| Uuid::parse_str(raw).ok())
@@ -93,9 +95,7 @@ pub async fn list_jobs(
     cursor: Option<&JobCursor>,
 ) -> LlmResult<JobPage> {
     let limit = if limit == 0 { 50 } else { limit.min(200) };
-    let mut builder = QueryBuilder::<Sqlite>::new(
-        "SELECT j.* FROM jobs j",
-    );
+    let mut builder = QueryBuilder::<Sqlite>::new("SELECT j.* FROM jobs j");
     if !filters.tags.is_empty() {
         builder.push(" LEFT JOIN job_tags t ON t.job_id = j.id");
     }
@@ -153,7 +153,10 @@ pub async fn list_jobs(
     builder.push_bind((limit as i64) + 1);
 
     let query = builder.build_query_as::<JobRow>();
-    let rows = query.fetch_all(pool).await.map_err(|err| database_error("listing jobs", err))?;
+    let rows = query
+        .fetch_all(pool)
+        .await
+        .map_err(|err| database_error("listing jobs", err))?;
     let mut items: Vec<Job> = Vec::with_capacity(rows.len());
     let has_more = rows.len() > limit;
     let mut count = 0;
@@ -200,7 +203,9 @@ pub async fn queue_positions(pool: &SqlitePool, job_ids: &[Uuid]) -> LlmResult<H
         .await
         .map_err(|err| database_error("loading queue position", err))?;
         if let Some(row) = row {
-            let rank: i64 = row.try_get("rank").map_err(|err| database_error("loading queue position", err))?;
+            let rank: i64 = row
+                .try_get("rank")
+                .map_err(|err| database_error("loading queue position", err))?;
             positions.insert(*job_id, rank);
         }
     }
@@ -208,13 +213,16 @@ pub async fn queue_positions(pool: &SqlitePool, job_ids: &[Uuid]) -> LlmResult<H
 }
 
 pub async fn queued_ids(pool: &SqlitePool) -> LlmResult<Vec<Uuid>> {
-    let rows = sqlx::query("SELECT id FROM jobs WHERE status = 'queued' ORDER BY created_at ASC, id ASC")
-        .fetch_all(pool)
-        .await
-        .map_err(|err| database_error("listing queued jobs", err))?;
+    let rows =
+        sqlx::query("SELECT id FROM jobs WHERE status = 'queued' ORDER BY created_at ASC, id ASC")
+            .fetch_all(pool)
+            .await
+            .map_err(|err| database_error("listing queued jobs", err))?;
     let mut ids = Vec::new();
     for row in rows {
-        let id: String = row.try_get("id").map_err(|err| database_error("listing queued jobs", err))?;
+        let id: String = row
+            .try_get("id")
+            .map_err(|err| database_error("listing queued jobs", err))?;
         if let Ok(uuid) = Uuid::parse_str(&id) {
             ids.push(uuid);
         }
@@ -232,8 +240,12 @@ pub async fn worker_counts(pool: &SqlitePool) -> LlmResult<WorkerCounts> {
         .await
         .map_err(|err| database_error("counting worker jobs", err))?;
     for row in rows {
-        let status: String = row.try_get("status").map_err(|err| database_error("counting worker jobs", err))?;
-        let count: i64 = row.try_get("count").map_err(|err| database_error("counting worker jobs", err))?;
+        let status: String = row
+            .try_get("status")
+            .map_err(|err| database_error("counting worker jobs", err))?;
+        let count: i64 = row
+            .try_get("count")
+            .map_err(|err| database_error("counting worker jobs", err))?;
         match status.as_str() {
             "validating" => validating = count,
             "training" => training = count,
@@ -242,7 +254,12 @@ pub async fn worker_counts(pool: &SqlitePool) -> LlmResult<WorkerCounts> {
             _ => {}
         }
     }
-    Ok(WorkerCounts { validating, training, evaluating, exporting })
+    Ok(WorkerCounts {
+        validating,
+        training,
+        evaluating,
+        exporting,
+    })
 }
 
 pub async fn get_job(pool: &SqlitePool, job_id: Uuid) -> LlmResult<Option<Job>> {

@@ -6,8 +6,7 @@ use llm_db::{artefacts, jobs, Database};
 use uuid::Uuid;
 
 pub async fn cmd_job(id: &str) -> Result<()> {
-    let job_id = Uuid::parse_str(id)
-        .map_err(|e| anyhow::anyhow!("Invalid job ID: {}", e))?;
+    let job_id = Uuid::parse_str(id).map_err(|e| anyhow::anyhow!("Invalid job ID: {}", e))?;
 
     let db = Database::connect(&get_settings()).await?;
     let job = jobs::get_job(db.pool(), job_id)
@@ -53,7 +52,10 @@ pub async fn cmd_jobs() -> Result<()> {
 
     println!("Jobs:");
     for job in &jobs_list.items {
-        println!("  {} - {} - {} - {}", job.id, job.status, job.task_type, job.algorithm_id);
+        println!(
+            "  {} - {} - {} - {}",
+            job.id, job.status, job.task_type, job.algorithm_id
+        );
     }
     Ok(())
 }
@@ -65,5 +67,3 @@ mod tests {
         assert!(true);
     }
 }
-
-

@@ -99,7 +99,12 @@ fn attr_strings(name: &str, values: &[&str]) -> AttributeProto {
     }
 }
 
-fn node(op_type: &str, inputs: &[&str], outputs: &[&str], attributes: Vec<AttributeProto>) -> NodeProto {
+fn node(
+    op_type: &str,
+    inputs: &[&str],
+    outputs: &[&str],
+    attributes: Vec<AttributeProto>,
+) -> NodeProto {
     NodeProto {
         op_type: op_type.to_string(),
         input: inputs.iter().map(|value| value.to_string()).collect(),
@@ -180,7 +185,11 @@ fn linear_graph(model: &LinearModel, input_dim: usize) -> GraphProto {
             weights.push(row.get(index).copied().unwrap_or(0.0) as f32);
         }
     }
-    initializers.push(tensor_f32("W", vec![outputs as i64, input_dim as i64], weights));
+    initializers.push(tensor_f32(
+        "W",
+        vec![outputs as i64, input_dim as i64],
+        weights,
+    ));
     initializers.push(tensor_f32(
         "B",
         vec![outputs as i64],
@@ -238,11 +247,7 @@ fn mlp_graph(model: &MlpModel, input_dim: usize) -> GraphProto {
     let mut current_dim = input_dim;
     for (index, layer) in model.layers.iter().enumerate() {
         let outputs = layer.weights.len();
-        let inputs = layer
-            .weights
-            .first()
-            .map(Vec::len)
-            .unwrap_or(current_dim);
+        let inputs = layer.weights.first().map(Vec::len).unwrap_or(current_dim);
         let mut weights = Vec::with_capacity(outputs * inputs);
         for row in &layer.weights {
             for feature in 0..inputs {
@@ -300,7 +305,11 @@ fn mlp_graph(model: &MlpModel, input_dim: usize) -> GraphProto {
         }
         current_dim = outputs;
     }
-    let output_dim = model.layers.last().map(|layer| layer.weights.len()).unwrap_or(1);
+    let output_dim = model
+        .layers
+        .last()
+        .map(|layer| layer.weights.len())
+        .unwrap_or(1);
     GraphProto {
         node: nodes,
         name: "llm-mlp".to_string(),
@@ -353,8 +362,7 @@ fn append_tree_ensemble(
                     target_treeids.push(tree_id as i64);
                     target_nodeids.push(node_id as i64);
                     target_ids.push(tree.output.min(ensemble.n_outputs.saturating_sub(1)) as i64);
-                    target_weights
-                        .push((tree_node.values[0] / divisor) as f32);
+                    target_weights.push((tree_node.values[0] / divisor) as f32);
                 } else {
                     for (index, value) in tree_node.values.iter().enumerate() {
                         if index >= ensemble.n_outputs {
@@ -503,7 +511,12 @@ fn kernel_graph(model: &KernelModel, input_dim: usize) -> GraphProto {
         &["distance"],
         vec![attr_int("axis", -1), attr_int("keepdims", 1)],
     ));
-    nodes.push(node("Mul", &["distance", "neg_gamma"], &["scaled"], Vec::new()));
+    nodes.push(node(
+        "Mul",
+        &["distance", "neg_gamma"],
+        &["scaled"],
+        Vec::new(),
+    ));
     nodes.push(node("Exp", &["scaled"], &["kernel"], Vec::new()));
     nodes.push(node(
         "MatMul",
@@ -566,7 +579,12 @@ fn cluster_graph(centers: &[Vec<f64>], input_dim: usize) -> GraphProto {
         &["nearest"],
         vec![attr_int("axis", 1), attr_int("keepdims", 1)],
     ));
-    nodes.push(node("Cast", &["nearest"], &["output"], vec![attr_int("to", 1)]));
+    nodes.push(node(
+        "Cast",
+        &["nearest"],
+        &["output"],
+        vec![attr_int("to", 1)],
+    ));
 
     GraphProto {
         node: nodes,
@@ -613,7 +631,11 @@ fn knn_graph(model: &crate::training::model::KnnModel, input_dim: usize) -> Grap
         "TopK",
         &["distance", "k"],
         &["top_values", "top_indices"],
-        vec![attr_int("axis", -1), attr_int("largest", 0), attr_int("sorted", 1)],
+        vec![
+            attr_int("axis", -1),
+            attr_int("largest", 0),
+            attr_int("sorted", 1),
+        ],
     ));
 
     if model.classifier {
@@ -671,7 +693,10 @@ fn knn_graph(model: &crate::training::model::KnnModel, input_dim: usize) -> Grap
         input: vec![value_info("X", &[None, Some(input_dim as i64)])],
         output: vec![value_info(
             "output",
-            &[None, Some(if model.classifier { classes as i64 } else { 1 })],
+            &[
+                None,
+                Some(if model.classifier { classes as i64 } else { 1 }),
+            ],
         )],
         ..Default::default()
     }
@@ -700,8 +725,8 @@ fn naive_bayes_graph(model: &NaiveBayes, input_dim: usize) -> GraphProto {
                 log_variance_sum += variance.ln();
             }
             constants.push(
-                (model.class_log_prior.get(class).copied().unwrap_or(0.0)
-                    - 0.5 * log_variance_sum) as f32,
+                (model.class_log_prior.get(class).copied().unwrap_or(0.0) - 0.5 * log_variance_sum)
+                    as f32,
             );
         }
         initializers.push(tensor_f32(
@@ -714,11 +739,7 @@ fn naive_bayes_graph(model: &NaiveBayes, input_dim: usize) -> GraphProto {
             vec![classes as i64, input_dim as i64],
             inverse_variances,
         ));
-        initializers.push(tensor_f32(
-            "constants",
-            vec![classes as i64],
-            constants,
-        ));
+        initializers.push(tensor_f32("constants", vec![classes as i64], constants));
         nodes.push(node(
             "Unsqueeze",
             &["X", "axes"],
@@ -747,7 +768,12 @@ fn naive_bayes_graph(model: &NaiveBayes, input_dim: usize) -> GraphProto {
             Vec::new(),
         ));
         initializers.push(tensor_f32("minus_half", Vec::new(), vec![-0.5]));
-        nodes.push(node("Add", &["scaled", "constants"], &["logits"], Vec::new()));
+        nodes.push(node(
+            "Add",
+            &["scaled", "constants"],
+            &["logits"],
+            Vec::new(),
+        ));
     } else {
         let mut weights = Vec::with_capacity(classes * input_dim);
         for class in 0..classes {
@@ -837,8 +863,8 @@ fn isolation_forest_graph(
                 nodes_truenodeids.push(0);
                 nodes_falsenodeids.push(0);
                 nodes_missing_true.push(0);
-                let path = tree_node.depth as f64
-                    + average_path_length(tree_node.size.max(1) as f64);
+                let path =
+                    tree_node.depth as f64 + average_path_length(tree_node.size.max(1) as f64);
                 target_treeids.push(tree_id as i64);
                 target_nodeids.push(node_id as i64);
                 target_ids.push(0);
@@ -873,18 +899,23 @@ fn isolation_forest_graph(
 
     let tree_count = forest.trees.len().max(1) as f32;
     initializers.push(tensor_f32("tree_count", Vec::new(), vec![tree_count]));
-    nodes.push(node("Div", &["path_sum", "tree_count"], &["mean_path"], Vec::new()));
+    nodes.push(node(
+        "Div",
+        &["path_sum", "tree_count"],
+        &["mean_path"],
+        Vec::new(),
+    ));
     nodes.push(node("Neg", &["mean_path"], &["neg_path"], Vec::new()));
     let c = average_path_length(forest.sample_size.max(2) as f64).max(1e-9) as f32;
     initializers.push(tensor_f32("path_scale", Vec::new(), vec![c]));
-    nodes.push(node("Div", &["neg_path", "path_scale"], &["exponent"], Vec::new()));
-    initializers.push(tensor_f32("two", Vec::new(), vec![2.0]));
     nodes.push(node(
-        "Pow",
-        &["two", "exponent"],
-        &["output"],
+        "Div",
+        &["neg_path", "path_scale"],
+        &["exponent"],
         Vec::new(),
     ));
+    initializers.push(tensor_f32("two", Vec::new(), vec![2.0]));
+    nodes.push(node("Pow", &["two", "exponent"], &["output"], Vec::new()));
 
     GraphProto {
         node: nodes,
@@ -921,12 +952,21 @@ fn lof_graph(model: &crate::training::model::LofModel, input_dim: usize) -> Grap
         &["squared_distance"],
         vec![attr_int("axis", -1), attr_int("keepdims", 1)],
     ));
-    nodes.push(node("Sqrt", &["squared_distance"], &["distance"], Vec::new()));
+    nodes.push(node(
+        "Sqrt",
+        &["squared_distance"],
+        &["distance"],
+        Vec::new(),
+    ));
     nodes.push(node(
         "TopK",
         &["distance", "k"],
         &["top_values", "top_indices"],
-        vec![attr_int("axis", -1), attr_int("largest", 0), attr_int("sorted", 1)],
+        vec![
+            attr_int("axis", -1),
+            attr_int("largest", 0),
+            attr_int("sorted", 1),
+        ],
     ));
     nodes.push(node(
         "ReduceMax",
@@ -947,7 +987,12 @@ fn lof_graph(model: &crate::training::model::LofModel, input_dim: usize) -> Grap
         .unwrap_or(1.0)
         .max(1e-9) as f32;
     initializers.push(tensor_f32("reference", Vec::new(), vec![median]));
-    nodes.push(node("Div", &["radius", "reference"], &["output"], Vec::new()));
+    nodes.push(node(
+        "Div",
+        &["radius", "reference"],
+        &["output"],
+        Vec::new(),
+    ));
 
     GraphProto {
         node: nodes,
@@ -994,7 +1039,12 @@ fn elliptic_graph(model: &crate::training::model::EllipticModel, input_dim: usiz
         &["transformed"],
         Vec::new(),
     ));
-    nodes.push(node("Mul", &["centered", "transformed"], &["product"], Vec::new()));
+    nodes.push(node(
+        "Mul",
+        &["centered", "transformed"],
+        &["product"],
+        Vec::new(),
+    ));
     nodes.push(node(
         "ReduceSum",
         &["product"],
@@ -1053,8 +1103,18 @@ fn rl_graph(trained: &TrainedModel, ensemble: &TreeEnsemble) -> LlmResult<GraphP
             .map(|feature| feature.scale as f32)
             .collect(),
     ));
-    nodes.push(node("Sub", &["state", "scaler_mean"], &["centered"], Vec::new()));
-    nodes.push(node("Div", &["centered", "scaler_scale"], &["scaled"], Vec::new()));
+    nodes.push(node(
+        "Sub",
+        &["state", "scaler_mean"],
+        &["centered"],
+        Vec::new(),
+    ));
+    nodes.push(node(
+        "Div",
+        &["centered", "scaler_scale"],
+        &["scaled"],
+        Vec::new(),
+    ));
     nodes.push(node(
         "Concat",
         &["scaled", "action"],
@@ -1112,31 +1172,41 @@ pub fn export_onnx(trained: &TrainedModel) -> LlmResult<Vec<u8>> {
     } else {
         match &trained.model {
             Model::Linear(model) => {
-                    // Bake standardisation into weights so ONNX accepts raw features.
-                    let mut model = model.clone();
-                    let means: Vec<f64> = trained.preprocessor.numeric.iter().map(|f| f.mean).collect();
-                    let scales: Vec<f64> = trained.preprocessor.numeric.iter().map(|f| f.scale).collect();
-                    let orig: Vec<f64> = model.weights.first().cloned().unwrap_or_default();
-                    let mut new_w = orig.clone();
-                    for (i, w) in new_w.iter_mut().enumerate() {
-                        let scale = scales.get(i).copied().unwrap_or(1.0).max(1e-12);
-                        *w /= scale;
-                    }
-                    let b_std = model.bias.get(0).copied().unwrap_or(0.0);
-                    let mut b_raw = b_std;
-                    for (i, w_std) in orig.iter().enumerate() {
-                        let mean = means.get(i).copied().unwrap_or(0.0);
-                        let scale = scales.get(i).copied().unwrap_or(1.0).max(1e-12);
-                        b_raw -= w_std * mean / scale;
-                    }
-                    if let Some(w) = model.weights.get_mut(0) {
-                        *w = new_w;
-                    }
-                    if let Some(b) = model.bias.get_mut(0) {
-                        *b = b_raw;
-                    }
-                    linear_graph(&model, input_dim.max(1))
+                // Bake standardisation into weights so ONNX accepts raw features.
+                let mut model = model.clone();
+                let means: Vec<f64> = trained
+                    .preprocessor
+                    .numeric
+                    .iter()
+                    .map(|f| f.mean)
+                    .collect();
+                let scales: Vec<f64> = trained
+                    .preprocessor
+                    .numeric
+                    .iter()
+                    .map(|f| f.scale)
+                    .collect();
+                let orig: Vec<f64> = model.weights.first().cloned().unwrap_or_default();
+                let mut new_w = orig.clone();
+                for (i, w) in new_w.iter_mut().enumerate() {
+                    let scale = scales.get(i).copied().unwrap_or(1.0).max(1e-12);
+                    *w /= scale;
                 }
+                let b_std = model.bias.get(0).copied().unwrap_or(0.0);
+                let mut b_raw = b_std;
+                for (i, w_std) in orig.iter().enumerate() {
+                    let mean = means.get(i).copied().unwrap_or(0.0);
+                    let scale = scales.get(i).copied().unwrap_or(1.0).max(1e-12);
+                    b_raw -= w_std * mean / scale;
+                }
+                if let Some(w) = model.weights.get_mut(0) {
+                    *w = new_w;
+                }
+                if let Some(b) = model.bias.get_mut(0) {
+                    *b = b_raw;
+                }
+                linear_graph(&model, input_dim.max(1))
+            }
             Model::Trees(model) => tree_graph(model, input_dim.max(1)),
             Model::Mlp(model) => {
                 let dim = model

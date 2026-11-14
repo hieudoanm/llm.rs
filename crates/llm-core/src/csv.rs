@@ -44,13 +44,7 @@ pub const BINARY_SIGNATURES: &[(&[u8], &str)] = &[
     (b"MZ", "a Windows executable"),
 ];
 
-pub const HTML_PREFIXES: &[&[u8]] = &[
-    b"<!doctype html",
-    b"<html",
-    b"<?xml",
-    b"<svg",
-    b"<script",
-];
+pub const HTML_PREFIXES: &[&[u8]] = &[b"<!doctype html", b"<html", b"<?xml", b"<svg", b"<script"];
 
 pub const UTF16_BOMS: &[&[u8]] = &[b"\xff\xfe", b"\xfe\xff"];
 pub const SNIFF_WINDOW: usize = 4096;
@@ -176,24 +170,25 @@ pub fn parse_csv(text: &str) -> LlmResult<(Vec<String>, usize)> {
         return Err(LlmError::validation("CSV has no header row"));
     }
     if header.len() < 2 {
-        return Err(LlmError::validation(
-            "CSV must have a header and at least one data column",
-        )
-        .with_details(json!({"field": "columns", "count": header.len()})));
+        return Err(
+            LlmError::validation("CSV must have a header and at least one data column")
+                .with_details(json!({"field": "columns", "count": header.len()})),
+        );
     }
     if header.len() > MAX_COLUMNS {
-        return Err(LlmError::validation(format!(
-            "CSV must have at most {MAX_COLUMNS} columns"
-        ))
-        .with_details(json!({"field": "columns", "limit": MAX_COLUMNS, "count": header.len()})));
+        return Err(
+            LlmError::validation(format!("CSV must have at most {MAX_COLUMNS} columns"))
+                .with_details(
+                    json!({"field": "columns", "limit": MAX_COLUMNS, "count": header.len()}),
+                ),
+        );
     }
     for (index, name) in header.iter().enumerate() {
         if name.is_empty() {
-            return Err(LlmError::validation(format!(
-                "Column {} has an empty name",
-                index + 1
-            ))
-            .with_details(json!({"field": "columns", "index": index})));
+            return Err(
+                LlmError::validation(format!("Column {} has an empty name", index + 1))
+                    .with_details(json!({"field": "columns", "index": index})),
+            );
         }
     }
 
@@ -217,10 +212,10 @@ pub fn parse_csv(text: &str) -> LlmResult<(Vec<String>, usize)> {
         }
     }
     if empty_columns.len() >= header.len() {
-        return Err(LlmError::validation(
-            "Every column is empty; the CSV has no usable data",
-        )
-        .with_details(json!({"field": "columns", "columns": empty_columns})));
+        return Err(
+            LlmError::validation("Every column is empty; the CSV has no usable data")
+                .with_details(json!({"field": "columns", "columns": empty_columns})),
+        );
     }
     if !empty_columns.is_empty() {
         return Err(LlmError::validation(format!(

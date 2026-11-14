@@ -121,19 +121,12 @@ impl Settings {
     }
 
     pub fn from_env() -> Self {
-        let allow_credentials = bool_env(
-            "LLM_CORS_ALLOW_CREDENTIALS",
-            DEFAULT_CORS_ALLOW_CREDENTIALS,
-        );
+        let allow_credentials =
+            bool_env("LLM_CORS_ALLOW_CREDENTIALS", DEFAULT_CORS_ALLOW_CREDENTIALS);
         Self {
             database_url: database_url(),
             data_dir: data_dir(),
-            max_upload_mb: int_env(
-                "LLM_MAX_UPLOAD_MB",
-                DEFAULT_MAX_UPLOAD_MB,
-                1,
-                MAX_UPLOAD_MB,
-            ),
+            max_upload_mb: int_env("LLM_MAX_UPLOAD_MB", DEFAULT_MAX_UPLOAD_MB, 1, MAX_UPLOAD_MB),
             log_level: log_level(),
             cors_origins: cors_origins(allow_credentials),
             cors_allow_credentials: allow_credentials,
@@ -230,9 +223,7 @@ fn env(name: &str) -> Option<String> {
 }
 
 fn warn_invalid(name: &str, value: &str, reason: &str, fallback: &dyn std::fmt::Debug) {
-    warn!(
-        "Invalid value for {name}={value:?} ({reason}); falling back to {fallback:?}."
-    );
+    warn!("Invalid value for {name}={value:?} ({reason}); falling back to {fallback:?}.");
 }
 
 fn bool_env(name: &str, default: bool) -> bool {
@@ -418,7 +409,10 @@ mod tests {
         assert_eq!(settings.log_level, "DEBUG");
         assert_eq!(
             settings.cors_origins,
-            vec!["https://a.example".to_string(), "https://b.example".to_string()]
+            vec![
+                "https://a.example".to_string(),
+                "https://b.example".to_string()
+            ]
         );
         assert!(settings.cors_allow_credentials);
         assert!(!settings.enable_interactive_docs);

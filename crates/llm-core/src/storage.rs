@@ -45,7 +45,11 @@ pub fn storage_key_for(prefix: &str, entity_id: Uuid, suffix: &str) -> String {
 pub fn sha256_bytes(data: &[u8]) -> String {
     let mut hasher = Sha256::new();
     hasher.update(data);
-    hasher.finalize().iter().map(|b| format!("{b:02x}")).collect()
+    hasher
+        .finalize()
+        .iter()
+        .map(|b| format!("{b:02x}"))
+        .collect()
 }
 
 pub fn sha256_of_file(path: &Path) -> LlmResult<String> {
@@ -76,7 +80,11 @@ pub fn artefact_dir(job_id: Uuid) -> PathBuf {
 }
 
 /// Write an artefact and return `(storage_key, path, byte_size)`.
-pub fn write_artefact(job_id: Uuid, data: &[u8], filename: &str) -> LlmResult<(String, PathBuf, i64)> {
+pub fn write_artefact(
+    job_id: Uuid,
+    data: &[u8],
+    filename: &str,
+) -> LlmResult<(String, PathBuf, i64)> {
     ensure_dirs()?;
     let dir = artefact_dir(job_id);
     std::fs::create_dir_all(&dir)?;
